@@ -1,0 +1,8 @@
+.DS_Store
+node_modules/
+
+# Editor folders
+.vscode/
+.idea/
+*.swp
+*.swo
