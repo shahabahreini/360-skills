@@ -18,10 +18,10 @@ Because quality failures hide in the angles nobody looked at. Every skill in thi
 
 ```bash
 # Any agent (Claude Code, Cursor, Codex, Windsurf, Copilot...)
-npx skills add <username>/360-skills
+npx skills add shahabahreini/360-skills
 
 # Or as a Claude Code marketplace
-/plugin marketplace add <username>/360-skills
+/plugin marketplace add shahabahreini/360-skills
 ```
 
 ## Philosophy
