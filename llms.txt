@@ -1,0 +1,20 @@
+# 360-skills
+
+> 360-skills is an open, MIT-licensed collection of Agent Skills: installable `SKILL.md` packages that give AI coding agents (Claude Code, Cursor, Codex, and 70+ others via skills.sh) senior-level expertise for specific, high-stakes tasks.
+
+Skills follow the open Agent Skills format (https://agentskills.io) and install with a single command via the skills.sh CLI (https://skills.sh). Every skill lives at `skills/<name>/SKILL.md` and is self-contained: install it, and the target agent gains that capability on demand through progressive disclosure.
+
+## Skills
+
+- [360-expert-review](https://github.com/shahabahreini/360-skills/blob/main/skills/360-expert-review/SKILL.md): Pre-finalization plan review by a virtual panel of senior experts. Stress-tests plans for user experience, reliability, scenario coverage, and traceability before anything ships.
+
+## Docs
+
+- [README](https://github.com/shahabahreini/360-skills/blob/main/README.md): Overview, installation instructions, and the full skills index.
+- [AGENTS.md](https://github.com/shahabahreini/360-skills/blob/main/AGENTS.md): Contributor guide for adding new skills to this repository.
+- [LICENSE](https://github.com/shahabahreini/360-skills/blob/main/LICENSE): MIT license text.
+
+## Optional
+
+- [Agent Skills specification](https://agentskills.io): The open standard this repository's skills conform to.
+- [skills.sh](https://skills.sh): The CLI and registry used to install skills from this repository.
