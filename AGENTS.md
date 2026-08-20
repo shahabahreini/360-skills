@@ -1,4 +1,4 @@
-# AGENTS.md — Contributor Guide for Agents
+# AGENTS.md: Contributor Guide for Agents
 
 This file tells AI agents how to add new skills to this repository. Follow it exactly.
 
@@ -29,25 +29,25 @@ version: 1.0.0
 ---
 ```
 
-- `name` — must exactly match the folder name
-- `description` — a single sentence, action-oriented, that tells an agent both what the skill does and when to reach for it
-- `version` — semantic version (`MAJOR.MINOR.PATCH`)
+- `name`: must exactly match the folder name
+- `description`: a single sentence, action-oriented, that tells an agent both what the skill does and when to reach for it
+- `version`: semantic version (`MAJOR.MINOR.PATCH`)
 
 ## Required Skill Body Structure
 
 Every `SKILL.md` follows this section order:
 
-1. **Purpose** — why this skill exists, in one or two sentences
-2. **When to Use** — concrete triggers for reaching for this skill
-3. **Core Principle** — the single idea the skill is built around
-4. **Workflow** — the ordered steps the agent executes
-5. **Output Format** — the exact shape of the final deliverable
-6. **Quality Gate** — a yes/no checklist that must fully pass before the work is considered done
+1. **Purpose**: why this skill exists, in one or two sentences
+2. **When to Use**: concrete triggers for reaching for this skill
+3. **Core Principle**: the single idea the skill is built around
+4. **Workflow**: the ordered steps the agent executes
+5. **Output Format**: the exact shape of the final deliverable
+6. **Quality Gate**: a yes/no checklist that must fully pass before the work is considered done
 
 ## Style Rules
 
 - Brief. Imperative. No filler.
-- No redundant restrictions — say a thing once, in the place it matters.
+- No redundant restrictions. Say a thing once, in the place it matters.
 - Usable by any agent, not just one product's assistant.
 - Prefer concrete checklists and steps over abstract advice.
 
@@ -55,8 +55,8 @@ Every `SKILL.md` follows this section order:
 
 Adding a skill to `skills/` (not `.experimental/`) is not complete until both of these are updated:
 
-1. **`README.md`** — add a row to the skills index table with name, one-line description, and status.
-2. **`.claude-plugin/marketplace.json`** — add an entry to `plugins`:
+1. **`README.md`**: add a row to the skills index table with name, one-line description, and status.
+2. **`.claude-plugin/marketplace.json`**: add an entry to `plugins`:
    ```json
    {
      "name": "<skill-name>",

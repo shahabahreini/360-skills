@@ -1,12 +1,12 @@
 # 360-skills
 
-**A curated collection of specialized agent skills that boost the outcome quality of AI agents — every angle, covered.**
+**A curated collection of specialized agent skills that boost the outcome quality of AI agents: every angle, covered.**
 
-Most AI agents produce plausible work. 360-skills makes them produce *excellent* work. Each skill injects senior-level expertise, rigorous process, and hard quality gates into the agent's workflow — so plans get stress-tested before they're finalized, and nothing ships with blind spots.
+Most AI agents produce plausible work. 360-skills makes them produce *excellent* work. Each skill injects senior-level expertise, rigorous process, and hard quality gates into the agent's workflow, so plans get stress-tested before they're finalized and nothing ships with blind spots.
 
 ## Why "360"?
 
-Because quality failures hide in the angles nobody looked at. Every skill in this collection examines the problem from all sides — user experience, engineering reliability, edge cases, traceability, risk — before declaring anything done.
+Because quality failures hide in the angles nobody looked at. Every skill in this collection examines the problem from all sides (user experience, engineering reliability, edge cases, traceability, risk) before declaring anything done.
 
 ## Skills
 
@@ -26,10 +26,10 @@ npx skills add shahabahreini/360-skills
 
 ## Philosophy
 
-1. **Expertise over templates** — skills simulate senior specialists, not checklists
-2. **Coverage over speed** — every scenario, every effect, every failure mode
-3. **Gates over suggestions** — nothing is "final" until it passes the quality gate
-4. **Simplicity over ceremony** — brief, strong, usable by everyone
+1. **Expertise over templates**: skills simulate senior specialists, not checklists
+2. **Coverage over speed**: every scenario, every effect, every failure mode
+3. **Gates over suggestions**: nothing is "final" until it passes the quality gate
+4. **Simplicity over ceremony**: brief, strong, usable by everyone
 
 ## License
 
