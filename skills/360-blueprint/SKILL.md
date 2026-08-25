@@ -1,7 +1,7 @@
 ---
 name: 360-blueprint
 description: Universal plan creator. Brings superhuman rigor to planning any objective — software, business, creative, operational, personal. Clarifies the true objective, thinks from first principles, enforces the quality standards of the domain, and delivers a crystal-clear, self-contained plan report that any AI agent can execute without guessing.
-version: 1.3.0
+version: 1.4.0
 ---
 
 # 360 Blueprint
@@ -34,6 +34,7 @@ Never plan toward fog.
 - Separate the stated request from the real goal; restate the objective back in the user's own terms and proceed only on confirmation
 - Check legitimacy and feasibility first — if the objective is harmful, impossible, or self-contradictory, say so before planning, not after
 - Surface every hidden objective, constraint, and deadline
+- Ask the user whether to apply `360-token-efficiency` during implementation of this plan — if yes, add it as a loaded skill in every implementation task in Section 6 and note it in Section 10
 - If anything is ambiguous, ask. Questions are cheaper than wrong plans
 
 ### 2. See From Every Angle
@@ -58,6 +59,7 @@ The superhuman pass — examine the problem the way no single mind would:
 - Structure: phases → tasks, ordered by dependency, each independently verifiable
 - Every task answers: **what** is done, **how** it is done, **where** it applies, and **done when** — the observable check that proves completion
 - Every task is marked: effort (S/M/L), priority (must / should / could), and whether it can run in parallel
+- If token efficiency was accepted in Step 1, every implementation task also lists `Skills: 360-token-efficiency` alongside any other loaded skill
 - Define the cut line — which should/could tasks drop first when constraints tighten. They always tighten
 - Zero vague words. Banned unless precisely defined: "appropriate", "handle", "optimize", "etc.", "as needed", "and so on" — this skill included
 - Names, terms, and definitions stay identical from first mention to last
@@ -112,6 +114,7 @@ Output every plan as an organized report in exactly this structure:
 | Status | Draft / Ready for review |
 | Version | <version or date> |
 | Created | <date> |
+| Token efficiency | Enabled (360-token-efficiency) / Not requested |
 
 ## 1. Objective & Definition of Done
 - Goal: <the real objective, confirmed with the user>
@@ -148,6 +151,7 @@ Checkpoint: <criterion that must hold before Phase 2 begins>
 - What: <what is done>
 - How: <how it is done, step by step where needed>
 - Where: <artifacts, areas, or components affected>
+- Skills: <e.g. 360-token-efficiency, if enabled, plus any other loaded skill, or "none">
 - Depends on: <task IDs or "none"> | Parallel: <yes/no>
 - Effort: <S/M/L> | Priority: <must/should/could>
 - Done when: <observable acceptance check>
@@ -175,6 +179,7 @@ Checkpoint: <criterion that must hold before Phase 2 begins>
 
 ## 10. Handover Summary
 - Executor must know: <everything a fresh agent needs, in one place>
+- Token efficiency: <"Load 360-token-efficiency for all implementation tasks" or "Not requested">
 - Cut line: <tasks that drop first if constraints tighten>
 - Open questions: <...>
 - Decision points: <...>
@@ -185,6 +190,7 @@ Checkpoint: <criterion that must hold before Phase 2 begins>
 The plan is ready only when every answer is yes:
 
 - The objective is crystal clear, restated in the user's terms, and confirmed — and it passed the legitimacy and feasibility check
+- The user was explicitly asked about applying `360-token-efficiency`, and the answer is reflected consistently across Section 6 and Section 10
 - Zero vague terms; zero unstated assumptions; every assumption is falsifiable
 - Every task is executable without guessing — what, how, where, and done-when are all present
 - Every task carries effort, priority, and parallel markings; the cut line is defined

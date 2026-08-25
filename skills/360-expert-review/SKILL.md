@@ -1,7 +1,7 @@
 ---
 name: 360-expert-review
 description: Pre-finalization plan review. Build a project-specific panel of senior experts, examine the plan from every angle (user experience, reliability, scenarios, traceability), then attack it as a hostile critic. Finalize only when it survives.
-version: 2.0.0
+version: 2.1.0
 ---
 
 # 360 Expert Review
@@ -31,6 +31,7 @@ Before judging the plan, establish:
 - Users, stakeholders, constraints, dependencies, assumptions
 - What must not break
 - Ask any question to have a crystal clear what is needed and how should it work
+- Ask the user whether a handover plan for the next AI agent should be generated after finalization — if yes, produce it per Step 8; if no, skip Step 8 and state in the Final Plan Format that no handover was requested
 
 Missing something critical? Ask, or state the assumption explicitly. Never guess silently.
 
@@ -97,6 +98,21 @@ Switch to hostile critic. Ask:
 
 Don't list concerns. Fix them. Revise and re-attack until no high-severity issue remains open.
 
+### 8. Generate the Handover Plan (Only If Requested)
+
+If the user confirmed a handover is wanted in Step 1, produce it now. It must be flawless: zero gaps, zero ambiguity. The handover must tell the next agent:
+
+- Context: what this plan covers and what the review found
+- Decisions: what was changed, what was deliberately kept, and why
+- Tasks: what to do, in what order, exactly how, and exactly where
+- Verification: what to check after each task to confirm correct implementation
+- Risks: what could break and how to detect it early
+- State: what is done, what is pending, what is blocked
+
+If the next agent would have to guess anything, the handover is not finished. Ask the user whether to issue it as a standalone prompt or a document.
+
+If no handover was requested, skip this step entirely and mark it "Not requested" in the Final Plan Format.
+
 ## Final Plan Format
 
 Present the finished plan as:
@@ -111,6 +127,7 @@ Present the finished plan as:
 8. Observability & debugging path
 9. Release, monitoring & rollback
 10. Risks found, how they were resolved, and why this is the best final plan
+11. Handover plan for the next AI agent, or "Not requested" if the user declined
 
 ## Quality Gate
 
@@ -125,5 +142,6 @@ The plan is final only when every answer is yes:
 - Testing matches the risk
 - Safe release and a viable rollback
 - Survived aggressive criticism
+- The user was explicitly asked about a handover plan, and the outcome (generated, with zero guessing, or explicitly skipped) is reflected in the Final Plan Format
 
 Any "no" means not final. Fix it and review again.

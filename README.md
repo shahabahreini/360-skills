@@ -24,13 +24,14 @@ npx skills add shahabahreini/360-skills --skill 360-expert-review --agent claude
 
 | Skill | Description | Version |
 |---|---|---|
-| [`360-blueprint`](skills/360-blueprint) | Universal plan creator. Clarifies the true objective, applies first-principles and inversion thinking, and delivers a crystal-clear, self-contained plan any agent can execute without guessing. | 1.3.0 |
-| [`360-expert-review`](skills/360-expert-review) | Pre-finalization plan review by a virtual panel of senior experts. Stress-tests plans for user experience, reliability, scenario coverage, and traceability before anything ships. | 2.0.0 |
+| [`360-blueprint`](skills/360-blueprint) | Universal plan creator. Clarifies the true objective, applies first-principles and inversion thinking, and delivers a crystal-clear, self-contained plan any agent can execute without guessing. | 1.4.0 |
+| [`360-expert-review`](skills/360-expert-review) | Pre-finalization plan review by a virtual panel of senior experts. Stress-tests plans for user experience, reliability, scenario coverage, and traceability before anything ships. | 2.1.0 |
 | [`360-backend-audit`](skills/360-backend-audit) | Deep audit of backend code: APIs, services, business logic, data layers, integrations, and jobs. Verifies accuracy, removes dead weight and duplication, finds safe performance wins, and hardens observability without trading away functionality or reliability. | 1.0.0 |
+| [`360-token-efficiency`](skills/360-token-efficiency) | Runtime skill that cuts token usage during any task through context triage, difficulty-aware effort sizing, and progressive disclosure, without changing the outcome. Layers underneath any other skill. | 1.0.0 |
 
 ## How the Skills Work Together
 
-Each skill is useful alone, but they are designed to hand off to one another when used sequentially on the same piece of work:
+Most skills hand off to one another sequentially on the same piece of work. `360-token-efficiency` is different: it is a runtime overlay that runs underneath any of the others rather than a step of its own.
 
 ```mermaid
 flowchart TD
@@ -40,14 +41,20 @@ flowchart TD
     Review --> Build["Implementation: build what the plan describes"]
     Build --> Audit["360-backend-audit: audit the resulting backend code"]
     Audit -->|findings seed the next objective| Objective
+
+    Efficiency["360-token-efficiency: runs underneath every step"] -.-> Blueprint
+    Efficiency -.-> Review
+    Efficiency -.-> Build
+    Efficiency -.-> Audit
 ```
 
-- **`360-blueprint`** turns a vague goal into a complete, unambiguous plan.
-- **`360-expert-review`** takes that plan and attacks it from every expert angle until only the strongest version survives.
+- **`360-blueprint`** turns a vague goal into a complete, unambiguous plan, and asks whether `360-token-efficiency` should be enabled for the implementation work that follows.
+- **`360-expert-review`** takes that plan and attacks it from every expert angle until only the strongest version survives, then, if requested, produces a zero-guesswork handover plan for the next AI agent.
 - The finalized plan gets **implemented** (by a human, an agent, or both).
 - **`360-backend-audit`** then audits the resulting backend code for correctness, duplication, performance, and observability, feeding any findings back into the next planning cycle.
+- **`360-token-efficiency`** runs continuously alongside whichever skill is active, trimming token usage without changing what any of them produce.
 
-Each skill also works standalone: skip straight to `360-expert-review` for a plan someone else drafted, or run `360-backend-audit` on existing code with no plan involved at all.
+Each skill also works standalone: skip straight to `360-expert-review` for a plan someone else drafted, run `360-backend-audit` on existing code with no plan involved at all, or apply `360-token-efficiency` to any task regardless of which other skills are in play.
 
 ## Design Principles
 
@@ -72,7 +79,9 @@ A skill is a folder containing a `SKILL.md` file with a `name`, a `description`,
     │   └── SKILL.md         Skill definition and instructions
     ├── 360-expert-review/
     │   └── SKILL.md         Skill definition and instructions
-    └── 360-backend-audit/
+    ├── 360-backend-audit/
+    │   └── SKILL.md         Skill definition and instructions
+    └── 360-token-efficiency/
         └── SKILL.md         Skill definition and instructions
 ```
 

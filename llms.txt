@@ -9,6 +9,7 @@ Skills follow the open Agent Skills format (https://agentskills.io) and install 
 - [360-blueprint](https://github.com/shahabahreini/360-skills/blob/main/skills/360-blueprint/SKILL.md): Universal plan creator. Clarifies the true objective, applies first-principles and inversion thinking, and delivers a crystal-clear, self-contained plan any agent can execute without guessing.
 - [360-expert-review](https://github.com/shahabahreini/360-skills/blob/main/skills/360-expert-review/SKILL.md): Pre-finalization plan review by a virtual panel of senior experts. Stress-tests plans for user experience, reliability, scenario coverage, and traceability before anything ships.
 - [360-backend-audit](https://github.com/shahabahreini/360-skills/blob/main/skills/360-backend-audit/SKILL.md): Deep audit of backend code: APIs, services, business logic, data layers, integrations, and jobs. Verifies accuracy, removes dead weight and duplication, finds safe performance wins, and hardens observability without trading away functionality or reliability.
+- [360-token-efficiency](https://github.com/shahabahreini/360-skills/blob/main/skills/360-token-efficiency/SKILL.md): Runtime skill that cuts token usage during any task through context triage, difficulty-aware effort sizing, and progressive disclosure, without changing the outcome. Layers underneath any other skill.
 
 ## Docs
 
