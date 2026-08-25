@@ -7,6 +7,7 @@ Skills follow the open Agent Skills format (https://agentskills.io) and install 
 ## Skills
 
 - [360-expert-review](https://github.com/shahabahreini/360-skills/blob/main/skills/360-expert-review/SKILL.md): Pre-finalization plan review by a virtual panel of senior experts. Stress-tests plans for user experience, reliability, scenario coverage, and traceability before anything ships.
+- [360-backend-audit](https://github.com/shahabahreini/360-skills/blob/main/skills/360-backend-audit/SKILL.md): Deep audit of backend code: APIs, services, business logic, data layers, integrations, and jobs. Verifies accuracy, removes dead weight and duplication, finds safe performance wins, and hardens observability without trading away functionality or reliability.
 
 ## Docs
 

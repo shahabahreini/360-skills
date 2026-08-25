@@ -25,6 +25,7 @@ npx skills add shahabahreini/360-skills --skill 360-expert-review --agent claude
 | Skill | Description | Version |
 |---|---|---|
 | [`360-expert-review`](skills/360-expert-review) | Pre-finalization plan review by a virtual panel of senior experts. Stress-tests plans for user experience, reliability, scenario coverage, and traceability before anything ships. | 2.0.0 |
+| [`360-backend-audit`](skills/360-backend-audit) | Deep audit of backend code: APIs, services, business logic, data layers, integrations, and jobs. Verifies accuracy, removes dead weight and duplication, finds safe performance wins, and hardens observability without trading away functionality or reliability. | 1.0.0 |
 
 ## Design Principles
 
@@ -45,7 +46,9 @@ A skill is a folder containing a `SKILL.md` file with a `name`, a `description`,
 ├── AGENTS.md               Contributor guide for adding new skills
 ├── LICENSE                 MIT license
 └── skills/
-    └── 360-expert-review/
+    ├── 360-expert-review/
+    │   └── SKILL.md         Skill definition and instructions
+    └── 360-backend-audit/
         └── SKILL.md         Skill definition and instructions
 ```
 

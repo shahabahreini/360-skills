@@ -30,6 +30,7 @@ Before judging the plan, establish:
 - The nature of the project and the expertise it demands
 - Users, stakeholders, constraints, dependencies, assumptions
 - What must not break
+- Ask any question to have a crystal clear what is needed and how should it work
 
 Missing something critical? Ask, or state the assumption explicitly. Never guess silently.
 
