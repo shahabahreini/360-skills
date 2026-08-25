@@ -24,8 +24,30 @@ npx skills add shahabahreini/360-skills --skill 360-expert-review --agent claude
 
 | Skill | Description | Version |
 |---|---|---|
+| [`360-blueprint`](skills/360-blueprint) | Universal plan creator. Clarifies the true objective, applies first-principles and inversion thinking, and delivers a crystal-clear, self-contained plan any agent can execute without guessing. | 1.3.0 |
 | [`360-expert-review`](skills/360-expert-review) | Pre-finalization plan review by a virtual panel of senior experts. Stress-tests plans for user experience, reliability, scenario coverage, and traceability before anything ships. | 2.0.0 |
 | [`360-backend-audit`](skills/360-backend-audit) | Deep audit of backend code: APIs, services, business logic, data layers, integrations, and jobs. Verifies accuracy, removes dead weight and duplication, finds safe performance wins, and hardens observability without trading away functionality or reliability. | 1.0.0 |
+
+## How the Skills Work Together
+
+Each skill is useful alone, but they are designed to hand off to one another when used sequentially on the same piece of work:
+
+```mermaid
+flowchart TD
+    Objective([Objective to plan]) --> Blueprint["360-blueprint: draft the plan"]
+    Blueprint --> Review["360-expert-review: stress-test and finalize the plan"]
+    Review -->|fails the gate, revise| Blueprint
+    Review --> Build["Implementation: build what the plan describes"]
+    Build --> Audit["360-backend-audit: audit the resulting backend code"]
+    Audit -->|findings seed the next objective| Objective
+```
+
+- **`360-blueprint`** turns a vague goal into a complete, unambiguous plan.
+- **`360-expert-review`** takes that plan and attacks it from every expert angle until only the strongest version survives.
+- The finalized plan gets **implemented** (by a human, an agent, or both).
+- **`360-backend-audit`** then audits the resulting backend code for correctness, duplication, performance, and observability, feeding any findings back into the next planning cycle.
+
+Each skill also works standalone: skip straight to `360-expert-review` for a plan someone else drafted, or run `360-backend-audit` on existing code with no plan involved at all.
 
 ## Design Principles
 
@@ -46,6 +68,8 @@ A skill is a folder containing a `SKILL.md` file with a `name`, a `description`,
 ├── AGENTS.md               Contributor guide for adding new skills
 ├── LICENSE                 MIT license
 └── skills/
+    ├── 360-blueprint/
+    │   └── SKILL.md         Skill definition and instructions
     ├── 360-expert-review/
     │   └── SKILL.md         Skill definition and instructions
     └── 360-backend-audit/
