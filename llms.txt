@@ -11,18 +11,18 @@ Skills follow the open Agent Skills format (https://agentskills.io) and install 
 ## Skills
 
 ### Planning & Architecture
-- [360-blueprint](https://github.com/shahabahreini/360-skills/blob/main/skills/360-blueprint/SKILL.md): Universal plan creator for new objectives, features, RFCs, and migrations in any domain. Clarifies the real objective, separates confirmation from generation, avoids invented details, enforces domain quality, and produces a self-contained plan an agent can execute without guessing.
+- [360-blueprint](https://github.com/shahabahreini/360-skills/blob/main/skills/360-blueprint/SKILL.md): Create an executable plan from a new objective — clarify first, write the full plan to a file, and brief the user in chat — when a goal exists but the path is unclear or the request is "plan this".
 - [360-faculty](https://github.com/shahabahreini/360-skills/blob/main/skills/360-faculty/SKILL.md): Seat a living, tailored expert team on a plan or task. Use when work must fit this developer's goals, taste, mindset, and strategy, when a plan needs the right expertise chosen for its complexity, depth, and nature, or when a named faculty team must be created, called, or updated. Recommends a short list, asks only the questions that still change the work, polishes immediately, and keeps upgradable memory.
 
 ### Hardening & Quality Gates
-- [360-expert-review](https://github.com/shahabahreini/360-skills/blob/main/skills/360-expert-review/SKILL.md): Pre-finalization plan review and adversarial pre-mortem that stress-tests draft plans for user impact, reliability, security, rollback, traceability, and edge cases. Uses direct expert lenses instead of persona theater and finalizes only after hostile review.
+- [360-expert-review](https://github.com/shahabahreini/360-skills/blob/main/skills/360-expert-review/SKILL.md): Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage.
 
 ### Execution & Code Auditing
-- [360-execute](https://github.com/shahabahreini/360-skills/blob/main/skills/360-execute/SKILL.md): Faithful plan execution with enforced coverage. Executes a finalized plan task by task, tracks every item in a coverage ledger, verifies each against its acceptance check with evidence, surfaces deviations instead of absorbing them, and finishes with a full-coverage QC sweep and flawless handover. Nothing on the plan is skipped, dropped, or claimed done without proof.
-- [360-backend-audit](https://github.com/shahabahreini/360-skills/blob/main/skills/360-backend-audit/SKILL.md): Deep audit of backend code, APIs, services, business logic, data layers, integrations, and jobs. Verifies correctness, hunts dead weight and duplication, finds safe performance risks, hardens observability, and ends with a usable handover. Functionality, reliability, and accuracy are never traded away.
+- [360-execute](https://github.com/shahabahreini/360-skills/blob/main/skills/360-execute/SKILL.md): Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and brief the user in chat. Use when a plan exists and work must begin, or when resuming a partial execution.
+- [360-backend-audit](https://github.com/shahabahreini/360-skills/blob/main/skills/360-backend-audit/SKILL.md): Deep-audit backend code, write the full report to a file, and brief the user in chat with bugs, updates, and dead weight. Use before or after significant backend work, or when inheriting, refactoring, or handing off services.
 
 ### Token & Cost Optimization
-- [360-token-efficiency](https://github.com/shahabahreini/360-skills/blob/main/skills/360-token-efficiency/SKILL.md): Runtime skill that reduces token waste during AI-agent tasks without dropping facts, changing requirements, or weakening correctness. Applies silent context discipline, effort sizing, progressive disclosure, compaction, and concise output. Use continuously alongside other skills when token cost matters.
+- [360-token-efficiency](https://github.com/shahabahreini/360-skills/blob/main/skills/360-token-efficiency/SKILL.md): Runtime skill that reduces token waste during AI-agent tasks without dropping facts, changing requirements, or weakening correctness. Use continuously alongside other skills when token cost matters.
 
 ## Documentation
 

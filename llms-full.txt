@@ -51,12 +51,12 @@ npx skills add shahabahreini/360-skills --skill 360-expert-review --agent claude
 
 | Skill                                                 | Description                                                                                                                                                                                                                                                                                                      | Version |
 | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| [`360-blueprint`](skills/360-blueprint)               | Universal plan creator for new objectives, features, RFCs, and migrations in any domain. Clarifies the real objective, separates confirmation from generation, avoids invented details, enforces domain quality, and produces a self-contained plan an agent can execute without guessing.                       | 2.1.0   |
+| [`360-blueprint`](skills/360-blueprint)               | Create an executable plan from a new objective — clarify first, write the full plan to a file, and brief the user in chat — when a goal exists but the path is unclear or the request is "plan this".                                                                                                          | 1.6.0   |
 | [`360-faculty`](skills/360-faculty)                   | Seat a living, tailored expert team on a plan or task. Use when work must fit this developer's goals, taste, mindset, and strategy, when a plan needs the right expertise chosen for its complexity, depth, and nature, or when a named faculty team must be created, called, or updated. Recommends a short list, asks only the questions that still change the work, polishes immediately, and keeps upgradable memory. | 1.0.0   |
-| [`360-expert-review`](skills/360-expert-review)       | Pre-finalization plan review and adversarial pre-mortem that stress-tests draft plans for user impact, reliability, security, rollback, traceability, and edge cases. Uses direct expert lenses instead of persona theater and finalizes only after hostile review.                                             | 3.1.0   |
-| [`360-execute`](skills/360-execute)                   | Faithful plan execution with enforced coverage. Executes a finalized plan task by task, tracks every item in a coverage ledger, verifies each against its acceptance check with evidence, surfaces deviations instead of absorbing them, and finishes with a full-coverage QC sweep and flawless handover. Nothing on the plan is skipped, dropped, or claimed done without proof. | 1.1.0   |
-| [`360-backend-audit`](skills/360-backend-audit)       | Deep audit of backend code, APIs, services, business logic, data layers, integrations, and jobs. Verifies correctness, hunts dead weight and duplication, finds safe performance risks, hardens observability, and ends with a usable handover. Functionality, reliability, and accuracy are never traded away.  | 1.2.0   |
-| [`360-token-efficiency`](skills/360-token-efficiency) | Runtime skill that reduces token waste during AI-agent tasks without dropping facts, changing requirements, or weakening correctness. Applies silent context discipline, effort sizing, progressive disclosure, compaction, and concise output. Use continuously alongside other skills when token cost matters. | 1.2.1   |
+| [`360-expert-review`](skills/360-expert-review)       | Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage.                                                                                                                    | 2.3.0   |
+| [`360-execute`](skills/360-execute)                   | Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and brief the user in chat. Use when a plan exists and work must begin, or when resuming a partial execution.                                                                                         | 1.1.0   |
+| [`360-backend-audit`](skills/360-backend-audit)       | Deep-audit backend code, write the full report to a file, and brief the user in chat with bugs, updates, and dead weight. Use before or after significant backend work, or when inheriting, refactoring, or handing off services.                                                                             | 1.2.0   |
+| [`360-token-efficiency`](skills/360-token-efficiency) | Runtime skill that reduces token waste during AI-agent tasks without dropping facts, changing requirements, or weakening correctness. Use continuously alongside other skills when token cost matters.                                                                                                         | 1.2.0   |
 
 ## Which Skill Do I Need?
 
@@ -97,11 +97,11 @@ flowchart TD
 
 The four planning skills share one data contract: `360-blueprint`'s Plan Template. Every task carries a stable ID, a declared skill list, `must` / `should` / `could` priority, and an observable `Done when` check. `360-faculty` tailors the plan and `360-expert-review` hardens it, neither breaking that shape, and `360-execute` reads those exact fields. That is what lets a plan travel the whole pipeline without anyone re-typing it.
 
-- **`360-blueprint`** turns a vague goal into a complete, unambiguous plan with explicit assumptions, constraints, risks, and handover details.
+- **`360-blueprint`** turns a vague goal into a complete, unambiguous plan written directly to a file, briefing the user in chat with key decisions, assumptions, and risks.
 - **`360-faculty`** seats a short list of named experts fitted to this developer and to the plan's own complexity, depth, and nature, tailoring it surgically, remembering what it learns, and saving reusable teams that can be called by name later.
-- **`360-expert-review`** attacks that plan from every expert angle until only the strongest version survives, returning it in the same template with its findings, coverage, and verdict appended.
-- **`360-execute`** builds it, tracking every task in a coverage ledger written to disk, verifying each against its own acceptance check with evidence, and surfacing deviations instead of absorbing them.
-- **`360-backend-audit`** audits the resulting backend code for correctness, duplication, performance risks, and observability, ending with a usable handover and feeding findings back into the next planning cycle.
+- **`360-expert-review`** attacks that plan from every expert angle until only the strongest version survives, writing the finalized plan back to the file and briefing the user in chat.
+- **`360-execute`** builds it, tracking every task in a coverage ledger written to disk, verifying each against its own acceptance check with evidence, and briefing progress in chat.
+- **`360-backend-audit`** audits the resulting backend code for correctness, duplication, performance risks, and observability, writing the full report to a file and briefing findings in chat.
 - **`360-token-efficiency`** runs continuously alongside whichever skill is active, reducing token waste without dropping facts, changing requirements, or weakening correctness.
 
 Each skill also works standalone: ask `360-faculty` which expertise a plan needs without seating anyone, skip straight to `360-expert-review` for a plan someone else drafted, point `360-execute` at a plan someone else finalized, run `360-backend-audit` on existing code with no plan involved at all, or apply `360-token-efficiency` to any task regardless of which other skills are in play.
@@ -284,7 +284,7 @@ Run `node scripts/check-consistency.mjs`. It enforces most of this list mechanic
 
 ---
 name: 360-backend-audit
-description: Deep audit of backend code, APIs, services, business logic, data layers, integrations, and jobs. Verifies correctness, hunts dead weight and duplication, finds safe performance risks, hardens observability, and ends with a usable handover. Functionality, reliability, and accuracy are never traded away.
+description: Deep-audit backend code, write the full report to a file, and brief the user in chat with bugs, updates, and dead weight. Use before or after significant backend work, or when inheriting, refactoring, or handing off services.
 version: 1.2.0
 ---
 
@@ -292,11 +292,11 @@ version: 1.2.0
 
 ## Purpose
 
-Run this skill on backend code: APIs, services, business logic, data access layers, integrations, background jobs, and pipelines. Its job is to turn working backend code into correct, lean, observable, and transferable code without breaking what already works.
+Run this skill on backend code: APIs, services, business logic, data access layers, integrations, background jobs, and pipelines. Turn working backend code into correct, lean, observable, and transferable code without breaking what already works.
 
-This skill is technology-agnostic. It audits logic, structure, and data flow, not the syntax of a specific stack.
+Technology-agnostic: audit logic, structure, and data flow, not stack syntax.
 
-The code it audits often came from `360-execute`, and its findings seed the next `360-blueprint` cycle. Run `360-token-efficiency` alongside this skill when context or cost matters.
+The full audit lives in a file. Chat gets a short briefing only.
 
 ## When to Use
 
@@ -312,6 +312,8 @@ Working backend code is not finished code. Audit what exists that should not, wh
 
 Functionality, reliability, and accuracy are untouchable. A fast bug is still a bug.
 
+The file is the audit. Chat is the briefing.
+
 ## Workflow
 
 ### 1. Map Before You Cut
@@ -323,28 +325,13 @@ Functionality, reliability, and accuracy are untouchable. A fast bug is still a 
 
 ### 2. Hunt Dead Weight
 
-Find and document:
-
-- Dead code
-- Redundant code
-- Incomplete logic
-- Swallowed failures
-- Stale flags, orphaned config, and unused paths
-
-Every finding needs evidence. No evidence, no removal.
+Find and document, with evidence only: dead code, redundant code, incomplete logic, swallowed failures, stale flags, orphaned config, unused paths.
 
 ### 3. Verify Code Accuracy
 
-Scrutinize:
+Scrutinize business logic, data integrity, numeric accuracy, concurrency, trust boundaries, and failure semantics.
 
-- Business logic
-- Data integrity
-- Numeric accuracy
-- Concurrency
-- Trust boundaries
-- Failure semantics
-
-If you cannot prove a bug exists, mark it as a suspected risk with reasoning.
+If you cannot prove a bug exists, mark it `possible` or `uncertain` with reasoning. Never say `proven` without evidence.
 
 ### 4. Unify and Modularize
 
@@ -355,16 +342,7 @@ If you cannot prove a bug exists, mark it as a suspected risk with reasoning.
 
 ### 5. Assess Performance Honestly
 
-Find real computational and data-access risks:
-
-- N+1 access
-- Missing indexes
-- Unbounded result sets
-- Repeated work
-- Blocking I/O
-- Caching opportunities with explicit staleness trade-offs
-
-Rules:
+Find real computational and data-access risks: N+1 access, missing indexes, unbounded result sets, repeated work, blocking I/O, caching with explicit staleness trade-offs.
 
 - No performance recommendation may weaken functionality, reliability, accuracy, or precision
 - If you did not measure it, call it a risk, not a measured result
@@ -372,14 +350,7 @@ Rules:
 
 ### 6. Make It Observable
 
-Audit the debugging surface:
-
-- Structured logs
-- Correct log levels
-- Useful error context
-- Correlation IDs
-- Audit trails for critical writes
-- Metrics for latency, errors, and throughput
+Audit the debugging surface: structured logs, correct log levels, useful error context, correlation IDs, audit trails for critical writes, metrics for latency, errors, and throughput.
 
 Observability changes must be additive and non-breaking.
 
@@ -390,20 +361,17 @@ Observability changes must be additive and non-breaking.
 - Classify every change as safe now, needs tests first, or needs human decision
 - When in doubt, deliver the audit as a plan and wait for approval
 
-### 8. Write the Handover Plan
+### 8. Write the Audit
 
-Always finish with a handover for the next agent. Include:
+- Write the full audit to a file using the work-file template
+- Reuse the existing path if known; otherwise `plans/<short-slug>-audit.md`; create the folder if needed; ask once if ambiguous
+- If the file cannot be written, stop and ask — never paste the audit into chat
+- Keep new work and updates to existing work in separate lists
+- Print only the terminal briefing
 
-- Context
-- Decisions
-- State: done / pending / blocked
-- Remaining tasks: what, how, where
-- Verification
-- Risks and how to detect them early
+## Output Format
 
-If the next agent would have to guess, the handover is not finished.
-
-## Audit Report Format
+### Work file
 
 1. Overview
 2. Dead weight
@@ -412,8 +380,38 @@ If the next agent would have to guess, the handover is not finished.
 5. Performance risks
 6. Observability
 7. Risk register
-8. Implementation plan
-9. Handover plan
+8. Implementation plan — grouped as New vs Updates to existing
+9. Handover plan — context, decisions, tasks, verification, risks, state
+
+Every finding needs evidence. Clean areas are stated as clean.
+
+### Terminal briefing
+
+Use this shape. Omit any section that would be empty. Never paste the work file into chat.
+
+```text
+Backend audit — complete
+Full audit: <path>
+
+Bugs found
+- <bug> — <proven|likely|possible|uncertain>
+
+Updates to existing
+- <fix or change to current behavior>
+
+Features to add
+- <new capability, if any>
+
+Dead weight
+- <remove or unused>
+
+Need from you
+- <decision required to proceed>
+```
+
+- Talk to the user, not the next agent
+- A new artifact is Features to add. A change to an existing artifact, feature, or document is Updates to existing. Never mix them
+- Confidence: `proven` evidence in hand; `likely` strong reason; `possible` suspected; `uncertain` hypothesis. Never numbers. Never say proven without evidence
 
 ## Quality Gate
 
@@ -421,13 +419,16 @@ The audit is complete only when every answer is yes:
 
 - Every finding is backed by evidence
 - Clean areas are stated as clean
-- Accuracy risks are verified or clearly marked as suspected
+- Accuracy risks are verified or marked possible/uncertain
 - No recommendation trades away functionality, reliability, accuracy, or precision without an explicit trade-off
 - Duplication is unified only where logic is genuinely the same
 - Every library suggested is maintained, trusted, and lighter than the code it replaces
 - Performance claims are measured when measurement is possible, and labeled as risks when it is not
 - The observability plan integrates without breaking behavior
-- The handover plan lets the next agent act with zero guessing
+- New work and updates to existing work are grouped separately
+- The handover lets the next agent act with zero guessing
+- The work file lives at the stated path and was not pasted into chat
+- The briefing omits empty sections and uses proven/likely/possible/uncertain, never numbers
 
 Any "no" means the audit is not finished. Fix it and review again.
 
@@ -437,46 +438,48 @@ Any "no" means the audit is not finished. Fix it and review again.
 
 ---
 name: 360-blueprint
-description: Universal plan creator for new objectives, features, RFCs, and migrations in any domain. Clarifies the real objective, separates confirmation from generation, avoids invented details, enforces domain quality, and produces a self-contained plan an agent can execute without guessing.
-version: 2.1.0
+description: Create an executable plan from a new objective — clarify first, write the full plan to a file, and brief the user in chat — when a goal exists but the path is unclear or the request is "plan this".
+version: 1.6.0
 ---
 
 # 360 Blueprint
 
 ## Purpose
 
-Run this skill when a plan must be created from scratch. Its job is to turn an objective into a clear, executable plan with explicit assumptions, constraints, risks, and handover.
+Run this skill when a plan must be created from scratch. Turn an objective into an executable plan with explicit assumptions, constraints, and risks.
 
-This skill creates plans. To fit one to this developer's goals, taste, and standing decisions, use `360-faculty`. To stress-test and finalize one, use `360-expert-review`. To execute a finalized plan, use `360-execute`. Run `360-token-efficiency` alongside this skill when context or cost matters.
+The full plan lives in a file. Chat gets a short briefing only.
+
+This skill creates plans. To review and finalize one, use `360-expert-review`.
 
 ## When to Use
 
 - A new project, feature, migration, product, workflow, or initiative needs a plan
 - A goal exists but the path is unclear
 - Any request of the form "plan this"
-- Not for tailoring a draft to this developer (`360-faculty`), hardening one that already exists (`360-expert-review`), or building one that is already final (`360-execute`)
+- Not for hardening a plan that already exists (`360-expert-review`) or building one that is already final (`360-execute`)
 
 ## Core Principle
 
-A plan is not finished when it sounds complete. It is finished when a fresh executor can act without guessing, and when every task is tied to a real objective.
-
-Begin at the end. Think from first principles. Design out failure. Prefer the simplest plan that fully works.
+- A plan is finished when a fresh executor can act without guessing, and every task serves a real objective
+- Begin at the end. Think from first principles. Design out failure. Prefer the simplest plan that fully works
+- The file is the plan. Chat is the briefing
 
 ## Workflow
 
 ### 1. Extract the True Objective
 
-- Ask until the objective is clear: what done means, what must not happen, and how success is measured.
-- Restate the objective in the user's terms.
-- Check legitimacy and feasibility before planning.
-- Surface constraints, deadlines, dependencies, and hidden goals.
-- If the objective is ambiguous, ask before generating.
+- Ask until the objective is clear: what done means, what must not happen, and how success is measured
+- Restate the objective in the user's terms
+- Check legitimacy and feasibility before planning
+- Surface constraints, deadlines, dependencies, and hidden goals
+- If the objective is ambiguous, ask before generating
 
 ### 2. Confirm Before Generating
 
-- If critical facts are missing, stop after clarification and wait for confirmation.
-- Do not both ask blocking questions and deliver a final plan in the same turn.
-- If the user asks for a draft despite uncertainty, label it `Draft` and list open questions explicitly.
+- If critical facts are missing, stop after clarification and wait for confirmation
+- Do not both ask blocking questions and deliver a plan in the same turn
+- If the user asks for a draft despite uncertainty, label it `Draft` and list open questions explicitly
 
 ### 3. See From Every Angle
 
@@ -488,61 +491,51 @@ Begin at the end. Think from first principles. Design out failure. Prefer the si
 
 ### 4. Design the Strategy
 
-- Choose the simplest path that fully satisfies the objective.
-- Sequence by dependency and by risk.
-- Put discovery work first when uncertainty could invalidate the plan.
-- Declare what is out of scope and how scope changes are handled.
+- Choose the simplest path that fully satisfies the objective
+- Sequence by dependency and by risk
+- Put discovery work first when uncertainty could invalidate the plan
+- Declare what is out of scope and how scope changes are handled
 
 ### 5. Craft the Plan
 
-- Structure the plan as phases and tasks. Give every task a stable ID (`1.1`, `1.2`) that later skills reference.
-- Every task states what, how, where, and done when.
-- Mark every task `Effort: S | M | L`, `Priority: must | should | could`, and `Parallel: yes | no`. Execution keys its drop rules off these exact values, so use no others.
-- List the skills the executor must load for each task, or `None`.
-- Define the cut line: `should` and `could` tasks may be cut, `must` tasks never.
-- Do not invent stack choices, vendors, metrics, or architecture details. If a choice is required but unknown, write it as an open question.
-- Keep names and terms consistent from start to finish.
-- Make the plan self-contained for a fresh executor.
+- Structure the plan as phases and tasks
+- Separate new capabilities from changes to existing features, behavior, or documents
+- Every task states what, how, where, and done when
+- Mark effort, priority, and parallelization
+- Define the cut line
+- Do not invent stack choices, vendors, metrics, or architecture details. If a choice is required but unknown, write it as an open question
+- Keep names and terms consistent from start to finish
+- Make the plan self-contained for a fresh executor
 
 ### 6. Enforce Quality by Domain
 
 Apply the standards of the domain the plan touches.
 
-When the plan produces code:
+When the plan produces code: maintainable, scalable, auditable, no duplication, no weak logic, no outdated practices.
 
-- Maintainable
-- Scalable
-- Auditable
-- No duplication
-- No weak logic
-- No outdated practices
-
-When the plan produces documentation:
-
-- Update before creating
-- One source of truth
-- Clean structure
-- Easy to find
+When the plan produces documentation: update before creating, one source of truth, clean structure, easy to find.
 
 For any other domain, define that domain's quality bar explicitly and enforce it.
 
 ### 7. Stress-Test Before Delivery
 
-- Walk the plan end to end.
-- Run a premortem.
-- Falsify assumptions.
-- Check whether two executors could read the same step two different ways.
-- Verify every objective maps to tasks and every task serves an objective.
+- Walk the plan end to end
+- Run a premortem
+- Falsify assumptions
+- Check whether two executors could read the same step two different ways
+- Verify every objective maps to tasks and every task serves an objective
 
-### 8. Deliver Crystal Clear
+### 8. Deliver in Two Channels
 
-- Use the Plan Template below.
-- Fill every field or write `N/A` with a one-line reason.
-- State assumptions, open questions, and decision points explicitly.
-- Offer `360-faculty` when the plan should be fitted to this developer's taste and standing decisions before review.
-- Offer `360-expert-review` when the plan is important enough to deserve adversarial review.
+- Write the full plan to a file using the work-file template
+- Reuse the existing path if known; otherwise `plans/<short-slug>.md`; create the folder if needed; ask once if the location is ambiguous
+- If the file cannot be written, stop and ask where to save — never paste the plan into chat as a fallback
+- Print only the terminal briefing
+- If the plan deserves adversarial review before build, say so in plain language — no skill names
 
-## Plan Template
+## Output Format
+
+### Work file
 
 ```markdown
 # Plan: <title>
@@ -550,10 +543,9 @@ For any other domain, define that domain's quality bar explicitly and enforce it
 | Field | Value |
 |---|---|
 | Objective | <one sentence> |
-| Status | Draft / Ready for review / Reviewed and ready to execute |
+| Status | Draft / Ready for review |
 | Version | <version or date> |
 | Created | <date> |
-| Tailored by | <faculty roster reference, or N/A> |
 
 ## 1. Objective & Definition of Done
 - Goal:
@@ -572,7 +564,8 @@ For any other domain, define that domain's quality bar explicitly and enforce it
 - Alternatives rejected:
 
 ## 4. Scope
-- In scope:
+- New:
+- Updates to existing:
 - Explicitly out of scope:
 - Change policy:
 
@@ -590,11 +583,10 @@ Checkpoint:
 - How:
 - Where:
 - Depends on:
-- Skills: <skills the executor must load, or None>
-- Parallel: yes | no
-- Effort: S | M | L
-- Priority: must | should | could
-- Done when: <observable check>
+- Parallel:
+- Effort:
+- Priority:
+- Done when:
 
 ## 7. Risks & Countermeasures
 | Risk | Impact | Countermeasure |
@@ -610,16 +602,43 @@ Checkpoint:
 |---|---|
 
 ## 10. Handover Summary
-- Context:
-- Decisions:
-- State: done / pending / blocked
-- Remaining tasks: what, how, where
-- Verification:
-- Risks and how to detect them early:
+- Executor must know:
 - Cut line:
 - Open questions:
 - Decision points:
 ```
+
+Fill every field or write `N/A` with a one-line reason.
+
+### Terminal briefing
+
+Use this shape. Omit any section that would be empty. Never paste the work file into chat.
+
+```text
+<what this plan is> — plan is ready
+Full plan: <path>
+
+Features to add
+- <new capability as an outcome>
+
+Updates to existing
+- <change to something that already exists>
+
+Not adding
+- <left out on purpose>
+
+Issues found
+- <problem or uncertainty> — <proven|likely|possible|uncertain>
+
+Need from you
+- <blocking decision only>
+```
+
+- First line is `plan is ready` or `draft — open questions remain`
+- Talk to the user, not the next agent. Outcomes, not tasks
+- A new artifact is Features to add. A change to an existing artifact, feature, or document is Updates to existing. Never mix them
+- Confidence: `proven` evidence in hand; `likely` strong reason; `possible` suspected; `uncertain` hypothesis. Never numbers
+- No phases, tasks, MoSCoW, status tables, handover, or skill names
 
 ## Quality Gate
 
@@ -629,14 +648,15 @@ The plan is ready only when every answer is yes:
 - No blocking question was skipped
 - No invented technical details were presented as facts
 - Every assumption is explicit and falsifiable
-- Every task has what, how, where, and done when
-- Every task has a stable ID, declared skills, and `Effort` / `Priority` / `Parallel` values from the defined vocabularies
+- Every task has what, how, where, done when, effort, priority, and parallel markings
 - The cut line is defined
 - Every objective maps to tasks and no orphan tasks remain
+- New work and updates to existing work are grouped separately
 - A fresh executor can act without guessing
 - Checkpoints and replanning triggers exist
 - The plan survived a premortem
-- The report follows the Plan Template exactly
+- The work file follows the template, lives at the stated path, and was not pasted into chat
+- The briefing omits empty sections and uses proven/likely/possible/uncertain, never numbers
 
 Any "no" means the plan is not finished. Refine and review again.
 
@@ -646,7 +666,7 @@ Any "no" means the plan is not finished. Refine and review again.
 
 ---
 name: 360-execute
-description: Faithful plan execution with enforced coverage. Executes a finalized plan task by task, tracks every item in a coverage ledger, verifies each against its acceptance check with evidence, surfaces deviations instead of absorbing them, and finishes with a full-coverage QC sweep and flawless handover. Nothing on the plan is skipped, dropped, or claimed done without proof.
+description: Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and brief the user in chat. Use when a plan exists and work must begin, or when resuming a partial execution.
 version: 1.1.0
 ---
 
@@ -654,22 +674,26 @@ version: 1.1.0
 
 ## Purpose
 
-Run this skill when a **finalized plan must be executed** — completely, faithfully, and verifiably. Its job: guarantee that everything on the plan gets done, gets QCed against its own acceptance check, and gets accounted for — nothing missed, nothing silently changed, nothing claimed without evidence.
+Run this skill when a finalized plan must be executed — completely, faithfully, and verifiably. Everything on the plan gets done, QCed against its own acceptance check, and accounted for.
 
-This skill executes plans. To create one, use `360-blueprint`. To fit one to this developer, use `360-faculty`. To stress-test and finalize one, use `360-expert-review`. To audit the built result afterward, use `360-backend-audit`. Run `360-token-efficiency` alongside this skill when context or cost matters.
+This skill executes plans. To create one, use `360-blueprint`. To stress-test and finalize one, use `360-expert-review`. To audit the built result afterward, use `360-backend-audit`.
+
+The ledger and report live in a file. Chat gets a short briefing only.
 
 ## When to Use
 
 - A plan exists and work must begin — any domain, any scale
 - Any request of the form "implement this plan", "build this", "execute this"
-- Resuming a partially executed plan — the ledger file rebuilds the state
-- Not for creating plans (`360-blueprint`), tailoring them to this developer (`360-faculty`), or reviewing drafts (`360-expert-review`)
+- Resuming a partially executed plan — the ledger file is the source of truth
+- Not for creating plans (`360-blueprint`) or reviewing drafts (`360-expert-review`)
 
 ## Core Principle
 
-The plan is the contract: execute what it says, not what feels close enough. Coverage is tracked rather than trusted, and done is a verdict backed by evidence, not a feeling that the work is finished.
-
-Reality overrides the plan only through an explicit decision, never through a quiet improvisation.
+- The plan is the contract — execute what it says, not what feels close enough
+- Coverage is tracked, not trusted — a persisted ledger records every task and its verdict
+- Done is a verdict with evidence — a task is complete when its acceptance check passes
+- Deviations surface, never absorb — reality overrides the plan only through an explicit decision
+- The file is the record. Chat is the briefing
 
 ## Workflow
 
@@ -680,19 +704,19 @@ Never execute a plan you have not fully read.
 - Read the entire plan before touching anything: objective, scope, assumptions, every phase, every task, every checkpoint
 - Build the full task inventory: every task ID, its priority, its dependencies, its "done when" check
 - If any task lacks an observable acceptance check, derive one and confirm it with the user before executing that task
-- Check the plan's `Status`: only `360-expert-review` sets `Reviewed and ready to execute`, so a plan merely drafted or tailored by `360-faculty` is not final. If it is not final, say so and confirm before executing
-- If anything is ambiguous, ask before starting — questions before execution, not after
+- If anything is ambiguous, ask before starting
 
-### 2. Build the Coverage Ledger
+### 2. Persist the Coverage Ledger
 
 The ledger is the spine of execution and the source of truth for progress.
 
-- Write it to a file, never only to the conversation: `<plan-name>.ledger.md` beside the plan, or an `## Execution Ledger` section appended to the plan file itself
-- One row per task: ID, name, priority, acceptance check, status, evidence
-- Statuses: `pending` / `in progress` / `done (verified)` / `blocked` / `dropped (approved)`. The last three are terminal
-- Update the file as each status changes, not in a batch at the end — an interrupted run must leave accurate state on disk
-- Nothing counts as done until the ledger says verified — memory and confidence are not tracking
-- To resume, read the ledger file first and continue from the first non-terminal row
+- Write it to a file and keep it current after every task
+- Reuse the existing path if known; otherwise `plans/<short-slug>-execution.md`; create the folder if needed; ask once if ambiguous
+- If the file cannot be written, stop and ask — never treat chat as the ledger
+- One row per task: ID, name, priority, acceptance check, status
+- Statuses: `pending` / `in progress` / `done (verified)` / `blocked` / `dropped (approved)`
+- Nothing counts as done until the ledger says verified
+- A fresh agent must be able to open the file and continue with zero guessing
 
 ### 3. Execute in Order
 
@@ -716,35 +740,65 @@ When reality disagrees with the plan — a failed assumption, missing informatio
 - Follow the plan's change policy or replanning triggers
 - Surface the deviation to the user with options and a recommendation
 - Never silently absorb new scope, never silently skip a task
-- A risk whose countermeasure reads `Accepted by developer` was decided before execution began; it is not a deviation. Re-surface it only if execution produces new evidence that overturns the acceptance
 - A `must`-priority task is never dropped without an explicit user decision; `should`/`could` tasks follow the plan's cut line
 
-### 6. Sweep for Full Coverage
+### 6. Sweep and Write the Report
 
 Before declaring completion, walk the ledger top to bottom:
 
-- Every task has an accounted status, and every non-terminal one is listed as unfinished with a reason
+- Every task has a final status — zero unaccounted items
 - Cross-check the plan's traceability: every objective maps to verified work
 - Run the plan's overall verification; confirm all checkpoints passed
 - Sweep once more for regressions introduced across phases
-- Only then write the Execution Report
+- Write the execution report into the same ledger file
+- Print only the terminal briefing
 
 ## Output Format
 
-Deliver an Execution Report in exactly this structure:
+### Work file
 
-1. **Coverage ledger** — every task: ID, name, priority, final status, and the evidence behind each `done (verified)`
-2. **Deviations** — what diverged from the plan, how each was resolved, who approved it; or "None"
-3. **QC results** — checks run, checkpoints verified, regression sweeps, and their outcomes
-4. **Unfinished items** — anything pending, blocked, or dropped, each with its reason and approval; or "None"
-5. **Handover summary** — context, decisions, state (done / pending / blocked), remaining tasks with exactly what, how, and where, verification, and risks with how to detect them early
+The ledger file contains:
+
+1. Coverage ledger — every task: ID, name, priority, final status, evidence for each `done (verified)`
+2. Deviations — what diverged, how it was resolved, who approved it; or "None"
+3. QC results — checks run, checkpoints verified, regression sweeps, outcomes
+4. Unfinished items — pending, blocked, or dropped, with reason and approval; or "None"
+5. Handover summary — context, decisions, current state, remaining tasks with what/how/where, risks and how to detect them early
+
+### Terminal briefing
+
+Use this shape. Omit any section that would be empty. Never paste the work file into chat.
+
+```text
+Execution — <n>/<m> tasks verified
+Full report: <path>
+
+Done
+- <outcome delivered>
+
+Updates to existing
+- <change made to something that already existed>
+
+Blocked
+- <item and why>
+
+Deviations
+- <what changed and whether it was approved>
+
+Issues found
+- <bug or surprise> — <proven|likely|possible|uncertain>
+```
+
+- Talk to the user, not the next agent
+- Done is new work shipped. Updates to existing is a change to something that already existed. Never mix them
+- Confidence: `proven` evidence in hand; `likely` strong reason; `possible` suspected; `uncertain` hypothesis. Never numbers. Never say proven without evidence
+- No ledger dump, no handover essay, no skill names
 
 ## Quality Gate
 
 Execution is complete only when every answer is yes:
 
-- The ledger exists as a file on disk and matches the reported outcome
-- Every task in the plan appears in the ledger with an accounted status — zero unaccounted items
+- Every task in the plan appears in the ledger file with a final status — zero unaccounted items
 - Every `done (verified)` verdict is backed by evidence from the task's own acceptance check
 - Every phase checkpoint was verified before the next phase began
 - Every deviation was surfaced and resolved through the plan's change policy or a user decision — none silently absorbed
@@ -752,9 +806,10 @@ Execution is complete only when every answer is yes:
 - Every objective in the plan's traceability maps to verified work
 - Regressions and collateral damage were swept for, and the results are stated
 - Declared skills were loaded wherever the plan required them
-- The plan's status was checked, and executing a plan that is not final was confirmed with the user
 - Unfinished items are stated honestly — pending, blocked, or dropped, with reasons
-- The handover lets the next agent continue with zero guessing
+- The ledger file lets the next agent continue with zero guessing
+- Chat does not contain the ledger or report body
+- The briefing omits empty sections and uses proven/likely/possible/uncertain, never numbers
 
 Any "no" means execution is not finished. Fix it and re-run the sweep.
 
@@ -764,37 +819,39 @@ Any "no" means execution is not finished. Fix it and re-run the sweep.
 
 ---
 name: 360-expert-review
-description: Pre-finalization plan review and adversarial pre-mortem that stress-tests draft plans for user impact, reliability, security, rollback, traceability, and edge cases. Uses direct expert lenses instead of persona theater and finalizes only after hostile review.
-version: 3.1.0
+description: Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage.
+version: 2.3.0
 ---
 
 # 360 Expert Review
 
 ## Purpose
 
-Run this skill before finalizing any important plan. Its job is to turn a draft into the strongest usable plan by exposing missing scenarios, weak assumptions, and hidden failure modes.
+Run this skill before finalizing any important plan. Turn a draft into the strongest executable plan by exposing missing scenarios, weak assumptions, and hidden failure modes.
 
-Drafts usually arrive from `360-blueprint`, sometimes already tailored by `360-faculty`. Once a plan passes this review, hand it to `360-execute` to build. Run `360-token-efficiency` alongside this skill when context or cost matters.
+The finalized plan lives in the plan file. Chat gets a short briefing only.
 
 ## When to Use
 
 - A plan changes real systems, data, users, money, security, or operations
 - A wrong assumption or missed case could create real damage
 - A plan needs adversarial review before execution
-- Not for writing a plan that does not exist yet (`360-blueprint`), tailoring one to this developer (`360-faculty`), or executing one already final (`360-execute`)
+- Not for drafting plans from scratch (`360-blueprint`) or executing a finalized plan (`360-execute`)
 
 ## Core Principle
 
-Review the plan the way a senior team would: user impact, reliability, security, operations, and domain correctness. Then attack it hard enough that only the strongest version survives.
+- Review the plan the way a senior team would: user impact, reliability, security, operations, and domain correctness
+- Attack it hard enough that only the strongest version survives
+- Finalize into the existing plan file. Do not replace tasks with a narrative essay
+- The file is the plan. Chat is the briefing
 
 ## Workflow
 
 ### 1. Understand the Project First
 
-- Identify the real problem, not just the requested task.
-- Identify users, stakeholders, constraints, dependencies, and what must not break.
-- Ask questions until the plan can be judged without guessing.
-- If a handover is needed, ask for it explicitly.
+- Identify the real problem, not just the requested task
+- Identify users, stakeholders, constraints, dependencies, and what must not break
+- Ask questions until the plan can be judged without guessing
 
 ### 2. Review Through Expert Lenses
 
@@ -810,21 +867,19 @@ Use only the lenses this project needs:
 
 Do not role-play personas. Extract findings directly from each lens.
 
-If `360-faculty` supplied a prioritized lens list for this plan, start from it, then add any lens this plan needs that the list omits. A supplied list sets the order of attack, never the limit of coverage.
-
 ### 3. Cover the User Completely
 
-- Solve the real need with the lowest-friction path that works.
-- Cover empty, loading, error, interrupted, and recovery states.
-- Prevent lost work, confusion, and irreversible mistakes.
-- Include first-time, returning, low-skill, accessibility, and poor-connectivity users when relevant.
+- Solve the real need with the lowest-friction path that works
+- Cover empty, loading, error, interrupted, and recovery states
+- Prevent lost work, confusion, and irreversible mistakes
+- Include first-time, returning, low-skill, accessibility, and poor-connectivity users when relevant
 
 ### 4. Cover Every Scenario and Effect
 
-- Map affected components, data, APIs, permissions, integrations, and existing behavior.
-- Cover happy paths, edge cases, invalid input, retries, duplicates, and concurrency.
-- Cover dependency failures, timeouts, partial completion, degraded performance, migrations, mixed versions, and rollback.
-- Every risk needs prevention, detection, mitigation, or rollback.
+- Map affected components, data, APIs, permissions, integrations, and existing behavior
+- Cover happy paths, edge cases, invalid input, retries, duplicates, and concurrency
+- Cover dependency failures, timeouts, partial completion, degraded performance, migrations, mixed versions, and rollback
+- Every risk needs prevention, detection, mitigation, or rollback
 
 ### 5. Guarantee Reliability and Traceability
 
@@ -836,9 +891,9 @@ If `360-faculty` supplied a prioritized lens list for this plan, start from it, 
 
 ### 6. Verify Everything
 
-- Define testing proportional to risk.
-- Every acceptance criterion must be observable.
-- "Works correctly" is not a criterion.
+- Define testing proportional to risk
+- Every acceptance criterion must be observable
+- "Works correctly" is not a criterion
 
 ### 7. Attack the Plan
 
@@ -851,41 +906,66 @@ Switch to hostile critic. Ask:
 - Which step could be read two different ways?
 - What cannot be detected, reproduced, or reversed?
 - What can be simpler?
-- Which risk was accepted instead of solved, and does evidence now overturn that acceptance?
-
-A risk whose countermeasure reads `Accepted by developer` is attack surface, not settled matter. Re-open any of them when evidence warrants, put the evidence in front of the developer, and let them decide again. An earlier acceptance never exempts a risk from this review.
 
 Fix the plan, then attack it again until no high-severity issue remains open.
 
-### 8. Complete the Handover
+### 8. Write the Final Plan
 
-Section 10 of the plan template is always filled. It is part of the plan, not an optional extra. Use these fields:
+- Update the draft's file in place using the `360-blueprint` work-file template
+- Preserve task IDs; add, split, or drop a task only with a stated reason
+- Keep new work and updates to existing work in separate scope lists
+- Put review findings, key decisions, and remaining risks in a short appendix in that same file
+- Executor handover lives in the file — never in chat
+- If the file cannot be written, stop and ask — never paste the plan into chat
+- Print only the terminal briefing
 
-- Context
-- Decisions
-- State: done / pending / blocked
-- Remaining tasks: what, how, where
-- Verification
-- Risks and how to detect them early
+## Output Format
 
-If the user also asked for a standalone handover document, produce one with the same fields. If they did not, mark it `Not requested`.
+### Work file
 
-## Final Plan Format
+The `360-blueprint` plan template, updated in place, plus a short appendix:
 
-Return the revised plan in `360-blueprint`'s Plan Template, sections 1 to 10 intact.
+```markdown
+## 11. Review appendix
+- Findings:
+- Decisions:
+- Remaining risks:
+```
 
-Preserve every task field — ID, Depends on, Skills, Parallel, Effort, Priority, Done when — along with phase checkpoints, the change policy, the replanning triggers, and the traceability table. `360-execute` reads those fields directly. A review that turns them into prose breaks execution.
+Do not replace the task list with a narrative plan.
 
-If the incoming plan is not in the template, normalize it into the template first, then review.
+### Terminal briefing
 
-Append the review's own output as four further sections:
+Use this shape. Omit any section that would be empty. Never paste the work file into chat.
 
-- **11. Expert Findings and Key Decisions**: what each lens surfaced, and what was decided
-- **12. Scenario and Impact Coverage**: components, data, users, states, edge cases, and failure modes
-- **13. Reliability, Observability, and Release**: reliability and security measures, debugging path, tests and observable acceptance criteria, release, monitoring, and rollback
-- **14. Review Verdict**: risks found, how each was resolved, and why this is the strongest version
+```text
+<what this plan is> — plan is final
+Full plan: <path>
 
-Set the plan's Status field to `Reviewed and ready to execute`.
+What changed
+- <material delta from the draft>
+
+Features to add
+- <new capability as an outcome>
+
+Updates to existing
+- <change to something that already exists>
+
+Issues found
+- <hole, bug, or weak assumption> — <proven|likely|possible|uncertain>
+
+Remaining risks
+- <accepted risk> — <likely|possible|uncertain>
+
+Need from you
+- <only if not ready to build>
+```
+
+- First line is `plan is final` or `not final — blocked on you`
+- Talk to the user, not the next agent. Outcomes, not tasks
+- A new artifact is Features to add. A change to an existing artifact, feature, or document is Updates to existing. Never mix them
+- Confidence: `proven` evidence in hand; `likely` strong reason; `possible` suspected; `uncertain` hypothesis. Never numbers. Never say proven without evidence
+- No phases, tasks, skill names, or review-essay dump
 
 ## Quality Gate
 
@@ -901,9 +981,10 @@ The plan is final only when every answer is yes:
 - Testing matches the risk
 - Release and rollback are safe
 - The plan survived hostile review
-- Every risk marked `Accepted by developer` was re-tested against evidence, and any re-opened one was decided again
-- Every Plan Template field survived intact: task IDs, Depends on, Skills, Parallel, Effort, Priority, Done when, checkpoints, change policy, replanning triggers, traceability
-- The plan's handover summary is complete, and a standalone handover document was produced if requested or marked `Not requested`
+- Task IDs were preserved or changed with a stated reason
+- New work and updates to existing work are grouped separately
+- The finalized plan is in the original file, not pasted into chat
+- The briefing omits empty sections and uses proven/likely/possible/uncertain, never numbers
 
 Any "no" means the plan is not final. Fix it and review again.
 
@@ -1436,19 +1517,17 @@ Any "no" means not finished. Measure, raise, polish, or write memory, then check
 
 ---
 name: 360-token-efficiency
-description: Runtime skill that reduces token waste during AI-agent tasks without dropping facts, changing requirements, or weakening correctness. Applies silent context discipline, effort sizing, progressive disclosure, compaction, and concise output. Use continuously alongside other skills when token cost matters.
-version: 1.2.1
+description: Runtime skill that reduces token waste during AI-agent tasks without dropping facts, changing requirements, or weakening correctness. Use continuously alongside other skills when token cost matters.
+version: 1.2.0
 ---
 
 # 360 Token Efficiency
 
 ## Purpose
 
-Run this skill during execution of a task, not as a separate report generator. Its job is to reduce token waste while preserving the same correctness, completeness, and usability the task would have without this skill.
+Run this skill during execution of a task, not as a separate report generator. Reduce token waste while preserving the same correctness, completeness, and usability the task would have without this skill.
 
-This skill is model- and platform-agnostic. It governs how the agent selects, reuses, compacts, and outputs information. It does not claim control over provider-side caching, billing internals, or hidden reasoning.
-
-It is an overlay, not a step: run it underneath `360-blueprint`, `360-faculty`, `360-expert-review`, `360-execute`, or `360-backend-audit`.
+Model- and platform-agnostic. Governs how the agent selects, reuses, compacts, and outputs information. Does not claim control over provider-side caching, billing internals, or hidden reasoning.
 
 ## When to Use
 
@@ -1466,49 +1545,50 @@ Token efficiency is not brevity for its own sake. It is maximum decision-relevan
 
 ### 1. Keep Only Decision-Relevant Context
 
-- Separate what the current step needs from what it does not.
-- Reuse stable instructions, prior decisions, and verified facts already in the session.
-- Do not resend static material when a shorter reference is enough.
-- Do not drop information that later steps still need.
+- Separate what the current step needs from what it does not
+- Reuse stable instructions, prior decisions, and verified facts already in the session
+- Do not resend static material when a shorter reference is enough
+- Do not drop information that later steps still need
 
 ### 2. Size Effort to Difficulty
 
-- Classify each sub-task as trivial, moderate, or hard.
-- Trivial: act directly.
-- Moderate: reason only where it changes the outcome.
-- Hard: use full rigor, but no extra ceremony.
-- Never save tokens by under-thinking a hard problem.
+- Classify each sub-task as trivial, moderate, or hard
+- Trivial: act directly
+- Moderate: reason only where it changes the outcome
+- Hard: use full rigor, but no extra ceremony
+- Never save tokens by under-thinking a hard problem
 
 ### 3. Load Progressively
 
-- Pull only the file, section, tool, or context needed for the current step.
-- Prefer summaries or indexes first; open full content only when needed.
-- When a large result arrives, extract what matters and leave the rest behind.
+- Pull only the file, section, tool, or context needed for the current step
+- Prefer summaries or indexes first; open full content only when needed
+- When a large result arrives, extract what matters and leave the rest behind
 
 ### 4. Compact Without Losing Facts
 
-- At natural checkpoints, replace verbose history with a compact state summary.
-- Keep decisions, constraints, open questions, blockers, and unresolved risks.
-- If a fact is uncertain, carry the uncertainty forward. Do not compress it into false confidence.
+- At natural checkpoints, replace verbose history with a compact state summary
+- Keep decisions, constraints, open questions, blockers, and unresolved risks
+- If a fact is uncertain, carry the uncertainty forward. Do not compress it into false confidence
 
 ### 5. Output With Discipline
 
-- Prefer the shortest structure that fully answers the task.
-- Use tables for comparisons, bullets for parallel facts, and direct prose for decisions.
-- Remove preamble, repetition, and restatement.
-- Add detail only when it changes correctness, usability, or handover quality.
+- Prefer the shortest structure that fully answers the task
+- Use tables for comparisons, bullets for parallel facts, and direct prose for decisions
+- Remove preamble, repetition, and restatement
+- Add detail only when it changes correctness, usability, or handover quality
+- When a sibling skill produces an artifact, write it to a file; chat carries only the briefing
 
 ### 6. Escalate Only on Trigger
 
-- Prefer the lighter reliable path first.
-- Escalate only when confidence is low, evidence conflicts, or the lightweight path fails.
-- State the reason for escalation when it matters to the user or next agent.
+- Prefer the lighter reliable path first
+- Escalate only when confidence is low, evidence conflicts, or the lightweight path fails
+- State the reason for escalation when it matters to the user or next agent
 
 ### 7. Persist Rules Only When Measured
 
-- Do not write reusable token-saving rules unless a real measurement showed savings without quality loss.
-- If no token telemetry exists, mark the rule as unverified and keep it out of the notes file.
-- Never invent token counts.
+- Do not write reusable token-saving rules unless a real measurement showed savings without quality loss
+- If no token telemetry exists, mark the rule as unverified and keep it out of the notes file
+- Never invent token counts
 
 ## Output Format
 
@@ -1531,6 +1611,7 @@ The application of this skill is complete only when every answer is yes:
 - No uncertainty was compressed into false confidence
 - Effort matched task difficulty
 - Output was no more verbose than the task required
+- Artifacts produced by sibling skills were not pasted into chat
 - No unverified token-saving rule was persisted
 - No token savings were claimed without measurement
 - The outcome is at least as correct and complete as it would be without this skill

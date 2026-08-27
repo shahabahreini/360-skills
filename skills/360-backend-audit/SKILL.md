@@ -20,6 +20,7 @@ The full audit lives in a file. Chat gets a short briefing only.
 - When inheriting, refactoring, or modernizing services or data layers
 - When code feels heavy, fragile, slow, or hard to debug
 - Before handing code to another engineer or AI agent
+- Not for planning work that does not exist yet (`360-blueprint`) or executing a plan (`360-execute`)
 
 ## Core Principle
 

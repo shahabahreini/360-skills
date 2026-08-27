@@ -19,6 +19,7 @@ This skill creates plans. To review and finalize one, use `360-expert-review`.
 - A new project, feature, migration, product, workflow, or initiative needs a plan
 - A goal exists but the path is unclear
 - Any request of the form "plan this"
+- Not for hardening a plan that already exists (`360-expert-review`) or building one that is already final (`360-execute`)
 
 ## Core Principle
 

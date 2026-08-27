@@ -18,6 +18,7 @@ Model- and platform-agnostic. Governs how the agent selects, reuses, compacts, a
 - Long sessions where context keeps growing
 - Repetitive work where prior results can be reused safely
 - As a companion to another skill, not a replacement for it
+- Never as the primary skill for a task — it shapes how other work is done, it does not do the work
 
 ## Core Principle
 

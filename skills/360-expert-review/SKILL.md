@@ -17,6 +17,7 @@ The finalized plan lives in the plan file. Chat gets a short briefing only.
 - A plan changes real systems, data, users, money, security, or operations
 - A wrong assumption or missed case could create real damage
 - A plan needs adversarial review before execution
+- Not for drafting plans from scratch (`360-blueprint`) or executing a finalized plan (`360-execute`)
 
 ## Core Principle
 
