@@ -1,7 +1,7 @@
 ---
 name: 360-blueprint
 description: Universal plan creator for new objectives in any domain. Clarifies the real objective, separates confirmation from generation, avoids invented details, enforces domain quality, and produces a self-contained plan an agent can execute without guessing.
-version: 2.0.0
+version: 2.1.0
 ---
 
 # 360 Blueprint
@@ -10,14 +10,14 @@ version: 2.0.0
 
 Run this skill when a plan must be created from scratch. Its job is to turn an objective into a clear, executable plan with explicit assumptions, constraints, risks, and handover.
 
-This skill creates plans. To stress-test and finalize one, use `360-expert-review`. To execute a finalized plan, use `360-execute`. Run `360-token-efficiency` alongside this skill when context or cost matters.
+This skill creates plans. To fit one to this developer's goals, taste, and standing decisions, use `360-faculty`. To stress-test and finalize one, use `360-expert-review`. To execute a finalized plan, use `360-execute`. Run `360-token-efficiency` alongside this skill when context or cost matters.
 
 ## When to Use
 
 - A new project, feature, migration, product, workflow, or initiative needs a plan
 - A goal exists but the path is unclear
 - Any request of the form "plan this"
-- Not for hardening a draft that already exists (`360-expert-review`) or building one that is already final (`360-execute`)
+- Not for tailoring a draft to this developer (`360-faculty`), hardening one that already exists (`360-expert-review`), or building one that is already final (`360-execute`)
 
 ## Core Principle
 
@@ -102,6 +102,7 @@ For any other domain, define that domain's quality bar explicitly and enforce it
 - Use the Plan Template below.
 - Fill every field or write `N/A` with a one-line reason.
 - State assumptions, open questions, and decision points explicitly.
+- Offer `360-faculty` when the plan should be fitted to this developer's taste and standing decisions before review.
 - Offer `360-expert-review` when the plan is important enough to deserve adversarial review.
 
 ## Plan Template
@@ -115,6 +116,7 @@ For any other domain, define that domain's quality bar explicitly and enforce it
 | Status | Draft / Ready for review / Reviewed and ready to execute |
 | Version | <version or date> |
 | Created | <date> |
+| Tailored by | <faculty roster reference, or N/A> |
 
 ## 1. Objective & Definition of Done
 - Goal:

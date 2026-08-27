@@ -1,7 +1,7 @@
 ---
 name: 360-token-efficiency
 description: Runtime skill that reduces token waste during AI-agent tasks without dropping facts, changing requirements, or weakening correctness. Applies silent context discipline, effort sizing, progressive disclosure, compaction, and concise output. Use continuously alongside other skills when token cost matters.
-version: 1.2.0
+version: 1.2.1
 ---
 
 # 360 Token Efficiency
@@ -12,7 +12,7 @@ Run this skill during execution of a task, not as a separate report generator. I
 
 This skill is model- and platform-agnostic. It governs how the agent selects, reuses, compacts, and outputs information. It does not claim control over provider-side caching, billing internals, or hidden reasoning.
 
-It is an overlay, not a step: run it underneath `360-blueprint`, `360-expert-review`, `360-execute`, or `360-backend-audit`.
+It is an overlay, not a step: run it underneath `360-blueprint`, `360-faculty`, `360-expert-review`, `360-execute`, or `360-backend-audit`.
 
 ## When to Use
 

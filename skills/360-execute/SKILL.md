@@ -1,7 +1,7 @@
 ---
 name: 360-execute
 description: Faithful plan execution with enforced coverage. Executes a finalized plan task by task, tracks every item in a coverage ledger, verifies each against its acceptance check with evidence, surfaces deviations instead of absorbing them, and finishes with a full-coverage QC sweep and flawless handover. Nothing on the plan is skipped, dropped, or claimed done without proof.
-version: 1.0.0
+version: 1.1.0
 ---
 
 # 360 Execute
@@ -10,14 +10,14 @@ version: 1.0.0
 
 Run this skill when a **finalized plan must be executed** — completely, faithfully, and verifiably. Its job: guarantee that everything on the plan gets done, gets QCed against its own acceptance check, and gets accounted for — nothing missed, nothing silently changed, nothing claimed without evidence.
 
-This skill executes plans. To create one, use `360-blueprint`. To stress-test and finalize one, use `360-expert-review`. To audit the built result afterward, use `360-backend-audit`. Run `360-token-efficiency` alongside this skill when context or cost matters.
+This skill executes plans. To create one, use `360-blueprint`. To fit one to this developer, use `360-faculty`. To stress-test and finalize one, use `360-expert-review`. To audit the built result afterward, use `360-backend-audit`. Run `360-token-efficiency` alongside this skill when context or cost matters.
 
 ## When to Use
 
 - A plan exists and work must begin — any domain, any scale
 - Any request of the form "implement this plan", "build this", "execute this"
 - Resuming a partially executed plan — the ledger file rebuilds the state
-- Not for creating plans (`360-blueprint`) or reviewing drafts (`360-expert-review`)
+- Not for creating plans (`360-blueprint`), tailoring them to this developer (`360-faculty`), or reviewing drafts (`360-expert-review`)
 
 ## Core Principle
 
@@ -34,6 +34,7 @@ Never execute a plan you have not fully read.
 - Read the entire plan before touching anything: objective, scope, assumptions, every phase, every task, every checkpoint
 - Build the full task inventory: every task ID, its priority, its dependencies, its "done when" check
 - If any task lacks an observable acceptance check, derive one and confirm it with the user before executing that task
+- Check the plan's `Status`: only `360-expert-review` sets `Reviewed and ready to execute`, so a plan merely drafted or tailored by `360-faculty` is not final. If it is not final, say so and confirm before executing
 - If anything is ambiguous, ask before starting — questions before execution, not after
 
 ### 2. Build the Coverage Ledger
@@ -69,6 +70,7 @@ When reality disagrees with the plan — a failed assumption, missing informatio
 - Follow the plan's change policy or replanning triggers
 - Surface the deviation to the user with options and a recommendation
 - Never silently absorb new scope, never silently skip a task
+- A risk whose countermeasure reads `Accepted by developer` was decided before execution began; it is not a deviation. Re-surface it only if execution produces new evidence that overturns the acceptance
 - A `must`-priority task is never dropped without an explicit user decision; `should`/`could` tasks follow the plan's cut line
 
 ### 6. Sweep for Full Coverage
@@ -104,6 +106,7 @@ Execution is complete only when every answer is yes:
 - Every objective in the plan's traceability maps to verified work
 - Regressions and collateral damage were swept for, and the results are stated
 - Declared skills were loaded wherever the plan required them
+- The plan's status was checked, and executing a plan that is not final was confirmed with the user
 - Unfinished items are stated honestly — pending, blocked, or dropped, with reasons
 - The handover lets the next agent continue with zero guessing
 

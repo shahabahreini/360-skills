@@ -1,7 +1,7 @@
 ---
 name: 360-expert-review
 description: Pre-finalization plan review that stress-tests a draft plan for user impact, reliability, security, rollback, traceability, and failure modes. Uses direct expert lenses instead of persona theater and finalizes only after hostile review.
-version: 3.0.0
+version: 3.1.0
 ---
 
 # 360 Expert Review
@@ -10,14 +10,14 @@ version: 3.0.0
 
 Run this skill before finalizing any important plan. Its job is to turn a draft into the strongest usable plan by exposing missing scenarios, weak assumptions, and hidden failure modes.
 
-Drafts usually arrive from `360-blueprint`. Once a plan passes this review, hand it to `360-execute` to build. Run `360-token-efficiency` alongside this skill when context or cost matters.
+Drafts usually arrive from `360-blueprint`, sometimes already tailored by `360-faculty`. Once a plan passes this review, hand it to `360-execute` to build. Run `360-token-efficiency` alongside this skill when context or cost matters.
 
 ## When to Use
 
 - A plan changes real systems, data, users, money, security, or operations
 - A wrong assumption or missed case could create real damage
 - A plan needs adversarial review before execution
-- Not for writing a plan that does not exist yet (`360-blueprint`) or executing one already final (`360-execute`)
+- Not for writing a plan that does not exist yet (`360-blueprint`), tailoring one to this developer (`360-faculty`), or executing one already final (`360-execute`)
 
 ## Core Principle
 
@@ -45,6 +45,8 @@ Use only the lenses this project needs:
 - Domain: business rules, terminology, real-world accuracy
 
 Do not role-play personas. Extract findings directly from each lens.
+
+If `360-faculty` supplied a prioritized lens list for this plan, start from it, then add any lens this plan needs that the list omits. A supplied list sets the order of attack, never the limit of coverage.
 
 ### 3. Cover the User Completely
 
@@ -85,6 +87,9 @@ Switch to hostile critic. Ask:
 - Which step could be read two different ways?
 - What cannot be detected, reproduced, or reversed?
 - What can be simpler?
+- Which risk was accepted instead of solved, and does evidence now overturn that acceptance?
+
+A risk whose countermeasure reads `Accepted by developer` is attack surface, not settled matter. Re-open any of them when evidence warrants, put the evidence in front of the developer, and let them decide again. An earlier acceptance never exempts a risk from this review.
 
 Fix the plan, then attack it again until no high-severity issue remains open.
 
@@ -132,6 +137,7 @@ The plan is final only when every answer is yes:
 - Testing matches the risk
 - Release and rollback are safe
 - The plan survived hostile review
+- Every risk marked `Accepted by developer` was re-tested against evidence, and any re-opened one was decided again
 - Every Plan Template field survived intact: task IDs, Depends on, Skills, Parallel, Effort, Priority, Done when, checkpoints, change policy, replanning triggers, traceability
 - The plan's handover summary is complete, and a standalone handover document was produced if requested or marked `Not requested`
 
