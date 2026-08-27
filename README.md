@@ -4,6 +4,10 @@
 [![Agent Skills format](https://img.shields.io/badge/format-agent--skills-black)](https://agentskills.io)
 [![Install via skills.sh](https://img.shields.io/badge/install-skills.sh-black)](https://skills.sh)
 
+<p align="center">
+  <img src="assets/cover-zen-dark.png" alt="360-skills Workflow" width="100%">
+</p>
+
 **360-skills is an open collection of Agent Skills that give AI coding agents senior-level expertise for specific, high-stakes tasks.**
 
 Most agents produce plausible work. Each skill in this repository packages the process, judgment, and quality gates of a senior specialist into a single installable `SKILL.md` file, so agents stop shipping the first draft and start shipping the vetted one. Skills follow the open [Agent Skills](https://agentskills.io) standard and install into Claude Code, Cursor, Codex, and 70+ other agents through [skills.sh](https://skills.sh).
