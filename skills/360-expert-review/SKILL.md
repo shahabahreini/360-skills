@@ -1,36 +1,37 @@
 ---
 name: 360-expert-review
-description: Pre-finalization plan review and adversarial pre-mortem that stress-tests draft plans for user impact, reliability, security, rollback, traceability, and edge cases. Uses direct expert lenses instead of persona theater and finalizes only after hostile review.
-version: 3.1.0
+description: Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage.
+version: 2.3.0
 ---
 
 # 360 Expert Review
 
 ## Purpose
 
-Run this skill before finalizing any important plan. Its job is to turn a draft into the strongest usable plan by exposing missing scenarios, weak assumptions, and hidden failure modes.
+Run this skill before finalizing any important plan. Turn a draft into the strongest executable plan by exposing missing scenarios, weak assumptions, and hidden failure modes.
 
-Drafts usually arrive from `360-blueprint`, sometimes already tailored by `360-faculty`. Once a plan passes this review, hand it to `360-execute` to build. Run `360-token-efficiency` alongside this skill when context or cost matters.
+The finalized plan lives in the plan file. Chat gets a short briefing only.
 
 ## When to Use
 
 - A plan changes real systems, data, users, money, security, or operations
 - A wrong assumption or missed case could create real damage
 - A plan needs adversarial review before execution
-- Not for writing a plan that does not exist yet (`360-blueprint`), tailoring one to this developer (`360-faculty`), or executing one already final (`360-execute`)
 
 ## Core Principle
 
-Review the plan the way a senior team would: user impact, reliability, security, operations, and domain correctness. Then attack it hard enough that only the strongest version survives.
+- Review the plan the way a senior team would: user impact, reliability, security, operations, and domain correctness
+- Attack it hard enough that only the strongest version survives
+- Finalize into the existing plan file. Do not replace tasks with a narrative essay
+- The file is the plan. Chat is the briefing
 
 ## Workflow
 
 ### 1. Understand the Project First
 
-- Identify the real problem, not just the requested task.
-- Identify users, stakeholders, constraints, dependencies, and what must not break.
-- Ask questions until the plan can be judged without guessing.
-- If a handover is needed, ask for it explicitly.
+- Identify the real problem, not just the requested task
+- Identify users, stakeholders, constraints, dependencies, and what must not break
+- Ask questions until the plan can be judged without guessing
 
 ### 2. Review Through Expert Lenses
 
@@ -46,21 +47,19 @@ Use only the lenses this project needs:
 
 Do not role-play personas. Extract findings directly from each lens.
 
-If `360-faculty` supplied a prioritized lens list for this plan, start from it, then add any lens this plan needs that the list omits. A supplied list sets the order of attack, never the limit of coverage.
-
 ### 3. Cover the User Completely
 
-- Solve the real need with the lowest-friction path that works.
-- Cover empty, loading, error, interrupted, and recovery states.
-- Prevent lost work, confusion, and irreversible mistakes.
-- Include first-time, returning, low-skill, accessibility, and poor-connectivity users when relevant.
+- Solve the real need with the lowest-friction path that works
+- Cover empty, loading, error, interrupted, and recovery states
+- Prevent lost work, confusion, and irreversible mistakes
+- Include first-time, returning, low-skill, accessibility, and poor-connectivity users when relevant
 
 ### 4. Cover Every Scenario and Effect
 
-- Map affected components, data, APIs, permissions, integrations, and existing behavior.
-- Cover happy paths, edge cases, invalid input, retries, duplicates, and concurrency.
-- Cover dependency failures, timeouts, partial completion, degraded performance, migrations, mixed versions, and rollback.
-- Every risk needs prevention, detection, mitigation, or rollback.
+- Map affected components, data, APIs, permissions, integrations, and existing behavior
+- Cover happy paths, edge cases, invalid input, retries, duplicates, and concurrency
+- Cover dependency failures, timeouts, partial completion, degraded performance, migrations, mixed versions, and rollback
+- Every risk needs prevention, detection, mitigation, or rollback
 
 ### 5. Guarantee Reliability and Traceability
 
@@ -72,9 +71,9 @@ If `360-faculty` supplied a prioritized lens list for this plan, start from it, 
 
 ### 6. Verify Everything
 
-- Define testing proportional to risk.
-- Every acceptance criterion must be observable.
-- "Works correctly" is not a criterion.
+- Define testing proportional to risk
+- Every acceptance criterion must be observable
+- "Works correctly" is not a criterion
 
 ### 7. Attack the Plan
 
@@ -87,41 +86,66 @@ Switch to hostile critic. Ask:
 - Which step could be read two different ways?
 - What cannot be detected, reproduced, or reversed?
 - What can be simpler?
-- Which risk was accepted instead of solved, and does evidence now overturn that acceptance?
-
-A risk whose countermeasure reads `Accepted by developer` is attack surface, not settled matter. Re-open any of them when evidence warrants, put the evidence in front of the developer, and let them decide again. An earlier acceptance never exempts a risk from this review.
 
 Fix the plan, then attack it again until no high-severity issue remains open.
 
-### 8. Complete the Handover
+### 8. Write the Final Plan
 
-Section 10 of the plan template is always filled. It is part of the plan, not an optional extra. Use these fields:
+- Update the draft's file in place using the `360-blueprint` work-file template
+- Preserve task IDs; add, split, or drop a task only with a stated reason
+- Keep new work and updates to existing work in separate scope lists
+- Put review findings, key decisions, and remaining risks in a short appendix in that same file
+- Executor handover lives in the file — never in chat
+- If the file cannot be written, stop and ask — never paste the plan into chat
+- Print only the terminal briefing
 
-- Context
-- Decisions
-- State: done / pending / blocked
-- Remaining tasks: what, how, where
-- Verification
-- Risks and how to detect them early
+## Output Format
 
-If the user also asked for a standalone handover document, produce one with the same fields. If they did not, mark it `Not requested`.
+### Work file
 
-## Final Plan Format
+The `360-blueprint` plan template, updated in place, plus a short appendix:
 
-Return the revised plan in `360-blueprint`'s Plan Template, sections 1 to 10 intact.
+```markdown
+## 11. Review appendix
+- Findings:
+- Decisions:
+- Remaining risks:
+```
 
-Preserve every task field — ID, Depends on, Skills, Parallel, Effort, Priority, Done when — along with phase checkpoints, the change policy, the replanning triggers, and the traceability table. `360-execute` reads those fields directly. A review that turns them into prose breaks execution.
+Do not replace the task list with a narrative plan.
 
-If the incoming plan is not in the template, normalize it into the template first, then review.
+### Terminal briefing
 
-Append the review's own output as four further sections:
+Use this shape. Omit any section that would be empty. Never paste the work file into chat.
 
-- **11. Expert Findings and Key Decisions**: what each lens surfaced, and what was decided
-- **12. Scenario and Impact Coverage**: components, data, users, states, edge cases, and failure modes
-- **13. Reliability, Observability, and Release**: reliability and security measures, debugging path, tests and observable acceptance criteria, release, monitoring, and rollback
-- **14. Review Verdict**: risks found, how each was resolved, and why this is the strongest version
+```text
+<what this plan is> — plan is final
+Full plan: <path>
 
-Set the plan's Status field to `Reviewed and ready to execute`.
+What changed
+- <material delta from the draft>
+
+Features to add
+- <new capability as an outcome>
+
+Updates to existing
+- <change to something that already exists>
+
+Issues found
+- <hole, bug, or weak assumption> — <proven|likely|possible|uncertain>
+
+Remaining risks
+- <accepted risk> — <likely|possible|uncertain>
+
+Need from you
+- <only if not ready to build>
+```
+
+- First line is `plan is final` or `not final — blocked on you`
+- Talk to the user, not the next agent. Outcomes, not tasks
+- A new artifact is Features to add. A change to an existing artifact, feature, or document is Updates to existing. Never mix them
+- Confidence: `proven` evidence in hand; `likely` strong reason; `possible` suspected; `uncertain` hypothesis. Never numbers. Never say proven without evidence
+- No phases, tasks, skill names, or review-essay dump
 
 ## Quality Gate
 
@@ -137,8 +161,9 @@ The plan is final only when every answer is yes:
 - Testing matches the risk
 - Release and rollback are safe
 - The plan survived hostile review
-- Every risk marked `Accepted by developer` was re-tested against evidence, and any re-opened one was decided again
-- Every Plan Template field survived intact: task IDs, Depends on, Skills, Parallel, Effort, Priority, Done when, checkpoints, change policy, replanning triggers, traceability
-- The plan's handover summary is complete, and a standalone handover document was produced if requested or marked `Not requested`
+- Task IDs were preserved or changed with a stated reason
+- New work and updates to existing work are grouped separately
+- The finalized plan is in the original file, not pasted into chat
+- The briefing omits empty sections and uses proven/likely/possible/uncertain, never numbers
 
 Any "no" means the plan is not final. Fix it and review again.

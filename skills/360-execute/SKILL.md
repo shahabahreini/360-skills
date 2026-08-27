@@ -1,6 +1,6 @@
 ---
 name: 360-execute
-description: Faithful plan execution with enforced coverage. Executes a finalized plan task by task, tracks every item in a coverage ledger, verifies each against its acceptance check with evidence, surfaces deviations instead of absorbing them, and finishes with a full-coverage QC sweep and flawless handover. Nothing on the plan is skipped, dropped, or claimed done without proof.
+description: Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and brief the user in chat. Use when a plan exists and work must begin, or when resuming a partial execution.
 version: 1.1.0
 ---
 
@@ -8,22 +8,26 @@ version: 1.1.0
 
 ## Purpose
 
-Run this skill when a **finalized plan must be executed** — completely, faithfully, and verifiably. Its job: guarantee that everything on the plan gets done, gets QCed against its own acceptance check, and gets accounted for — nothing missed, nothing silently changed, nothing claimed without evidence.
+Run this skill when a finalized plan must be executed — completely, faithfully, and verifiably. Everything on the plan gets done, QCed against its own acceptance check, and accounted for.
 
-This skill executes plans. To create one, use `360-blueprint`. To fit one to this developer, use `360-faculty`. To stress-test and finalize one, use `360-expert-review`. To audit the built result afterward, use `360-backend-audit`. Run `360-token-efficiency` alongside this skill when context or cost matters.
+This skill executes plans. To create one, use `360-blueprint`. To stress-test and finalize one, use `360-expert-review`. To audit the built result afterward, use `360-backend-audit`.
+
+The ledger and report live in a file. Chat gets a short briefing only.
 
 ## When to Use
 
 - A plan exists and work must begin — any domain, any scale
 - Any request of the form "implement this plan", "build this", "execute this"
-- Resuming a partially executed plan — the ledger file rebuilds the state
-- Not for creating plans (`360-blueprint`), tailoring them to this developer (`360-faculty`), or reviewing drafts (`360-expert-review`)
+- Resuming a partially executed plan — the ledger file is the source of truth
+- Not for creating plans (`360-blueprint`) or reviewing drafts (`360-expert-review`)
 
 ## Core Principle
 
-The plan is the contract: execute what it says, not what feels close enough. Coverage is tracked rather than trusted, and done is a verdict backed by evidence, not a feeling that the work is finished.
-
-Reality overrides the plan only through an explicit decision, never through a quiet improvisation.
+- The plan is the contract — execute what it says, not what feels close enough
+- Coverage is tracked, not trusted — a persisted ledger records every task and its verdict
+- Done is a verdict with evidence — a task is complete when its acceptance check passes
+- Deviations surface, never absorb — reality overrides the plan only through an explicit decision
+- The file is the record. Chat is the briefing
 
 ## Workflow
 
@@ -34,19 +38,19 @@ Never execute a plan you have not fully read.
 - Read the entire plan before touching anything: objective, scope, assumptions, every phase, every task, every checkpoint
 - Build the full task inventory: every task ID, its priority, its dependencies, its "done when" check
 - If any task lacks an observable acceptance check, derive one and confirm it with the user before executing that task
-- Check the plan's `Status`: only `360-expert-review` sets `Reviewed and ready to execute`, so a plan merely drafted or tailored by `360-faculty` is not final. If it is not final, say so and confirm before executing
-- If anything is ambiguous, ask before starting — questions before execution, not after
+- If anything is ambiguous, ask before starting
 
-### 2. Build the Coverage Ledger
+### 2. Persist the Coverage Ledger
 
 The ledger is the spine of execution and the source of truth for progress.
 
-- Write it to a file, never only to the conversation: `<plan-name>.ledger.md` beside the plan, or an `## Execution Ledger` section appended to the plan file itself
-- One row per task: ID, name, priority, acceptance check, status, evidence
-- Statuses: `pending` / `in progress` / `done (verified)` / `blocked` / `dropped (approved)`. The last three are terminal
-- Update the file as each status changes, not in a batch at the end — an interrupted run must leave accurate state on disk
-- Nothing counts as done until the ledger says verified — memory and confidence are not tracking
-- To resume, read the ledger file first and continue from the first non-terminal row
+- Write it to a file and keep it current after every task
+- Reuse the existing path if known; otherwise `plans/<short-slug>-execution.md`; create the folder if needed; ask once if ambiguous
+- If the file cannot be written, stop and ask — never treat chat as the ledger
+- One row per task: ID, name, priority, acceptance check, status
+- Statuses: `pending` / `in progress` / `done (verified)` / `blocked` / `dropped (approved)`
+- Nothing counts as done until the ledger says verified
+- A fresh agent must be able to open the file and continue with zero guessing
 
 ### 3. Execute in Order
 
@@ -70,35 +74,65 @@ When reality disagrees with the plan — a failed assumption, missing informatio
 - Follow the plan's change policy or replanning triggers
 - Surface the deviation to the user with options and a recommendation
 - Never silently absorb new scope, never silently skip a task
-- A risk whose countermeasure reads `Accepted by developer` was decided before execution began; it is not a deviation. Re-surface it only if execution produces new evidence that overturns the acceptance
 - A `must`-priority task is never dropped without an explicit user decision; `should`/`could` tasks follow the plan's cut line
 
-### 6. Sweep for Full Coverage
+### 6. Sweep and Write the Report
 
 Before declaring completion, walk the ledger top to bottom:
 
-- Every task has an accounted status, and every non-terminal one is listed as unfinished with a reason
+- Every task has a final status — zero unaccounted items
 - Cross-check the plan's traceability: every objective maps to verified work
 - Run the plan's overall verification; confirm all checkpoints passed
 - Sweep once more for regressions introduced across phases
-- Only then write the Execution Report
+- Write the execution report into the same ledger file
+- Print only the terminal briefing
 
 ## Output Format
 
-Deliver an Execution Report in exactly this structure:
+### Work file
 
-1. **Coverage ledger** — every task: ID, name, priority, final status, and the evidence behind each `done (verified)`
-2. **Deviations** — what diverged from the plan, how each was resolved, who approved it; or "None"
-3. **QC results** — checks run, checkpoints verified, regression sweeps, and their outcomes
-4. **Unfinished items** — anything pending, blocked, or dropped, each with its reason and approval; or "None"
-5. **Handover summary** — context, decisions, state (done / pending / blocked), remaining tasks with exactly what, how, and where, verification, and risks with how to detect them early
+The ledger file contains:
+
+1. Coverage ledger — every task: ID, name, priority, final status, evidence for each `done (verified)`
+2. Deviations — what diverged, how it was resolved, who approved it; or "None"
+3. QC results — checks run, checkpoints verified, regression sweeps, outcomes
+4. Unfinished items — pending, blocked, or dropped, with reason and approval; or "None"
+5. Handover summary — context, decisions, current state, remaining tasks with what/how/where, risks and how to detect them early
+
+### Terminal briefing
+
+Use this shape. Omit any section that would be empty. Never paste the work file into chat.
+
+```text
+Execution — <n>/<m> tasks verified
+Full report: <path>
+
+Done
+- <outcome delivered>
+
+Updates to existing
+- <change made to something that already existed>
+
+Blocked
+- <item and why>
+
+Deviations
+- <what changed and whether it was approved>
+
+Issues found
+- <bug or surprise> — <proven|likely|possible|uncertain>
+```
+
+- Talk to the user, not the next agent
+- Done is new work shipped. Updates to existing is a change to something that already existed. Never mix them
+- Confidence: `proven` evidence in hand; `likely` strong reason; `possible` suspected; `uncertain` hypothesis. Never numbers. Never say proven without evidence
+- No ledger dump, no handover essay, no skill names
 
 ## Quality Gate
 
 Execution is complete only when every answer is yes:
 
-- The ledger exists as a file on disk and matches the reported outcome
-- Every task in the plan appears in the ledger with an accounted status — zero unaccounted items
+- Every task in the plan appears in the ledger file with a final status — zero unaccounted items
 - Every `done (verified)` verdict is backed by evidence from the task's own acceptance check
 - Every phase checkpoint was verified before the next phase began
 - Every deviation was surfaced and resolved through the plan's change policy or a user decision — none silently absorbed
@@ -106,8 +140,9 @@ Execution is complete only when every answer is yes:
 - Every objective in the plan's traceability maps to verified work
 - Regressions and collateral damage were swept for, and the results are stated
 - Declared skills were loaded wherever the plan required them
-- The plan's status was checked, and executing a plan that is not final was confirmed with the user
 - Unfinished items are stated honestly — pending, blocked, or dropped, with reasons
-- The handover lets the next agent continue with zero guessing
+- The ledger file lets the next agent continue with zero guessing
+- Chat does not contain the ledger or report body
+- The briefing omits empty sections and uses proven/likely/possible/uncertain, never numbers
 
 Any "no" means execution is not finished. Fix it and re-run the sweep.
