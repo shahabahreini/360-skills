@@ -1,6 +1,6 @@
 ---
 name: 360-expert-review
-description: Pre-finalization plan review that stress-tests a draft plan for user impact, reliability, security, rollback, traceability, and failure modes. Uses direct expert lenses instead of persona theater and finalizes only after hostile review.
+description: Pre-finalization plan review and adversarial pre-mortem that stress-tests draft plans for user impact, reliability, security, rollback, traceability, and edge cases. Uses direct expert lenses instead of persona theater and finalizes only after hostile review.
 version: 3.1.0
 ---
 

@@ -3,6 +3,8 @@
 [![License: MIT](https://img.shields.io/github/license/shahabahreini/360-skills?color=blue)](LICENSE)
 [![Agent Skills format](https://img.shields.io/badge/format-agent--skills-black)](https://agentskills.io)
 [![Install via skills.sh](https://img.shields.io/badge/install-skills.sh-black)](https://skills.sh)
+[![llms.txt](https://img.shields.io/badge/llms.txt-standard-blue)](llms.txt)
+[![CI](https://github.com/shahabahreini/360-skills/actions/workflows/consistency.yml/badge.svg)](https://github.com/shahabahreini/360-skills/actions)
 
 <p align="center">
   <img src="assets/cover-zen-dark.png" alt="360-skills Workflow" width="100%">
@@ -10,7 +12,7 @@
 
 **360-skills is an open collection of Agent Skills that give AI coding agents senior-level expertise for specific, high-stakes tasks.**
 
-Most agents produce plausible work. Each skill in this repository packages the process, judgment, and quality gates of a senior specialist into a single installable `SKILL.md` file, so agents stop shipping the first draft and start shipping the vetted one. Skills follow the open [Agent Skills](https://agentskills.io) standard and install into Claude Code, Cursor, Codex, and 70+ other agents through [skills.sh](https://skills.sh).
+Most agents produce plausible work. Each skill in this repository packages the process, judgment, and quality gates of a senior specialist into a single installable `SKILL.md` file, so agents stop shipping the first draft and start shipping the vetted one. Skills follow the open [Agent Skills](https://agentskills.io) standard and install into Claude Code, Cursor, Codex, Copilot, Windsurf, Gemini CLI, and 70+ other agents through [skills.sh](https://skills.sh).
 
 ## Install
 
@@ -28,9 +30,9 @@ npx skills add shahabahreini/360-skills --skill 360-expert-review --agent claude
 
 | Skill                                                 | Description                                                                                                                                                                                                                                                                                                      | Version |
 | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| [`360-blueprint`](skills/360-blueprint)               | Universal plan creator for new objectives in any domain. Clarifies the real objective, separates confirmation from generation, avoids invented details, enforces domain quality, and produces a self-contained plan an agent can execute without guessing.                                                       | 2.1.0   |
+| [`360-blueprint`](skills/360-blueprint)               | Universal plan creator for new objectives, features, RFCs, and migrations in any domain. Clarifies the real objective, separates confirmation from generation, avoids invented details, enforces domain quality, and produces a self-contained plan an agent can execute without guessing.                       | 2.1.0   |
 | [`360-faculty`](skills/360-faculty)                   | Seat a living, tailored expert team on a plan or task. Use when work must fit this developer's goals, taste, mindset, and strategy, when a plan needs the right expertise chosen for its complexity, depth, and nature, or when a named faculty team must be created, called, or updated. Recommends a short list, asks only the questions that still change the work, polishes immediately, and keeps upgradable memory. | 1.0.0   |
-| [`360-expert-review`](skills/360-expert-review)       | Pre-finalization plan review that stress-tests a draft plan for user impact, reliability, security, rollback, traceability, and failure modes. Uses direct expert lenses instead of persona theater and finalizes only after hostile review.                                                                     | 3.1.0   |
+| [`360-expert-review`](skills/360-expert-review)       | Pre-finalization plan review and adversarial pre-mortem that stress-tests draft plans for user impact, reliability, security, rollback, traceability, and edge cases. Uses direct expert lenses instead of persona theater and finalizes only after hostile review.                                             | 3.1.0   |
 | [`360-execute`](skills/360-execute)                   | Faithful plan execution with enforced coverage. Executes a finalized plan task by task, tracks every item in a coverage ledger, verifies each against its acceptance check with evidence, surfaces deviations instead of absorbing them, and finishes with a full-coverage QC sweep and flawless handover. Nothing on the plan is skipped, dropped, or claimed done without proof. | 1.1.0   |
 | [`360-backend-audit`](skills/360-backend-audit)       | Deep audit of backend code, APIs, services, business logic, data layers, integrations, and jobs. Verifies correctness, hunts dead weight and duplication, finds safe performance risks, hardens observability, and ends with a usable handover. Functionality, reliability, and accuracy are never traded away.  | 1.2.0   |
 | [`360-token-efficiency`](skills/360-token-efficiency) | Runtime skill that reduces token waste during AI-agent tasks without dropping facts, changing requirements, or weakening correctness. Applies silent context discipline, effort sizing, progressive disclosure, compaction, and concise output. Use continuously alongside other skills when token cost matters. | 1.2.1   |
@@ -98,27 +100,31 @@ A skill is a folder containing a `SKILL.md` file with a `name`, a `description`,
 
 ```
 360-skills/
-├── README.md                Project overview and install instructions
-├── AGENTS.md                Contributor guide for adding new skills
-├── llms.txt                 Machine-readable index for AI engines
-├── LICENSE                  MIT license
+├── README.md                  Project overview and install instructions
+├── AGENTS.md                  Contributor guide for adding new skills
+├── CONTRIBUTING.md            Quick pointer to contributor guide
+├── llms.txt                   Machine-readable index for AI engines
+├── llms-full.txt              Full compiled context for single-fetch LLM ingestion
+├── LICENSE                    MIT license
+├── faculty/                   Tailored expert dossiers and developer profile
 ├── scripts/
-│   └── check-consistency.mjs  Validates skills against README and llms.txt
+│   ├── build-llms-full.mjs    Compiles full documentation into llms-full.txt
+│   └── check-consistency.mjs Validates skills against README and llms.txt
 ├── .github/workflows/
-│   └── consistency.yml      Runs the validator on every push and PR
+│   └── consistency.yml        Runs the validator on every push and PR
 └── skills/
     ├── 360-blueprint/
-    │   └── SKILL.md         Skill definition and instructions
+    │   └── SKILL.md           Skill definition and instructions
     ├── 360-faculty/
-    │   └── SKILL.md         Skill definition and instructions
+    │   └── SKILL.md           Skill definition and instructions
     ├── 360-expert-review/
-    │   └── SKILL.md         Skill definition and instructions
+    │   └── SKILL.md           Skill definition and instructions
     ├── 360-execute/
-    │   └── SKILL.md         Skill definition and instructions
+    │   └── SKILL.md           Skill definition and instructions
     ├── 360-backend-audit/
-    │   └── SKILL.md         Skill definition and instructions
+    │   └── SKILL.md           Skill definition and instructions
     └── 360-token-efficiency/
-        └── SKILL.md         Skill definition and instructions
+        └── SKILL.md           Skill definition and instructions
 ```
 
 ## Contributing
@@ -131,7 +137,7 @@ Before opening a pull request, run the consistency validator:
 node scripts/check-consistency.mjs
 ```
 
-It fails the build when a skill is missing from the README table or `llms.txt`, when a version or description has drifted from its `SKILL.md` frontmatter, or when a skill's section order is wrong.
+It fails the build when a skill is missing from the README table or `llms.txt`, when a version or description has drifted from its `SKILL.md` frontmatter, when `llms-full.txt` is stale, or when a skill's section order is wrong.
 
 ## FAQ
 

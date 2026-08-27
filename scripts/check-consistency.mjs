@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 // Validates that every skill on disk is registered, in sync, and correctly structured.
-// Zero dependencies. Exits non-zero and lists every violation it found.
+// Zero external dependencies. Exits non-zero and lists every violation it found.
 
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { generateLlmsFull } from "./build-llms-full.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SKILLS_DIR = join(ROOT, "skills");
@@ -175,6 +176,22 @@ for (const name of llmsEntries.keys()) {
   if (!skills.has(name)) fail(`llms.txt: lists ${name}, which does not exist under skills/`);
 }
 
+// --- llms-full.txt -----------------------------------------------------------
+
+let diskLlmsFull;
+try {
+  diskLlmsFull = readFileSync(join(ROOT, "llms-full.txt"), "utf8").replace(/\r\n/g, "\n");
+} catch {
+  fail("llms-full.txt: missing file. Run: node scripts/build-llms-full.mjs");
+}
+
+if (diskLlmsFull) {
+  const expectedLlmsFull = generateLlmsFull();
+  if (diskLlmsFull !== expectedLlmsFull) {
+    fail("llms-full.txt: out of sync with repository contents. Run: node scripts/build-llms-full.mjs");
+  }
+}
+
 // --- report ------------------------------------------------------------------
 
 if (errors.length > 0) {
@@ -184,4 +201,4 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-console.log(`check-consistency: ${skills.size} skills, all consistent.`);
+console.log(`check-consistency: ${skills.size} skills and llms-full.txt, all consistent.`);

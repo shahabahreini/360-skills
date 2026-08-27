@@ -1,0 +1,1540 @@
+# 360-skills: Complete Agent Skills Catalog & Documentation
+
+> 360-skills is an open-standard, MIT-licensed collection of Agent Skills for AI coding agents (Claude Code, Cursor, Codex, Copilot, Windsurf, Gemini CLI, and 70+ others via skills.sh).
+
+This document compiles all repository documentation, contributor specifications, and full SKILL.md instruction sets for direct, single-fetch LLM ingestion.
+
+## Table of Contents
+- [Overview & Installation](#overview--installation)
+- [Contributor Guide (AGENTS.md)](#contributor-guide-agentsmd)
+- [Skills Catalog](#skills-catalog)
+  - [360-backend-audit](#skill-360-backend-audit)
+  - [360-blueprint](#skill-360-blueprint)
+  - [360-execute](#skill-360-execute)
+  - [360-expert-review](#skill-360-expert-review)
+  - [360-faculty](#skill-360-faculty)
+  - [360-token-efficiency](#skill-360-token-efficiency)
+
+---
+
+## Overview & Installation
+
+# 360-skills
+
+[![License: MIT](https://img.shields.io/github/license/shahabahreini/360-skills?color=blue)](LICENSE)
+[![Agent Skills format](https://img.shields.io/badge/format-agent--skills-black)](https://agentskills.io)
+[![Install via skills.sh](https://img.shields.io/badge/install-skills.sh-black)](https://skills.sh)
+[![llms.txt](https://img.shields.io/badge/llms.txt-standard-blue)](llms.txt)
+[![CI](https://github.com/shahabahreini/360-skills/actions/workflows/consistency.yml/badge.svg)](https://github.com/shahabahreini/360-skills/actions)
+
+<p align="center">
+  <img src="assets/cover-zen-dark.png" alt="360-skills Workflow" width="100%">
+</p>
+
+**360-skills is an open collection of Agent Skills that give AI coding agents senior-level expertise for specific, high-stakes tasks.**
+
+Most agents produce plausible work. Each skill in this repository packages the process, judgment, and quality gates of a senior specialist into a single installable `SKILL.md` file, so agents stop shipping the first draft and start shipping the vetted one. Skills follow the open [Agent Skills](https://agentskills.io) standard and install into Claude Code, Cursor, Codex, Copilot, Windsurf, Gemini CLI, and 70+ other agents through [skills.sh](https://skills.sh).
+
+## Install
+
+```bash
+npx skills add shahabahreini/360-skills
+```
+
+The installer lists every skill in this repository and lets you choose which agents to install it for. To install a single skill non-interactively:
+
+```bash
+npx skills add shahabahreini/360-skills --skill 360-expert-review --agent claude-code
+```
+
+## Skills
+
+| Skill                                                 | Description                                                                                                                                                                                                                                                                                                      | Version |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| [`360-blueprint`](skills/360-blueprint)               | Universal plan creator for new objectives, features, RFCs, and migrations in any domain. Clarifies the real objective, separates confirmation from generation, avoids invented details, enforces domain quality, and produces a self-contained plan an agent can execute without guessing.                       | 2.1.0   |
+| [`360-faculty`](skills/360-faculty)                   | Seat a living, tailored expert team on a plan or task. Use when work must fit this developer's goals, taste, mindset, and strategy, when a plan needs the right expertise chosen for its complexity, depth, and nature, or when a named faculty team must be created, called, or updated. Recommends a short list, asks only the questions that still change the work, polishes immediately, and keeps upgradable memory. | 1.0.0   |
+| [`360-expert-review`](skills/360-expert-review)       | Pre-finalization plan review and adversarial pre-mortem that stress-tests draft plans for user impact, reliability, security, rollback, traceability, and edge cases. Uses direct expert lenses instead of persona theater and finalizes only after hostile review.                                             | 3.1.0   |
+| [`360-execute`](skills/360-execute)                   | Faithful plan execution with enforced coverage. Executes a finalized plan task by task, tracks every item in a coverage ledger, verifies each against its acceptance check with evidence, surfaces deviations instead of absorbing them, and finishes with a full-coverage QC sweep and flawless handover. Nothing on the plan is skipped, dropped, or claimed done without proof. | 1.1.0   |
+| [`360-backend-audit`](skills/360-backend-audit)       | Deep audit of backend code, APIs, services, business logic, data layers, integrations, and jobs. Verifies correctness, hunts dead weight and duplication, finds safe performance risks, hardens observability, and ends with a usable handover. Functionality, reliability, and accuracy are never traded away.  | 1.2.0   |
+| [`360-token-efficiency`](skills/360-token-efficiency) | Runtime skill that reduces token waste during AI-agent tasks without dropping facts, changing requirements, or weakening correctness. Applies silent context discipline, effort sizing, progressive disclosure, compaction, and concise output. Use continuously alongside other skills when token cost matters. | 1.2.1   |
+
+## Which Skill Do I Need?
+
+| Your situation | Load |
+| --- | --- |
+| A goal exists, but no plan yet | `360-blueprint` |
+| Unsure which expertise the work needs, before or after planning | `360-faculty` (suggest mode) |
+| Work must fit this developer's goals, taste, and standing decisions | `360-faculty` |
+| A named expert team must be created, called, or updated | `360-faculty` |
+| A draft plan exists and needs hardening | `360-expert-review` |
+| A finalized plan exists and needs building | `360-execute` |
+| Backend code exists and needs auditing | `360-backend-audit` |
+| Any of the above, and context or cost matters | add `360-token-efficiency` |
+
+## How the Skills Work Together
+
+Most skills hand off to one another sequentially on the same piece of work. Two are more flexible: `360-faculty` attaches wherever expertise is needed — before planning, after a draft, or ahead of review — and `360-token-efficiency` is a runtime overlay that runs underneath any of the others rather than a step of its own.
+
+```mermaid
+flowchart TD
+    Objective([Objective to plan]) --> Blueprint["360-blueprint: draft the plan"]
+    Blueprint --> Faculty["360-faculty: tailor the plan to this developer"]
+    Faculty --> Review["360-expert-review: stress-test and finalize the plan"]
+    Review -->|fails the gate, revise| Blueprint
+    Review --> Execute["360-execute: run the finalized plan task by task"]
+    Execute --> Audit["360-backend-audit: audit the resulting backend code"]
+    Audit -->|findings seed the next objective| Objective
+
+    Faculty -.->|house style before planning| Blueprint
+    Faculty -.->|which lenses this review needs| Review
+
+    Efficiency["360-token-efficiency: runs underneath every step"] -.-> Blueprint
+    Efficiency -.-> Faculty
+    Efficiency -.-> Review
+    Efficiency -.-> Execute
+    Efficiency -.-> Audit
+```
+
+The four planning skills share one data contract: `360-blueprint`'s Plan Template. Every task carries a stable ID, a declared skill list, `must` / `should` / `could` priority, and an observable `Done when` check. `360-faculty` tailors the plan and `360-expert-review` hardens it, neither breaking that shape, and `360-execute` reads those exact fields. That is what lets a plan travel the whole pipeline without anyone re-typing it.
+
+- **`360-blueprint`** turns a vague goal into a complete, unambiguous plan with explicit assumptions, constraints, risks, and handover details.
+- **`360-faculty`** seats a short list of named experts fitted to this developer and to the plan's own complexity, depth, and nature, tailoring it surgically, remembering what it learns, and saving reusable teams that can be called by name later.
+- **`360-expert-review`** attacks that plan from every expert angle until only the strongest version survives, returning it in the same template with its findings, coverage, and verdict appended.
+- **`360-execute`** builds it, tracking every task in a coverage ledger written to disk, verifying each against its own acceptance check with evidence, and surfacing deviations instead of absorbing them.
+- **`360-backend-audit`** audits the resulting backend code for correctness, duplication, performance risks, and observability, ending with a usable handover and feeding findings back into the next planning cycle.
+- **`360-token-efficiency`** runs continuously alongside whichever skill is active, reducing token waste without dropping facts, changing requirements, or weakening correctness.
+
+Each skill also works standalone: ask `360-faculty` which expertise a plan needs without seating anyone, skip straight to `360-expert-review` for a plan someone else drafted, point `360-execute` at a plan someone else finalized, run `360-backend-audit` on existing code with no plan involved at all, or apply `360-token-efficiency` to any task regardless of which other skills are in play.
+
+## Design Principles
+
+1. **Expertise over templates**: skills simulate senior specialists, not checklists.
+2. **Coverage over speed**: every scenario, every effect, every failure mode.
+3. **Gates over suggestions**: nothing is "final" until it passes an explicit quality gate.
+4. **Simplicity over ceremony**: brief, strong instructions any agent can follow.
+
+## How Agent Skills Work
+
+A skill is a folder containing a `SKILL.md` file with a `name`, a `description`, and step-by-step instructions. Agents load skills through progressive disclosure: they scan every skill's name and description at startup, then load the full instructions only when a task matches. This keeps many skills available at once without bloating the agent's context window. See the [Agent Skills specification](https://agentskills.io) for the full format.
+
+## Repository Structure
+
+```
+360-skills/
+├── README.md                  Project overview and install instructions
+├── AGENTS.md                  Contributor guide for adding new skills
+├── CONTRIBUTING.md            Quick pointer to contributor guide
+├── llms.txt                   Machine-readable index for AI engines
+├── llms-full.txt              Full compiled context for single-fetch LLM ingestion
+├── LICENSE                    MIT license
+├── faculty/                   Tailored expert dossiers and developer profile
+├── scripts/
+│   ├── build-llms-full.mjs    Compiles full documentation into llms-full.txt
+│   └── check-consistency.mjs Validates skills against README and llms.txt
+├── .github/workflows/
+│   └── consistency.yml        Runs the validator on every push and PR
+└── skills/
+    ├── 360-blueprint/
+    │   └── SKILL.md           Skill definition and instructions
+    ├── 360-faculty/
+    │   └── SKILL.md           Skill definition and instructions
+    ├── 360-expert-review/
+    │   └── SKILL.md           Skill definition and instructions
+    ├── 360-execute/
+    │   └── SKILL.md           Skill definition and instructions
+    ├── 360-backend-audit/
+    │   └── SKILL.md           Skill definition and instructions
+    └── 360-token-efficiency/
+        └── SKILL.md           Skill definition and instructions
+```
+
+## Contributing
+
+New skills must follow the structure, naming, and quality bar defined in [AGENTS.md](AGENTS.md). In short: one skill per directory under `skills/`, kebab-case names prefixed with `360-`, required frontmatter (`name`, `description`, `version`), and a fixed section order (Purpose, When to Use, Core Principle, Workflow, Output Format, Quality Gate).
+
+Before opening a pull request, run the consistency validator:
+
+```bash
+node scripts/check-consistency.mjs
+```
+
+It fails the build when a skill is missing from the README table or `llms.txt`, when a version or description has drifted from its `SKILL.md` frontmatter, when `llms-full.txt` is stale, or when a skill's section order is wrong.
+
+## FAQ
+
+**What is an Agent Skill?**
+A portable, version-controlled folder that packages domain expertise and a repeatable workflow into instructions an AI agent can load on demand. See [agentskills.io](https://agentskills.io) for the open specification.
+
+**Which AI agents can use these skills?**
+Any agent supported by the [skills.sh](https://skills.sh) CLI, including Claude Code, Cursor, Codex, Windsurf, GitHub Copilot, OpenCode, and Gemini CLI.
+
+**Why is it called 360-skills?**
+Because the quality failures that matter most hide in the angles nobody checked. Every skill here is built to examine a problem from all sides before calling it done.
+
+**How do I add a new skill?**
+Read [AGENTS.md](AGENTS.md), create `skills/360-<name>/SKILL.md` following the required structure, then register it in this README's skills table.
+
+## License
+
+[MIT](LICENSE)
+
+---
+
+## Contributor Guide (AGENTS.md)
+
+# AGENTS.md: Contributor Guide for Agents
+
+This file tells AI agents how to add new skills to this repository. Follow it exactly.
+
+## Where Skills Live
+
+Every skill is a directory under `skills/`, named in kebab-case, containing one `SKILL.md`:
+
+```
+skills/<kebab-case-name>/SKILL.md
+```
+
+Experimental or unproven skills go under `skills/.experimental/<kebab-case-name>/SKILL.md` instead. Promote them to `skills/` only once they're stable and ready to be listed publicly.
+
+## Naming
+
+- Every skill name carries the `360-` prefix (e.g. `360-expert-review`, `360-api-design`).
+- The folder name and the frontmatter `name` must match exactly.
+
+## Required Frontmatter
+
+Every `SKILL.md` starts with YAML frontmatter containing exactly these fields:
+
+```yaml
+---
+name: 360-example-skill
+description: One sentence. Action-oriented. States what it does and when to use it.
+version: 1.0.0
+---
+```
+
+- `name`: must exactly match the folder name
+- `description`: two or three sentences, action-oriented, covering both what the skill does and when to reach for it. This is the only text an agent sees before deciding to load the skill, so it is the trigger surface: make it specific enough to win the right tasks and lose the wrong ones.
+- `version`: semantic version (`MAJOR.MINOR.PATCH`). Bump major when a skill's output shape changes, since other skills consume it.
+
+## Required Skill Body Structure
+
+Every `SKILL.md` follows this section order:
+
+1. **Purpose**: why this skill exists, in one or two sentences
+2. **When to Use**: concrete triggers for reaching for this skill
+3. **Core Principle**: the single idea the skill is built around
+4. **Workflow**: the ordered steps the agent executes
+5. **Output Format**: the exact shape of the final deliverable. May carry a domain-specific heading instead (`Plan Template`, `Final Plan Format`, `Audit Report Format`) as long as it defines that exact shape.
+6. **Quality Gate**: a yes/no checklist that must fully pass before the work is considered done
+
+## Style Rules
+
+- Brief. Imperative. No filler.
+- No redundant restrictions. Say a thing once, in the place it matters.
+- Usable by any agent, not just one product's assistant.
+- Prefer concrete checklists and steps over abstract advice.
+
+## Family Conventions
+
+Skills in this repository hand work to each other, so shared vocabulary is a contract, not a preference. A skill that emits or consumes a plan uses these exact values:
+
+- `Priority: must | should | could`. Only `should` and `could` sit below the cut line.
+- `Effort: S | M | L`
+- `Parallel: yes | no`
+- Every task carries a stable ID (`1.1`, `1.2`) that downstream skills reference.
+
+Every skill that produces a handover uses the same field list:
+
+> Context · Decisions · State (done / pending / blocked) · Remaining tasks (what, how, where) · Verification · Risks and how to detect them early
+
+Skills install individually into arbitrary agents, so there is no include mechanism. Each skill carries its own copy of these conventions, and that duplication is deliberate.
+
+Each skill's **When to Use** ends with a negative trigger naming the neighboring skills it should not be confused with. Keep those lines in sync with the routing table in `README.md`.
+
+## Registering a New Skill
+
+Adding a skill to `skills/` (not `.experimental/`) is not complete until both of these are updated:
+
+1. **`README.md`**: add a row to the skills index table with name, description, and version, plus a row in the routing table.
+2. **`llms.txt`**: add a bullet to the Skills list with the description copied verbatim from the frontmatter.
+
+Optional, and local only: `.claude-plugin/marketplace.json`. That directory is gitignored and never ships with the repository, so keep it in sync only if you maintain a local copy for plugin testing. It does not gate "done".
+
+Skills under `skills/.experimental/` are not registered anywhere until promoted.
+
+## Before You're Done
+
+Run `node scripts/check-consistency.mjs`. It enforces most of this list mechanically and exits non-zero with the specific violation.
+
+- [ ] Folder name is kebab-case and starts with `360-`
+- [ ] Frontmatter `name` matches the folder name exactly
+- [ ] `description` is two or three sentences, action-oriented, states when to use it
+- [ ] `version` is valid semver
+- [ ] Body follows the required section order
+- [ ] Family conventions followed: priority vocabulary, handover fields, negative trigger
+- [ ] `README.md` index, `README.md` routing table, and `llms.txt` are all updated (unless experimental)
+- [ ] `node scripts/check-consistency.mjs` exits 0
+
+---
+
+## Skills Catalog
+
+### Skill: 360-backend-audit
+
+---
+name: 360-backend-audit
+description: Deep audit of backend code, APIs, services, business logic, data layers, integrations, and jobs. Verifies correctness, hunts dead weight and duplication, finds safe performance risks, hardens observability, and ends with a usable handover. Functionality, reliability, and accuracy are never traded away.
+version: 1.2.0
+---
+
+# 360 Backend Audit
+
+## Purpose
+
+Run this skill on backend code: APIs, services, business logic, data access layers, integrations, background jobs, and pipelines. Its job is to turn working backend code into correct, lean, observable, and transferable code without breaking what already works.
+
+This skill is technology-agnostic. It audits logic, structure, and data flow, not the syntax of a specific stack.
+
+The code it audits often came from `360-execute`, and its findings seed the next `360-blueprint` cycle. Run `360-token-efficiency` alongside this skill when context or cost matters.
+
+## When to Use
+
+- Before or after merging significant backend work
+- When inheriting, refactoring, or modernizing services or data layers
+- When code feels heavy, fragile, slow, or hard to debug
+- Before handing code to another engineer or AI agent
+- Not for planning work that does not exist yet (`360-blueprint`) or executing a plan (`360-execute`)
+
+## Core Principle
+
+Working backend code is not finished code. Audit what exists that should not, what exists twice, what is subtly wrong, what may fail under load, what cannot be diagnosed when it breaks, and what the next engineer needs to continue safely.
+
+Functionality, reliability, and accuracy are untouchable. A fast bug is still a bug.
+
+## Workflow
+
+### 1. Map Before You Cut
+
+- Establish what the code does: purpose, inputs, outputs, side effects
+- Identify callers, dependencies, state changes, and trust boundaries
+- Treat current behavior as the baseline that must survive the audit
+- If behavior is unclear, mark it as a question, not a deletion
+
+### 2. Hunt Dead Weight
+
+Find and document:
+
+- Dead code
+- Redundant code
+- Incomplete logic
+- Swallowed failures
+- Stale flags, orphaned config, and unused paths
+
+Every finding needs evidence. No evidence, no removal.
+
+### 3. Verify Code Accuracy
+
+Scrutinize:
+
+- Business logic
+- Data integrity
+- Numeric accuracy
+- Concurrency
+- Trust boundaries
+- Failure semantics
+
+If you cannot prove a bug exists, mark it as a suspected risk with reasoning.
+
+### 4. Unify and Modularize
+
+- Unify duplicated business logic only when it is truly the same
+- Replace reinvented wheels with mature, maintained, lighter alternatives when justified
+- Separate transport, domain logic, and data access cleanly
+- Avoid premature abstraction
+
+### 5. Assess Performance Honestly
+
+Find real computational and data-access risks:
+
+- N+1 access
+- Missing indexes
+- Unbounded result sets
+- Repeated work
+- Blocking I/O
+- Caching opportunities with explicit staleness trade-offs
+
+Rules:
+
+- No performance recommendation may weaken functionality, reliability, accuracy, or precision
+- If you did not measure it, call it a risk, not a measured result
+- Rank opportunities by impact versus effort
+
+### 6. Make It Observable
+
+Audit the debugging surface:
+
+- Structured logs
+- Correct log levels
+- Useful error context
+- Correlation IDs
+- Audit trails for critical writes
+- Metrics for latency, errors, and throughput
+
+Observability changes must be additive and non-breaking.
+
+### 7. Verify Nothing Broke
+
+- Existing tests must pass
+- Where coverage is thin, propose missing tests first: boundary, failure, and concurrency cases
+- Classify every change as safe now, needs tests first, or needs human decision
+- When in doubt, deliver the audit as a plan and wait for approval
+
+### 8. Write the Handover Plan
+
+Always finish with a handover for the next agent. Include:
+
+- Context
+- Decisions
+- State: done / pending / blocked
+- Remaining tasks: what, how, where
+- Verification
+- Risks and how to detect them early
+
+If the next agent would have to guess, the handover is not finished.
+
+## Audit Report Format
+
+1. Overview
+2. Dead weight
+3. Accuracy
+4. Duplication and structure
+5. Performance risks
+6. Observability
+7. Risk register
+8. Implementation plan
+9. Handover plan
+
+## Quality Gate
+
+The audit is complete only when every answer is yes:
+
+- Every finding is backed by evidence
+- Clean areas are stated as clean
+- Accuracy risks are verified or clearly marked as suspected
+- No recommendation trades away functionality, reliability, accuracy, or precision without an explicit trade-off
+- Duplication is unified only where logic is genuinely the same
+- Every library suggested is maintained, trusted, and lighter than the code it replaces
+- Performance claims are measured when measurement is possible, and labeled as risks when it is not
+- The observability plan integrates without breaking behavior
+- The handover plan lets the next agent act with zero guessing
+
+Any "no" means the audit is not finished. Fix it and review again.
+
+---
+
+### Skill: 360-blueprint
+
+---
+name: 360-blueprint
+description: Universal plan creator for new objectives, features, RFCs, and migrations in any domain. Clarifies the real objective, separates confirmation from generation, avoids invented details, enforces domain quality, and produces a self-contained plan an agent can execute without guessing.
+version: 2.1.0
+---
+
+# 360 Blueprint
+
+## Purpose
+
+Run this skill when a plan must be created from scratch. Its job is to turn an objective into a clear, executable plan with explicit assumptions, constraints, risks, and handover.
+
+This skill creates plans. To fit one to this developer's goals, taste, and standing decisions, use `360-faculty`. To stress-test and finalize one, use `360-expert-review`. To execute a finalized plan, use `360-execute`. Run `360-token-efficiency` alongside this skill when context or cost matters.
+
+## When to Use
+
+- A new project, feature, migration, product, workflow, or initiative needs a plan
+- A goal exists but the path is unclear
+- Any request of the form "plan this"
+- Not for tailoring a draft to this developer (`360-faculty`), hardening one that already exists (`360-expert-review`), or building one that is already final (`360-execute`)
+
+## Core Principle
+
+A plan is not finished when it sounds complete. It is finished when a fresh executor can act without guessing, and when every task is tied to a real objective.
+
+Begin at the end. Think from first principles. Design out failure. Prefer the simplest plan that fully works.
+
+## Workflow
+
+### 1. Extract the True Objective
+
+- Ask until the objective is clear: what done means, what must not happen, and how success is measured.
+- Restate the objective in the user's terms.
+- Check legitimacy and feasibility before planning.
+- Surface constraints, deadlines, dependencies, and hidden goals.
+- If the objective is ambiguous, ask before generating.
+
+### 2. Confirm Before Generating
+
+- If critical facts are missing, stop after clarification and wait for confirmation.
+- Do not both ask blocking questions and deliver a final plan in the same turn.
+- If the user asks for a draft despite uncertainty, label it `Draft` and list open questions explicitly.
+
+### 3. See From Every Angle
+
+- First principles: what is known, what is assumed, what is unknown
+- Inversion: what would guarantee failure
+- Second-order effects: what each major step sets in motion
+- Stakeholders: who is affected, who decides, who executes, who can block
+- Constraints: time, people, skills, systems, dependencies, unknowns
+
+### 4. Design the Strategy
+
+- Choose the simplest path that fully satisfies the objective.
+- Sequence by dependency and by risk.
+- Put discovery work first when uncertainty could invalidate the plan.
+- Declare what is out of scope and how scope changes are handled.
+
+### 5. Craft the Plan
+
+- Structure the plan as phases and tasks. Give every task a stable ID (`1.1`, `1.2`) that later skills reference.
+- Every task states what, how, where, and done when.
+- Mark every task `Effort: S | M | L`, `Priority: must | should | could`, and `Parallel: yes | no`. Execution keys its drop rules off these exact values, so use no others.
+- List the skills the executor must load for each task, or `None`.
+- Define the cut line: `should` and `could` tasks may be cut, `must` tasks never.
+- Do not invent stack choices, vendors, metrics, or architecture details. If a choice is required but unknown, write it as an open question.
+- Keep names and terms consistent from start to finish.
+- Make the plan self-contained for a fresh executor.
+
+### 6. Enforce Quality by Domain
+
+Apply the standards of the domain the plan touches.
+
+When the plan produces code:
+
+- Maintainable
+- Scalable
+- Auditable
+- No duplication
+- No weak logic
+- No outdated practices
+
+When the plan produces documentation:
+
+- Update before creating
+- One source of truth
+- Clean structure
+- Easy to find
+
+For any other domain, define that domain's quality bar explicitly and enforce it.
+
+### 7. Stress-Test Before Delivery
+
+- Walk the plan end to end.
+- Run a premortem.
+- Falsify assumptions.
+- Check whether two executors could read the same step two different ways.
+- Verify every objective maps to tasks and every task serves an objective.
+
+### 8. Deliver Crystal Clear
+
+- Use the Plan Template below.
+- Fill every field or write `N/A` with a one-line reason.
+- State assumptions, open questions, and decision points explicitly.
+- Offer `360-faculty` when the plan should be fitted to this developer's taste and standing decisions before review.
+- Offer `360-expert-review` when the plan is important enough to deserve adversarial review.
+
+## Plan Template
+
+```markdown
+# Plan: <title>
+
+| Field | Value |
+|---|---|
+| Objective | <one sentence> |
+| Status | Draft / Ready for review / Reviewed and ready to execute |
+| Version | <version or date> |
+| Created | <date> |
+| Tailored by | <faculty roster reference, or N/A> |
+
+## 1. Objective & Definition of Done
+- Goal:
+- Done when:
+- Success measures:
+- Must not happen:
+
+## 2. Context & Constraints
+- Background:
+- Constraints:
+- Stakeholders:
+
+## 3. Strategy
+- Chosen path:
+- Why it wins:
+- Alternatives rejected:
+
+## 4. Scope
+- In scope:
+- Explicitly out of scope:
+- Change policy:
+
+## 5. Assumptions
+| # | Assumption | Validated by |
+|---|---|---|
+| A1 |  |  |
+
+## 6. Phases & Tasks
+### Phase 1: <name>
+Checkpoint:
+
+**Task 1.1 — <name>**
+- What:
+- How:
+- Where:
+- Depends on:
+- Skills: <skills the executor must load, or None>
+- Parallel: yes | no
+- Effort: S | M | L
+- Priority: must | should | could
+- Done when: <observable check>
+
+## 7. Risks & Countermeasures
+| Risk | Impact | Countermeasure |
+|---|---|---|
+
+## 8. Verification & Replanning
+- Per task:
+- Overall:
+- Replan when:
+
+## 9. Traceability
+| Objective | Covered by tasks |
+|---|---|
+
+## 10. Handover Summary
+- Context:
+- Decisions:
+- State: done / pending / blocked
+- Remaining tasks: what, how, where
+- Verification:
+- Risks and how to detect them early:
+- Cut line:
+- Open questions:
+- Decision points:
+```
+
+## Quality Gate
+
+The plan is ready only when every answer is yes:
+
+- The objective is clear and confirmed, or the output is explicitly marked `Draft`
+- No blocking question was skipped
+- No invented technical details were presented as facts
+- Every assumption is explicit and falsifiable
+- Every task has what, how, where, and done when
+- Every task has a stable ID, declared skills, and `Effort` / `Priority` / `Parallel` values from the defined vocabularies
+- The cut line is defined
+- Every objective maps to tasks and no orphan tasks remain
+- A fresh executor can act without guessing
+- Checkpoints and replanning triggers exist
+- The plan survived a premortem
+- The report follows the Plan Template exactly
+
+Any "no" means the plan is not finished. Refine and review again.
+
+---
+
+### Skill: 360-execute
+
+---
+name: 360-execute
+description: Faithful plan execution with enforced coverage. Executes a finalized plan task by task, tracks every item in a coverage ledger, verifies each against its acceptance check with evidence, surfaces deviations instead of absorbing them, and finishes with a full-coverage QC sweep and flawless handover. Nothing on the plan is skipped, dropped, or claimed done without proof.
+version: 1.1.0
+---
+
+# 360 Execute
+
+## Purpose
+
+Run this skill when a **finalized plan must be executed** — completely, faithfully, and verifiably. Its job: guarantee that everything on the plan gets done, gets QCed against its own acceptance check, and gets accounted for — nothing missed, nothing silently changed, nothing claimed without evidence.
+
+This skill executes plans. To create one, use `360-blueprint`. To fit one to this developer, use `360-faculty`. To stress-test and finalize one, use `360-expert-review`. To audit the built result afterward, use `360-backend-audit`. Run `360-token-efficiency` alongside this skill when context or cost matters.
+
+## When to Use
+
+- A plan exists and work must begin — any domain, any scale
+- Any request of the form "implement this plan", "build this", "execute this"
+- Resuming a partially executed plan — the ledger file rebuilds the state
+- Not for creating plans (`360-blueprint`), tailoring them to this developer (`360-faculty`), or reviewing drafts (`360-expert-review`)
+
+## Core Principle
+
+The plan is the contract: execute what it says, not what feels close enough. Coverage is tracked rather than trusted, and done is a verdict backed by evidence, not a feeling that the work is finished.
+
+Reality overrides the plan only through an explicit decision, never through a quiet improvisation.
+
+## Workflow
+
+### 1. Load the Plan Completely
+
+Never execute a plan you have not fully read.
+
+- Read the entire plan before touching anything: objective, scope, assumptions, every phase, every task, every checkpoint
+- Build the full task inventory: every task ID, its priority, its dependencies, its "done when" check
+- If any task lacks an observable acceptance check, derive one and confirm it with the user before executing that task
+- Check the plan's `Status`: only `360-expert-review` sets `Reviewed and ready to execute`, so a plan merely drafted or tailored by `360-faculty` is not final. If it is not final, say so and confirm before executing
+- If anything is ambiguous, ask before starting — questions before execution, not after
+
+### 2. Build the Coverage Ledger
+
+The ledger is the spine of execution and the source of truth for progress.
+
+- Write it to a file, never only to the conversation: `<plan-name>.ledger.md` beside the plan, or an `## Execution Ledger` section appended to the plan file itself
+- One row per task: ID, name, priority, acceptance check, status, evidence
+- Statuses: `pending` / `in progress` / `done (verified)` / `blocked` / `dropped (approved)`. The last three are terminal
+- Update the file as each status changes, not in a batch at the end — an interrupted run must leave accurate state on disk
+- Nothing counts as done until the ledger says verified — memory and confidence are not tracking
+- To resume, read the ledger file first and continue from the first non-terminal row
+
+### 3. Execute in Order
+
+- Follow phase order and task dependencies exactly; honor parallel markers
+- Load every skill a task declares (e.g., `360-token-efficiency`) before starting that task
+- Verify each phase checkpoint before advancing to the next phase — a failed checkpoint stops the line
+- Do exactly what the task specifies — no silent extras, no silent shortcuts
+
+### 4. Verify Every Task
+
+- Run the task's "done when" check and record the evidence in the ledger
+- Done means the check passed with evidence — never "looks right", never "should work"
+- If a check cannot be executed, mark the task `blocked` with the reason — never mark it done
+- Sweep for collateral damage after each task: nothing else broke, nothing unrelated changed
+
+### 5. Handle Deviations in the Open
+
+When reality disagrees with the plan — a failed assumption, missing information, a visibly better path:
+
+- Stop that line of work; do not improvise forward
+- Follow the plan's change policy or replanning triggers
+- Surface the deviation to the user with options and a recommendation
+- Never silently absorb new scope, never silently skip a task
+- A risk whose countermeasure reads `Accepted by developer` was decided before execution began; it is not a deviation. Re-surface it only if execution produces new evidence that overturns the acceptance
+- A `must`-priority task is never dropped without an explicit user decision; `should`/`could` tasks follow the plan's cut line
+
+### 6. Sweep for Full Coverage
+
+Before declaring completion, walk the ledger top to bottom:
+
+- Every task has an accounted status, and every non-terminal one is listed as unfinished with a reason
+- Cross-check the plan's traceability: every objective maps to verified work
+- Run the plan's overall verification; confirm all checkpoints passed
+- Sweep once more for regressions introduced across phases
+- Only then write the Execution Report
+
+## Output Format
+
+Deliver an Execution Report in exactly this structure:
+
+1. **Coverage ledger** — every task: ID, name, priority, final status, and the evidence behind each `done (verified)`
+2. **Deviations** — what diverged from the plan, how each was resolved, who approved it; or "None"
+3. **QC results** — checks run, checkpoints verified, regression sweeps, and their outcomes
+4. **Unfinished items** — anything pending, blocked, or dropped, each with its reason and approval; or "None"
+5. **Handover summary** — context, decisions, state (done / pending / blocked), remaining tasks with exactly what, how, and where, verification, and risks with how to detect them early
+
+## Quality Gate
+
+Execution is complete only when every answer is yes:
+
+- The ledger exists as a file on disk and matches the reported outcome
+- Every task in the plan appears in the ledger with an accounted status — zero unaccounted items
+- Every `done (verified)` verdict is backed by evidence from the task's own acceptance check
+- Every phase checkpoint was verified before the next phase began
+- Every deviation was surfaced and resolved through the plan's change policy or a user decision — none silently absorbed
+- No `must`-priority task was dropped or skipped without explicit user approval
+- Every objective in the plan's traceability maps to verified work
+- Regressions and collateral damage were swept for, and the results are stated
+- Declared skills were loaded wherever the plan required them
+- The plan's status was checked, and executing a plan that is not final was confirmed with the user
+- Unfinished items are stated honestly — pending, blocked, or dropped, with reasons
+- The handover lets the next agent continue with zero guessing
+
+Any "no" means execution is not finished. Fix it and re-run the sweep.
+
+---
+
+### Skill: 360-expert-review
+
+---
+name: 360-expert-review
+description: Pre-finalization plan review and adversarial pre-mortem that stress-tests draft plans for user impact, reliability, security, rollback, traceability, and edge cases. Uses direct expert lenses instead of persona theater and finalizes only after hostile review.
+version: 3.1.0
+---
+
+# 360 Expert Review
+
+## Purpose
+
+Run this skill before finalizing any important plan. Its job is to turn a draft into the strongest usable plan by exposing missing scenarios, weak assumptions, and hidden failure modes.
+
+Drafts usually arrive from `360-blueprint`, sometimes already tailored by `360-faculty`. Once a plan passes this review, hand it to `360-execute` to build. Run `360-token-efficiency` alongside this skill when context or cost matters.
+
+## When to Use
+
+- A plan changes real systems, data, users, money, security, or operations
+- A wrong assumption or missed case could create real damage
+- A plan needs adversarial review before execution
+- Not for writing a plan that does not exist yet (`360-blueprint`), tailoring one to this developer (`360-faculty`), or executing one already final (`360-execute`)
+
+## Core Principle
+
+Review the plan the way a senior team would: user impact, reliability, security, operations, and domain correctness. Then attack it hard enough that only the strongest version survives.
+
+## Workflow
+
+### 1. Understand the Project First
+
+- Identify the real problem, not just the requested task.
+- Identify users, stakeholders, constraints, dependencies, and what must not break.
+- Ask questions until the plan can be judged without guessing.
+- If a handover is needed, ask for it explicitly.
+
+### 2. Review Through Expert Lenses
+
+Use only the lenses this project needs:
+
+- Architecture: boundaries, simplicity, trade-offs
+- Engineering: correctness, edge cases, integration, performance
+- Product and UX: user value, friction, recovery, accessibility
+- QA: scenario coverage, regressions, acceptance criteria
+- Operations: deployment, observability, rollback
+- Security and privacy: access, data exposure, abuse cases
+- Domain: business rules, terminology, real-world accuracy
+
+Do not role-play personas. Extract findings directly from each lens.
+
+If `360-faculty` supplied a prioritized lens list for this plan, start from it, then add any lens this plan needs that the list omits. A supplied list sets the order of attack, never the limit of coverage.
+
+### 3. Cover the User Completely
+
+- Solve the real need with the lowest-friction path that works.
+- Cover empty, loading, error, interrupted, and recovery states.
+- Prevent lost work, confusion, and irreversible mistakes.
+- Include first-time, returning, low-skill, accessibility, and poor-connectivity users when relevant.
+
+### 4. Cover Every Scenario and Effect
+
+- Map affected components, data, APIs, permissions, integrations, and existing behavior.
+- Cover happy paths, edge cases, invalid input, retries, duplicates, and concurrency.
+- Cover dependency failures, timeouts, partial completion, degraded performance, migrations, mixed versions, and rollback.
+- Every risk needs prevention, detection, mitigation, or rollback.
+
+### 5. Guarantee Reliability and Traceability
+
+- Validation, error handling, idempotency, and graceful failure where relevant
+- Security, privacy, performance, and compatibility where relevant
+- The simplest design that fully works
+- Every requirement traceable to implementation, tests, monitoring, and ownership
+- Debugging path: meaningful errors, structured logs, correlation IDs, metrics, alerts, and reproduction path
+
+### 6. Verify Everything
+
+- Define testing proportional to risk.
+- Every acceptance criterion must be observable.
+- "Works correctly" is not a criterion.
+
+### 7. Attack the Plan
+
+Switch to hostile critic. Ask:
+
+- What is assumed but unproven?
+- What is missing: a user, a state, a sequence, a permission, a failure mode?
+- What is the most likely failure?
+- What is the most damaging failure?
+- Which step could be read two different ways?
+- What cannot be detected, reproduced, or reversed?
+- What can be simpler?
+- Which risk was accepted instead of solved, and does evidence now overturn that acceptance?
+
+A risk whose countermeasure reads `Accepted by developer` is attack surface, not settled matter. Re-open any of them when evidence warrants, put the evidence in front of the developer, and let them decide again. An earlier acceptance never exempts a risk from this review.
+
+Fix the plan, then attack it again until no high-severity issue remains open.
+
+### 8. Complete the Handover
+
+Section 10 of the plan template is always filled. It is part of the plan, not an optional extra. Use these fields:
+
+- Context
+- Decisions
+- State: done / pending / blocked
+- Remaining tasks: what, how, where
+- Verification
+- Risks and how to detect them early
+
+If the user also asked for a standalone handover document, produce one with the same fields. If they did not, mark it `Not requested`.
+
+## Final Plan Format
+
+Return the revised plan in `360-blueprint`'s Plan Template, sections 1 to 10 intact.
+
+Preserve every task field — ID, Depends on, Skills, Parallel, Effort, Priority, Done when — along with phase checkpoints, the change policy, the replanning triggers, and the traceability table. `360-execute` reads those fields directly. A review that turns them into prose breaks execution.
+
+If the incoming plan is not in the template, normalize it into the template first, then review.
+
+Append the review's own output as four further sections:
+
+- **11. Expert Findings and Key Decisions**: what each lens surfaced, and what was decided
+- **12. Scenario and Impact Coverage**: components, data, users, states, edge cases, and failure modes
+- **13. Reliability, Observability, and Release**: reliability and security measures, debugging path, tests and observable acceptance criteria, release, monitoring, and rollback
+- **14. Review Verdict**: risks found, how each was resolved, and why this is the strongest version
+
+Set the plan's Status field to `Reviewed and ready to execute`.
+
+## Quality Gate
+
+The plan is final only when every answer is yes:
+
+- Real user need understood and served
+- The right expert lenses were applied
+- Every important scenario and effect was mapped
+- Every risk has a countermeasure
+- Requirements are traceable to code, tests, and monitoring
+- Failures are detectable, reproducible, diagnosable, and fixable
+- The design is clear, consistent, and as simple as possible
+- Testing matches the risk
+- Release and rollback are safe
+- The plan survived hostile review
+- Every risk marked `Accepted by developer` was re-tested against evidence, and any re-opened one was decided again
+- Every Plan Template field survived intact: task IDs, Depends on, Skills, Parallel, Effort, Priority, Done when, checkpoints, change policy, replanning triggers, traceability
+- The plan's handover summary is complete, and a standalone handover document was produced if requested or marked `Not requested`
+
+Any "no" means the plan is not final. Fix it and review again.
+
+---
+
+### Skill: 360-faculty
+
+---
+name: 360-faculty
+description: Seat a living, tailored expert team on a plan or task. Use when work must fit this developer's goals, taste, mindset, and strategy, when a plan needs the right expertise chosen for its complexity, depth, and nature, or when a named faculty team must be created, called, or updated. Recommends a short list, asks only the questions that still change the work, polishes immediately, and keeps upgradable memory.
+version: 1.0.0
+---
+
+# 360 Faculty
+
+## Purpose
+
+Run this skill to **staff and tailor** work. Its job: seat named faculties who know this developer, ask only what still changes the plan, polish at once, and remember what they learned.
+
+Family position:
+
+- `360-blueprint` creates the plan — this skill does not
+- `360-faculty` attaches at any stage: before planning to set the house style, after a draft to tailor it, or ahead of review to name the lenses that review must apply
+- `360-expert-review` finalizes the plan through adversarial attack — this skill never claims finality
+- `360-execute` builds the finalized plan — this skill never marks a plan ready for it
+- `360-token-efficiency` may run underneath, as with any other skill
+
+`360-expert-review` assembles an ephemeral panel per plan and attacks it. This skill keeps a persistent team that grows with the developer and advises. One is a hostile review board; the other is a tailor's shop.
+
+Produces four artifacts: a fit assessment, a seated roster, upgradable dossiers and named teams, and a surgically polished plan — or concrete faculty guidance if no plan exists yet.
+
+## When to Use
+
+- A plan or task needs experts fitted to this developer, not a generic panel
+- The developer asks which expertise this work needs, and wants the best fit chosen from its complexity, depth, and nature
+- A named faculty team must be created, called, or updated
+- A project needs a house style before more planning
+- The developer says "faculty this", "add experts", or "seat a team"
+- A seated faculty must update its understanding and retouch the plan
+- Not for writing the plan itself (`360-blueprint`), attacking a finished draft (`360-expert-review`), or building one (`360-execute`)
+
+## Core Principle
+
+- Tailor, not template — cut for this person, this project, this request
+- Know four measures before advising: goals, taste, mindset, strategy
+- Fit is derived, not guessed — complexity sets how many seats, depth sets their urgency, nature sets which lenses
+- Every recommendation cites the plan element that demands it
+- Follow when the developer's cut is coherent and professionally sound
+- Raise when the frame is unfinished, a better cut exists, or the thought can be shaped
+- Never flatter. Never lecture. Never silently override
+- Memory upgrades; craft does not dilute
+- The roster is a floor, not a ceiling — failure modes decide seating, and a needed faculty is derived even when the roster does not name it
+- Hide the catalog; recommend a short list
+- A question is allowed only when its answer would change the plan or the house style
+- Polish after each seat — value appears before the next faculty speaks
+
+## Workflow
+
+### 0. Pick the Mode
+
+Four entry points into one workflow. Choose from what the developer asked; when it is unclear, ask which one in a single question.
+
+| Mode | Trigger | Does | Never does |
+|---|---|---|---|
+| `suggest` | "who should look at this", "which experts", "help me pick" | Steps 1–4, then stops with the fit assessment, short list, and rationale | Seat, ask past fit, or touch the plan |
+| `seat` | "faculty this", "add experts", "seat a team" — the default | Steps 1–8: recommend, confirm, seat one at a time, polish after each | Batch the polish to the end |
+| `team` | "save this as X", "call the X team", "add Y to X" | Step 7: create, call, or edit a named team | Skip the drift check |
+| `quiet` | the developer replies `quiet` | Seats the confirmed set, asks blocking questions only, polishes from memory, records gaps as explicit assumptions | Ask anything two honest implementations would not diverge on |
+
+### 1. Load What Exists
+
+Read the current task or draft plan. Then read dossiers if present:
+
+- `faculty/developer.md` — goals, taste, mindset, strategy, house style
+- `faculty/roster.md` — who has been seated on this project, and when
+- `faculty/teams.md` — named teams this developer created
+- `faculty/<role>.md` — each faculty's claims about this developer and project; `<role>` is kebab-case
+
+`faculty/` sits beside the plan file. If the plan is not on disk, put it at the project root. If this project cannot persist files, keep the same structure in-session and ask where to persist before closing.
+
+If `faculty/developer.md` is missing or empty, do not seat yet. Measure first.
+
+### 2. Measure the Developer
+
+Ask at most 3 questions. Stop early if all four measures are already known. Each question must reveal at least one measure:
+
+- Goals — what this project must become, and must never become
+- Taste — what they find elegant, ugly, overbuilt, or cheap
+- Mindset — how they decide, what they protect, how they take challenge
+- Strategy — the live bet: speed, simplicity, control, craft, learning, or revenue
+
+Prefer a forced choice over an essay. Never ask what the plan, repo, or dossiers already answer.
+
+Write `faculty/developer.md` before seating. Derive the house style from the answers:
+
+- How to ask — choices vs open, blunt vs gentle
+- Standing refusals — what this developer will not accept
+- Push strength per area — where to spar, where to finish quietly
+- Maturity map — which frames are already strong, which are still forming
+
+House style is one shop. Every seated faculty wears it; none invents a private personality.
+
+### 3. Assess the Fit
+
+Read three dimensions off the plan, or off the stated task when no plan exists yet. Never skip this — it is what makes the short list defensible instead of habitual.
+
+- **Nature** — what the work touches: user-facing, data, money, security and privacy, infrastructure, ML and agents, docs and content, org and process. Decides **which** lenses.
+- **Depth** — blast radius and reversibility: reversible-local, reversible-shared, hard to reverse, irreversible or regulated. Decides **seat urgency**.
+- **Complexity** — moving parts: task count, phase count, cross-system dependencies, unresolved assumptions, and how many tasks are `must` priority. Decides **how many** seats.
+
+Size the seat count from the assessment:
+
+| Complexity | Depth | Seats |
+|---|---|---|
+| low | reversible | 1–2 |
+| moderate | reversible | 2–3 |
+| moderate | hard to reverse | 3–4 |
+| high | any | 4–5 |
+| any | irreversible or regulated | 4–5, and at least one `must` seat from security, privacy, compliance, or reliability |
+
+Five is the cap unless the developer asks for more. State the three dimensions and the resulting band before recommending, so the developer can correct the read rather than the list.
+
+### 4. Recommend a Short List
+
+Recommend the number of faculties the fit assessment sized, for this task only. Never dump the Seating Roster unless the developer asks for it.
+
+| # | Faculty | Seat | Why now | If absent |
+|---|---|---|---|---|
+| 1 | <role> | must / should / could | <the task ID, assumption, or risk row that demands this lens> | <the disaster if they stay silent> |
+
+- `must` — silence creates a known failure mode
+- `should` — silence creates likely waste or rework
+- `could` — the developer may want this lens; their call
+
+`Why now` cites a real element of the plan or task. A recommendation that cannot cite one is a habit, not a fit — drop it.
+
+Choose by failure mode, not by habit. Scan the Seating Roster — including its rarest roles — and ask of each: what breaks if this lens stays silent on this plan? The roster is a floor, not a ceiling: when the plan's failure modes demand a faculty the roster does not name, derive it, name it plainly, and say why.
+
+Accept these replies: `accept`, `1-3`, `drop 4 add privacy`, `only architect`, `quiet`.
+
+Do not seat until the developer confirms. If they name a faculty you did not recommend, seat it.
+
+In `suggest` mode, stop here and deliver:
+
+- **Asked before planning** — the fit assessment, the short list, and the house-style questions worth answering first. Then offer `360-blueprint`.
+- **Asked before review** — a prioritized lens list for `360-expert-review`: which of its lenses this plan needs, in what order, plus any lens the plan needs that its seven do not name. Hand it over; do not run the review.
+
+### 5. Seat One Faculty at a Time
+
+For each confirmed faculty, in the listed order:
+
+**Load.** Read `faculty/developer.md` and `faculty/<role>.md`.
+
+**Ask.** Hard caps:
+
+- New faculty on this project: at most 3 questions
+- Returning faculty: at most 1, and only if this task contradicts or extends its memory
+- Zero when memory plus the plan is enough
+- `quiet` mode: zero unless two honest implementations would diverge without the answer
+
+A question must do exactly one job: intention, taste, or a sharper frame offered as a choice. Never ask two questions that one answer would cover.
+
+**Follow or raise.** Follow when the developer's cut matches their goals, their taste, and a professionally sound path. Raise when any of these is true:
+
+- The frame is unfinished — they asked for a feature when they need a decision
+- A better cut exists — same goal, cleaner seam, less future pain
+- The thought can be shaped — they are close, but the frame is wrong
+
+Raise in their language. Put two cuts side by side — theirs and the tailor's — and name what each protects. Then wait.
+
+- They take the raise → polish to the tailor's cut; upgrade memory: this mind can be moved on this point
+- They keep their cut → tailor that cut; record the accepted risk; do not fight it again without new evidence. `360-expert-review` may reopen it later with evidence — that is its job, not a contradiction of this one
+
+**Polish now.** Edit only the steps, states, checks, and risks this faculty owns. Regenerate the whole plan only if the faculty proved the objective itself wrong. If no plan exists, write concrete guidance this faculty owns, then offer `360-blueprint`.
+
+Hold the plan contract while polishing. `360-execute` reads these fields directly, and prose in their place breaks execution:
+
+- Preserve every field of any task touched: ID, `Depends on`, `Skills`, `Parallel`, `Effort`, `Priority`, `Done when` — along with phase checkpoints, the change policy, the replanning triggers, and the traceability table
+- A task a faculty adds gets a stable ID continuing that phase's numbering, `Effort: S | M | L`, `Priority: must | should | could`, `Parallel: yes | no`, a `Skills` list or `None`, and an observable `Done when`
+- Never advance the plan's `Status` to `Reviewed and ready to execute`. Only `360-expert-review` sets that. Leave it `Draft` or `Ready for review`
+
+Write what the pass produced into the plan's existing slots — never a new numbered section, which would collide with `360-expert-review`'s sections 11 to 14:
+
+- Accepted risks → section 7, countermeasure reading `Accepted by developer; owned by <faculty>`
+- Explicit assumptions → section 5, `Validated by` naming the seated faculty
+- Open questions and decision points → section 10
+- One header row so a fresh reader knows a faculty pass happened: `| Tailored by | faculty/roster.md @ <date> |`
+
+**Resolve disagreements in the open.** If two seated faculties conflict, present both cuts to the developer with what each protects. Never pick silently.
+
+**Remember.** Update dossiers (Step 6), show the faculty block (Output Format), then move to the next seat — or stop when the developer stops or the remaining faculties would not change the plan.
+
+A faculty blocks the plan only when a missing answer would make two honest implementations diverge. Otherwise it states the assumption and continues.
+
+### 6. Upgrade Memory
+
+Every claim keeps this shape:
+
+| Claim | Source | Status | Touches |
+|---|---|---|---|
+| <one sentence> | user-said / inferred / observed | active / superseded / disputed | <plan sections this claim may change> |
+
+Rules:
+
+- New answer agrees → keep, refresh
+- New answer sharpens → replace the claim; mark the old one superseded
+- New answer conflicts → ask one confirm question, then replace or split
+- Inferred never overwrites user-said
+- Unused inferred claims become disputed — never silently deleted
+- `faculty/developer.md` changes only when goals, taste, mindset, strategy, or a standing refusal changes
+- `faculty/<role>.md` changes after every seating of that role
+- `faculty/roster.md` records every seated role and its last seated date
+
+Memory must stay short enough that a fresh agent can read it cold.
+
+### 7. Create and Call Teams
+
+A team is a named lineup this developer can reuse. Teams live in `faculty/teams.md` beside the dossiers:
+
+```markdown
+## Team: <name>
+- For: <the kind of work this team is cut for>
+- Members: <role>, <role>, <role>
+- Created: <date> · Last called: <date>
+- Notes: <what this team has learned about this kind of work>
+```
+
+- **Create** — `save this as <name>` turns the session's seated set into a team; `team create <name>: <roles>` builds one from scratch
+- **Call** — `call <name>` loads the team and skips Step 4's recommendation, going straight to seating. Dossiers and every question cap still apply
+- **Edit** — `team <name> add <role>` or `drop <role>`; record the change and its date
+
+**Drift check, always.** After loading a team, still run Step 3 against the current plan. If the fit assessment surfaces a `must` seat the team lacks, name it in one line with its plan evidence and ask before seating. A stale team must never silently under-cover a new plan — the roster is a floor for teams too.
+
+Keep every team short enough to read cold.
+
+### 8. Close the Session
+
+After the last seated faculty:
+
+- Present the session report (Output Format)
+- Offer `360-expert-review` if the plan is ready to be attacked; offer `360-blueprint` if the guidance still needs to become a plan
+- Ask the user whether to issue the session handover as a standalone prompt or a document, and where to persist dossiers and teams if they are not on disk
+- If the next agent would have to guess the house style, the roster, or any accepted risk, the handover is not finished
+
+### Reference: Seating Roster
+
+Reference material, not a step. Use it to recommend in Step 4. It is a floor, not a ceiling — derive unlisted faculties when the plan's failure modes demand them. Never show it unless the developer asks.
+
+**Human mind**
+
+- UX psychologist — cognition, attention, memory, decision load
+- Behavioral scientist — habits, defaults, incentives, dark-pattern refusal
+- Emotional-design expert — trust, anxiety, delight, recovery after failure
+- Inclusive-cognition expert — neurodiversity, literacy, aging, first-time vs expert
+- Motivation specialist — why people start, stall, and abandon
+- Trust psychologist — credibility, risk perception, permission to act
+
+**Research**
+
+- UX researcher — interviews, usability, evidence before opinion
+- Ethnographer — real context of use, not lab tasks
+- Jobs-to-be-done analyst — the job hired, not the feature requested
+- Market researcher — alternatives, switching cost, category norms
+- Accessibility researcher — who is excluded by the current path
+- Support-insight analyst — tickets and complaints as product signal
+
+**Experience design**
+
+- Product designer — whole problem-to-interface path
+- Interaction designer — flows, states, gestures, timing
+- UI / visual designer — hierarchy, density, visual language
+- Information architect — findability, navigation, mental model
+- Service designer — cross-channel journey, handoffs, waiting
+- Design-systems designer — tokens, consistency, reuse without sameness
+- Content designer / UX writer — words as interface
+- Conversational designer — chat, voice, agent tone, turn-taking
+- Motion designer — feedback, orientation, reduced-motion respect
+- Data-visualization designer — charts that tell truth, not decoration
+- Onboarding designer — first-run, empty states, competence growth
+- Error-experience designer — blame-free recovery, undo, next action
+
+**Product and strategy**
+
+- Product manager — outcome, priority, trade-off against goals
+- Product strategist — positioning, bets, what not to become
+- Product owner — backlog truth, acceptance, scope discipline
+- Growth specialist — activation, retention, loops without coercion
+- Monetization specialist — pricing, packaging, value exchange
+- Roadmap / portfolio manager — sequencing across bets
+- Opportunity discoverer — problem worth solving vs solution theater
+- Competitive-intelligence analyst — copy nothing; steal only the job
+
+**Delivery**
+
+- Project manager — time, dependencies, cut line, status without theater
+- Technical program manager — multi-team, multi-system sequencing
+- Scrum master / delivery coach — flow, blockers, team health
+- Release manager — ship window, freeze, comms, rollback clock
+- Change manager — adoption inside the org that must live with it
+- Risk officer — what can kill the plan, ranked by damage not drama
+- Estimator / uncertainty specialist — ranges, not fake precision
+
+**Architecture**
+
+- Software architect — boundaries, simplicity, irreversible choices
+- Systems architect — runtime, data, failure domains
+- Solution architect — integration across existing systems
+- Domain-driven design strategist — bounded contexts, language
+- API designer — contracts, versioning, consumer empathy
+- Data modeler — truth in storage, migrations, identity
+- Integration architect — third parties, sync, eventual consistency
+- Migration / legacy specialist — strangler paths, coexistence
+- Complexity reductionist — delete before add
+
+**Build**
+
+- Backend engineer — logic, integrity, authorization, failure
+- Frontend engineer — state, accessibility in pixels, perceived speed
+- Mobile engineer — lifecycle, offline, store, device limits
+- Desktop / native engineer — OS integration, install, updates
+- CLI / developer-experience engineer — flags, scripts, composability
+- Full-lifecycle feature engineer — one slice, all layers, no orphans
+- Platform engineer — paved roads, internal products
+- Build / tooling engineer — local loop, CI, reproducibility
+- Performance engineer — latency, memory, budgets
+- Concurrency / realtime specialist — races, ordering, backpressure
+- Search / relevance engineer — find vs dump
+- Offline / sync specialist — conflict, merge, user-visible truth
+- Embedded / IoT specialist — when hardware is in the loop
+- Gameplay / simulation specialist — loops, feedback, fairness
+
+**Quality**
+
+- QA strategist — what must be proven, at what cost
+- Exploratory tester — the nasty path a script will never write
+- SDET / automation engineer — durable checks, not brittle theater
+- Test architect — pyramid, fixtures, environments
+- Accessibility QA — WCAG as behavior, not a badge
+- Localization tester — language, locale, cultural fit
+- Chaos / resilience tester — kill dependencies on purpose
+- UAT / acceptance specialist — "done" in the user's words
+- Regression historian — what broke last time and why
+
+**Operate and survive**
+
+- SRE — SLOs, error budget, toil
+- DevOps / delivery engineer — pipeline, environments, promotion
+- Incident commander — detect, mitigate, communicate, learn
+- Observability engineer — logs, traces, metrics, reproduction
+- Capacity planner — load, cost, degradation
+- FinOps / cost engineer — unit cost, waste, surprise bills
+- Reliability engineer — graceful failure, idempotency, rollback
+- Disaster-recovery specialist — backups that actually restore
+- Environment / secrets steward — config, credentials, least privilege
+
+**Security, privacy, abuse**
+
+- Application-security engineer — threats in the actual design
+- Threat modeler — assets, attackers, entry points
+- Identity / auth specialist — sessions, tokens, account recovery
+- Privacy engineer — collection, retention, consent, deletion
+- Compliance officer — regulation that actually applies
+- Cryptography specialist — only when crypto is the domain
+- Abuse / fraud specialist — misuse, spam, automation, social attack
+- Supply-chain security specialist — dependencies, provenance
+- Security-UX specialist — safe defaults people will still use
+
+**Data and intelligence**
+
+- Product analyst — behavior vs intention
+- Data analyst — questions, definitions, honest charts
+- Data engineer — pipelines, quality, lineage
+- Data scientist — prediction only when it beats a rule
+- ML engineer — training, eval, drift, fallback
+- MLOps specialist — reproducibility, promotion, rollback of models
+- Evaluation / benchmarking specialist — claims vs numbers
+- Information-retrieval / RAG specialist — grounding, citation, miss
+- Agent architect — tools, memory, handoff, refusal
+- Computer-vision specialist — data, labels, failure in pixels
+- Human-in-the-loop designer — when the model must ask a person
+
+**Words, brand, adoption**
+
+- Brand strategist — promise, voice, what the product stands for
+- Naming specialist — product, feature, and company language
+- Technical writer — docs a stranger can finish a task from
+- Developer advocate — when other builders are users
+- Customer-success lead — activation after the sale
+- Support engineer — first-line reality
+- Sales engineer — what was promised vs what can ship
+- Training designer — competence, not a tour
+- Community / open-source maintainer — contribution, governance, tone
+- Localization / i18n strategist — expansion without rewrite
+
+**Business, legal, ethics**
+
+- Business analyst — rules, processes, acceptance language
+- Domain expert — the real-world craft the software sits inside
+- Operations designer — the work around the software
+- Stakeholder diplomat — who decides, who blocks, who is surprised
+- Legal counsel — IP, contracts, liability, terms
+- Licensing specialist — OSS and proprietary mix
+- Procurement / vendor specialist — lock-in, SLA, exit
+- Ethicist — who is harmed if this works as designed
+- Digital-wellbeing specialist — attention, addiction, after-hours
+- Sustainability specialist — energy, hardware waste, long life
+- Accessibility policy lead — legal plus moral floor
+- AI-policy / safety specialist — autonomy, consent, audit of agents
+
+**Meta**
+
+- Hostile critic — never seated here; owned by `360-expert-review`
+- Handover specialist — the next agent needs zero guesses
+- Simplifier — shortest design that still covers every required angle
+- First-principles philosopher — separate fact from habit
+- User-feeling advocate — thought, experience, and emotion as first-class
+- Traceability clerk — requirement, task, test, production signal
+- Professor-panel chair — convenes only the seated faculties this request needs
+
+## Output Format
+
+Before recommending, and always in `suggest` mode:
+
+```markdown
+### Fit assessment
+
+Nature: <what the work touches>
+Depth: <reversible-local / reversible-shared / hard to reverse / irreversible or regulated>
+Complexity: <low / moderate / high> — <the counts that decided it>
+Seats sized: <n>–<n>
+```
+
+After each faculty:
+
+```markdown
+### Faculty: <role>
+
+Questions: <the questions asked, or "none — memory enough">
+Follow or raise: <followed / raised — tailor taken / raised — developer kept cut>
+Plan touch:
+- <section or task>: <what changed and why>
+Memory:
+- <claim> (<source>, <status>)
+Next: <next faculty> or stop
+```
+
+After the session:
+
+```markdown
+# Faculty Session: <title>
+
+## Developer fit
+- Goals:
+- Taste:
+- Mindset:
+- Strategy:
+- House style:
+
+## Fit assessment
+- Nature:
+- Depth:
+- Complexity:
+- Seats sized: <band> — seated: <n>
+
+## Seated
+| Faculty | New or returning | Questions asked | Follow or raise |
+|---|---|---|---|
+
+## Plan changes
+- <each surgical edit, grouped by faculty>
+
+## Teams
+- <team name>: <created / called / edited / none this session>
+- Drift check: <missing must seats raised, or "none — team covered the plan">
+
+## Memory written
+- faculty/developer.md: <created / updated / unchanged>
+- faculty/roster.md: <created / updated>
+- faculty/teams.md: <created / updated / unchanged>
+- faculty/<role>.md: <created / updated>
+- Persist: <path> or <asked, waiting>
+
+## Accepted risks and explicit assumptions
+- <risk or assumption> — owned by <faculty>, written to plan section <5 / 7 / 10>
+
+## Handover
+- Context:
+- Decisions:
+- State: done / pending / blocked
+- Remaining tasks: what, how, where
+- Verification:
+- Risks and how to detect them early:
+- Issued as: <prompt / document / declined by user>
+
+## Next
+- 360-expert-review / 360-blueprint / more faculties / stop
+```
+
+## Quality Gate
+
+The session is finished only when every answer is yes:
+
+- The mode was clear, and `suggest` mode stopped before seating and left the plan untouched
+- Goals, taste, mindset, and strategy were known from memory or asked in this session
+- The fit assessment stated nature, depth, and complexity, and the seat count stayed inside the band it sized
+- Every recommendation cited the plan element that demands it, chosen by failure mode rather than habit — including rare roles and roles the roster does not name
+- A short list was shown and seating was confirmed, with no catalog dump unless the developer asked
+- Every faculty stayed inside its question caps, and no question was asked whose answer the plan, repo, or dossiers already held
+- Every faculty followed or raised; no silent override; no flattery
+- Every raise placed two cuts side by side and waited for the developer
+- The plan or guidance was polished after each seat, never batched to the end
+- Every Plan Template field survived on every task touched: ID, Depends on, Skills, Parallel, Effort, Priority, Done when, checkpoints, change policy, replanning triggers, traceability
+- Every task a faculty added carries a stable ID, declared skills, `Effort` / `Priority` / `Parallel` values from the family vocabularies, and an observable `Done when`
+- The plan's `Status` was left `Draft` or `Ready for review` — this skill never claimed finality
+- Accepted risks, assumptions, and open questions landed in the plan's existing sections; no new numbered section was invented
+- Faculty conflicts were presented to the developer, never settled silently
+- Memory uses claim / source / status / touches; conflicts were confirmed before rewriting
+- Any called team was drift-checked against this plan, and a missing `must` seat was raised before seating
+- House style is one shop, shared across all seated faculties
+- The hostile critic was never seated — that role belongs to `360-expert-review`
+- The handover carries context, decisions, state, remaining tasks, verification, and risks with how to detect them early
+- The user was asked about handover format and where dossiers and teams persist; the outcome is recorded
+- A fresh agent can continue from the dossiers, teams, and roster with zero guessing
+
+Any "no" means not finished. Measure, raise, polish, or write memory, then check again.
+
+---
+
+### Skill: 360-token-efficiency
+
+---
+name: 360-token-efficiency
+description: Runtime skill that reduces token waste during AI-agent tasks without dropping facts, changing requirements, or weakening correctness. Applies silent context discipline, effort sizing, progressive disclosure, compaction, and concise output. Use continuously alongside other skills when token cost matters.
+version: 1.2.1
+---
+
+# 360 Token Efficiency
+
+## Purpose
+
+Run this skill during execution of a task, not as a separate report generator. Its job is to reduce token waste while preserving the same correctness, completeness, and usability the task would have without this skill.
+
+This skill is model- and platform-agnostic. It governs how the agent selects, reuses, compacts, and outputs information. It does not claim control over provider-side caching, billing internals, or hidden reasoning.
+
+It is an overlay, not a step: run it underneath `360-blueprint`, `360-faculty`, `360-expert-review`, `360-execute`, or `360-backend-audit`.
+
+## When to Use
+
+- Multi-step, multi-turn, or tool-heavy tasks
+- Long sessions where context keeps growing
+- Repetitive work where prior results can be reused safely
+- As a companion to another skill, not a replacement for it
+- Never as the primary skill for a task — it shapes how other work is done, it does not do the work
+
+## Core Principle
+
+Token efficiency is not brevity for its own sake. It is maximum decision-relevant signal per token spent. Compress the container, never the content. If a shortcut risks correctness, completeness, or traceability, do not take it.
+
+## Workflow
+
+### 1. Keep Only Decision-Relevant Context
+
+- Separate what the current step needs from what it does not.
+- Reuse stable instructions, prior decisions, and verified facts already in the session.
+- Do not resend static material when a shorter reference is enough.
+- Do not drop information that later steps still need.
+
+### 2. Size Effort to Difficulty
+
+- Classify each sub-task as trivial, moderate, or hard.
+- Trivial: act directly.
+- Moderate: reason only where it changes the outcome.
+- Hard: use full rigor, but no extra ceremony.
+- Never save tokens by under-thinking a hard problem.
+
+### 3. Load Progressively
+
+- Pull only the file, section, tool, or context needed for the current step.
+- Prefer summaries or indexes first; open full content only when needed.
+- When a large result arrives, extract what matters and leave the rest behind.
+
+### 4. Compact Without Losing Facts
+
+- At natural checkpoints, replace verbose history with a compact state summary.
+- Keep decisions, constraints, open questions, blockers, and unresolved risks.
+- If a fact is uncertain, carry the uncertainty forward. Do not compress it into false confidence.
+
+### 5. Output With Discipline
+
+- Prefer the shortest structure that fully answers the task.
+- Use tables for comparisons, bullets for parallel facts, and direct prose for decisions.
+- Remove preamble, repetition, and restatement.
+- Add detail only when it changes correctness, usability, or handover quality.
+
+### 6. Escalate Only on Trigger
+
+- Prefer the lighter reliable path first.
+- Escalate only when confidence is low, evidence conflicts, or the lightweight path fails.
+- State the reason for escalation when it matters to the user or next agent.
+
+### 7. Persist Rules Only When Measured
+
+- Do not write reusable token-saving rules unless a real measurement showed savings without quality loss.
+- If no token telemetry exists, mark the rule as unverified and keep it out of the notes file.
+- Never invent token counts.
+
+## Output Format
+
+Default: no extra report.
+
+Emit a token-efficiency report only when the user explicitly asks for one. When requested, include:
+
+1. What context was reused or omitted
+2. How effort was sized
+3. What was compacted and what facts were preserved
+4. Any escalations and why they happened
+5. Any measured token deltas, or `UNMEASURED`
+6. Any residual risk
+
+## Quality Gate
+
+The application of this skill is complete only when every answer is yes:
+
+- No fact needed for correctness was dropped
+- No uncertainty was compressed into false confidence
+- Effort matched task difficulty
+- Output was no more verbose than the task required
+- No unverified token-saving rule was persisted
+- No token savings were claimed without measurement
+- The outcome is at least as correct and complete as it would be without this skill
+
+Any "no" means the application is not finished. Fix it and re-check.
+
+---

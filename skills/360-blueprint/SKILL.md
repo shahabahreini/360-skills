@@ -1,6 +1,6 @@
 ---
 name: 360-blueprint
-description: Universal plan creator for new objectives in any domain. Clarifies the real objective, separates confirmation from generation, avoids invented details, enforces domain quality, and produces a self-contained plan an agent can execute without guessing.
+description: Universal plan creator for new objectives, features, RFCs, and migrations in any domain. Clarifies the real objective, separates confirmation from generation, avoids invented details, enforces domain quality, and produces a self-contained plan an agent can execute without guessing.
 version: 2.1.0
 ---
 
