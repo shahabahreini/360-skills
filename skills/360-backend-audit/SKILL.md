@@ -1,7 +1,7 @@
 ---
 name: 360-backend-audit
 description: Deep audit of backend code, APIs, services, business logic, data layers, integrations, and jobs. Verifies correctness, hunts dead weight and duplication, finds safe performance risks, hardens observability, and ends with a usable handover. Functionality, reliability, and accuracy are never traded away.
-version: 1.1.0
+version: 1.2.0
 ---
 
 # 360 Backend Audit
@@ -12,12 +12,15 @@ Run this skill on backend code: APIs, services, business logic, data access laye
 
 This skill is technology-agnostic. It audits logic, structure, and data flow, not the syntax of a specific stack.
 
+The code it audits often came from `360-execute`, and its findings seed the next `360-blueprint` cycle. Run `360-token-efficiency` alongside this skill when context or cost matters.
+
 ## When to Use
 
 - Before or after merging significant backend work
 - When inheriting, refactoring, or modernizing services or data layers
 - When code feels heavy, fragile, slow, or hard to debug
 - Before handing code to another engineer or AI agent
+- Not for planning work that does not exist yet (`360-blueprint`) or executing a plan (`360-execute`)
 
 ## Core Principle
 
@@ -109,10 +112,10 @@ Always finish with a handover for the next agent. Include:
 
 - Context
 - Decisions
-- Tasks
+- State: done / pending / blocked
+- Remaining tasks: what, how, where
 - Verification
-- Risks
-- State
+- Risks and how to detect them early
 
 If the next agent would have to guess, the handover is not finished.
 

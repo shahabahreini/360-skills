@@ -1,7 +1,7 @@
 ---
 name: 360-expert-review
 description: Pre-finalization plan review that stress-tests a draft plan for user impact, reliability, security, rollback, traceability, and failure modes. Uses direct expert lenses instead of persona theater and finalizes only after hostile review.
-version: 2.2.0
+version: 3.0.0
 ---
 
 # 360 Expert Review
@@ -10,11 +10,14 @@ version: 2.2.0
 
 Run this skill before finalizing any important plan. Its job is to turn a draft into the strongest usable plan by exposing missing scenarios, weak assumptions, and hidden failure modes.
 
+Drafts usually arrive from `360-blueprint`. Once a plan passes this review, hand it to `360-execute` to build. Run `360-token-efficiency` alongside this skill when context or cost matters.
+
 ## When to Use
 
 - A plan changes real systems, data, users, money, security, or operations
 - A wrong assumption or missed case could create real damage
 - A plan needs adversarial review before execution
+- Not for writing a plan that does not exist yet (`360-blueprint`) or executing one already final (`360-execute`)
 
 ## Core Principle
 
@@ -85,32 +88,35 @@ Switch to hostile critic. Ask:
 
 Fix the plan, then attack it again until no high-severity issue remains open.
 
-### 8. Produce Handover Only If Requested
+### 8. Complete the Handover
 
-If the user asked for a handover, produce one that includes:
+Section 10 of the plan template is always filled. It is part of the plan, not an optional extra. Use these fields:
 
 - Context
 - Decisions
-- Tasks
+- State: done / pending / blocked
+- Remaining tasks: what, how, where
 - Verification
-- Risks
-- State
+- Risks and how to detect them early
 
-If no handover was requested, mark it `Not requested`.
+If the user also asked for a standalone handover document, produce one with the same fields. If they did not, mark it `Not requested`.
 
 ## Final Plan Format
 
-1. Objective and user outcome
-2. Scope, assumptions, open questions
-3. Expert findings and key decisions
-4. Implementation steps
-5. Scenario and impact coverage
-6. Reliability, security, and simplicity measures
-7. Tests and observable acceptance criteria
-8. Observability and debugging path
-9. Release, monitoring, and rollback
-10. Risks found, how they were resolved, and why this is the best final plan
-11. Handover plan, or `Not requested`
+Return the revised plan in `360-blueprint`'s Plan Template, sections 1 to 10 intact.
+
+Preserve every task field — ID, Depends on, Skills, Parallel, Effort, Priority, Done when — along with phase checkpoints, the change policy, the replanning triggers, and the traceability table. `360-execute` reads those fields directly. A review that turns them into prose breaks execution.
+
+If the incoming plan is not in the template, normalize it into the template first, then review.
+
+Append the review's own output as four further sections:
+
+- **11. Expert Findings and Key Decisions**: what each lens surfaced, and what was decided
+- **12. Scenario and Impact Coverage**: components, data, users, states, edge cases, and failure modes
+- **13. Reliability, Observability, and Release**: reliability and security measures, debugging path, tests and observable acceptance criteria, release, monitoring, and rollback
+- **14. Review Verdict**: risks found, how each was resolved, and why this is the strongest version
+
+Set the plan's Status field to `Reviewed and ready to execute`.
 
 ## Quality Gate
 
@@ -126,6 +132,7 @@ The plan is final only when every answer is yes:
 - Testing matches the risk
 - Release and rollback are safe
 - The plan survived hostile review
-- Handover was explicitly requested and completed, or explicitly skipped
+- Every Plan Template field survived intact: task IDs, Depends on, Skills, Parallel, Effort, Priority, Done when, checkpoints, change policy, replanning triggers, traceability
+- The plan's handover summary is complete, and a standalone handover document was produced if requested or marked `Not requested`
 
 Any "no" means the plan is not final. Fix it and review again.

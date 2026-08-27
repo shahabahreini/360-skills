@@ -1,7 +1,7 @@
 ---
 name: 360-blueprint
 description: Universal plan creator for new objectives in any domain. Clarifies the real objective, separates confirmation from generation, avoids invented details, enforces domain quality, and produces a self-contained plan an agent can execute without guessing.
-version: 1.5.0
+version: 2.0.0
 ---
 
 # 360 Blueprint
@@ -10,13 +10,14 @@ version: 1.5.0
 
 Run this skill when a plan must be created from scratch. Its job is to turn an objective into a clear, executable plan with explicit assumptions, constraints, risks, and handover.
 
-This skill creates plans. To review and finalize an existing plan, use `360-expert-review`.
+This skill creates plans. To stress-test and finalize one, use `360-expert-review`. To execute a finalized plan, use `360-execute`. Run `360-token-efficiency` alongside this skill when context or cost matters.
 
 ## When to Use
 
 - A new project, feature, migration, product, workflow, or initiative needs a plan
 - A goal exists but the path is unclear
 - Any request of the form "plan this"
+- Not for hardening a draft that already exists (`360-expert-review`) or building one that is already final (`360-execute`)
 
 ## Core Principle
 
@@ -57,10 +58,11 @@ Begin at the end. Think from first principles. Design out failure. Prefer the si
 
 ### 5. Craft the Plan
 
-- Structure the plan as phases and tasks.
+- Structure the plan as phases and tasks. Give every task a stable ID (`1.1`, `1.2`) that later skills reference.
 - Every task states what, how, where, and done when.
-- Mark effort, priority, and parallelization.
-- Define the cut line.
+- Mark every task `Effort: S | M | L`, `Priority: must | should | could`, and `Parallel: yes | no`. Execution keys its drop rules off these exact values, so use no others.
+- List the skills the executor must load for each task, or `None`.
+- Define the cut line: `should` and `could` tasks may be cut, `must` tasks never.
 - Do not invent stack choices, vendors, metrics, or architecture details. If a choice is required but unknown, write it as an open question.
 - Keep names and terms consistent from start to finish.
 - Make the plan self-contained for a fresh executor.
@@ -110,7 +112,7 @@ For any other domain, define that domain's quality bar explicitly and enforce it
 | Field | Value |
 |---|---|
 | Objective | <one sentence> |
-| Status | Draft / Ready for review |
+| Status | Draft / Ready for review / Reviewed and ready to execute |
 | Version | <version or date> |
 | Created | <date> |
 
@@ -149,10 +151,11 @@ Checkpoint:
 - How:
 - Where:
 - Depends on:
-- Parallel:
-- Effort:
-- Priority:
-- Done when:
+- Skills: <skills the executor must load, or None>
+- Parallel: yes | no
+- Effort: S | M | L
+- Priority: must | should | could
+- Done when: <observable check>
 
 ## 7. Risks & Countermeasures
 | Risk | Impact | Countermeasure |
@@ -168,7 +171,12 @@ Checkpoint:
 |---|---|
 
 ## 10. Handover Summary
-- Executor must know:
+- Context:
+- Decisions:
+- State: done / pending / blocked
+- Remaining tasks: what, how, where
+- Verification:
+- Risks and how to detect them early:
 - Cut line:
 - Open questions:
 - Decision points:
@@ -183,7 +191,7 @@ The plan is ready only when every answer is yes:
 - No invented technical details were presented as facts
 - Every assumption is explicit and falsifiable
 - Every task has what, how, where, and done when
-- Every task has effort, priority, and parallel markings
+- Every task has a stable ID, declared skills, and `Effort` / `Priority` / `Parallel` values from the defined vocabularies
 - The cut line is defined
 - Every objective maps to tasks and no orphan tasks remain
 - A fresh executor can act without guessing
