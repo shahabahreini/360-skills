@@ -706,7 +706,7 @@ Never execute a plan you have not fully read.
 - If any task lacks an observable acceptance check, derive one and confirm it with the user before executing that task
 - If anything is ambiguous, ask before starting
 
-IMPORTAT NOTE: CLEAR THE CONVERSATION BEFORE STARTING DEVELOPMENT TO SAVE TOKENS INSTEAD OF LETTING THE AUTO COMPACT PERFORMS.
+IMPORTANT NOTE: Clear the conversation before starting development to save tokens instead of letting auto-compact run.
 
 ### 2. Persist the Coverage Ledger
 
