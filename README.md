@@ -28,27 +28,27 @@ npx skills add shahabahreini/360-skills --skill 360-expert-review --agent claude
 
 ## Skills
 
-| Skill                                                 | Description                                                                                                                                                                                                                                                                                                      | Version |
-| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| [`360-blueprint`](skills/360-blueprint)               | Create an executable plan from a new objective — clarify first, write the full plan to a file, and brief the user in chat — when a goal exists but the path is unclear or the request is "plan this".                                                                                                          | 1.6.0   |
+| Skill                                                 | Description                                                                                                                                                                                                                                                                                                                                                                                                               | Version |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| [`360-blueprint`](skills/360-blueprint)               | Create an executable plan from a new objective — clarify first, write the full plan to a file, and brief the user in chat — when a goal exists but the path is unclear or the request is "plan this".                                                                                                                                                                                                                     | 1.6.0   |
 | [`360-faculty`](skills/360-faculty)                   | Seat a living, tailored expert team on a plan or task. Use when work must fit this developer's goals, taste, mindset, and strategy, when a plan needs the right expertise chosen for its complexity, depth, and nature, or when a named faculty team must be created, called, or updated. Recommends a short list, asks only the questions that still change the work, polishes immediately, and keeps upgradable memory. | 1.0.0   |
-| [`360-expert-review`](skills/360-expert-review)       | Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage.                                                                                                                    | 2.3.0   |
-| [`360-execute`](skills/360-execute)                   | Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and brief the user in chat. Use when a plan exists and work must begin, or when resuming a partial execution.                                                                                         | 1.1.0   |
-| [`360-backend-audit`](skills/360-backend-audit)       | Deep-audit backend code, write the full report to a file, and brief the user in chat with bugs, updates, and dead weight. Use before or after significant backend work, or when inheriting, refactoring, or handing off services.                                                                             | 1.2.0   |
-| [`360-token-efficiency`](skills/360-token-efficiency) | Runtime skill that reduces token waste during AI-agent tasks without dropping facts, changing requirements, or weakening correctness. Use continuously alongside other skills when token cost matters.                                                                                                         | 1.2.0   |
+| [`360-expert-review`](skills/360-expert-review)       | Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage.                                                                                                                                                                                                                               | 2.3.0   |
+| [`360-execute`](skills/360-execute)                   | Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and brief the user in chat. Use when a plan exists and work must begin, or when resuming a partial execution.                                                                                                                                                                                                    | 1.1.1   |
+| [`360-backend-audit`](skills/360-backend-audit)       | Deep-audit backend code, write the full report to a file, and brief the user in chat with bugs, updates, and dead weight. Use before or after significant backend work, or when inheriting, refactoring, or handing off services.                                                                                                                                                                                         | 1.2.0   |
+| [`360-token-efficiency`](skills/360-token-efficiency) | Runtime skill that reduces token waste during AI-agent tasks without dropping facts, changing requirements, or weakening correctness. Use continuously alongside other skills when token cost matters.                                                                                                                                                                                                                    | 1.2.0   |
 
 ## Which Skill Do I Need?
 
-| Your situation | Load |
-| --- | --- |
-| A goal exists, but no plan yet | `360-blueprint` |
-| Unsure which expertise the work needs, before or after planning | `360-faculty` (suggest mode) |
-| Work must fit this developer's goals, taste, and standing decisions | `360-faculty` |
-| A named expert team must be created, called, or updated | `360-faculty` |
-| A draft plan exists and needs hardening | `360-expert-review` |
-| A finalized plan exists and needs building | `360-execute` |
-| Backend code exists and needs auditing | `360-backend-audit` |
-| Any of the above, and context or cost matters | add `360-token-efficiency` |
+| Your situation                                                      | Load                         |
+| ------------------------------------------------------------------- | ---------------------------- |
+| A goal exists, but no plan yet                                      | `360-blueprint`              |
+| Unsure which expertise the work needs, before or after planning     | `360-faculty` (suggest mode) |
+| Work must fit this developer's goals, taste, and standing decisions | `360-faculty`                |
+| A named expert team must be created, called, or updated             | `360-faculty`                |
+| A draft plan exists and needs hardening                             | `360-expert-review`          |
+| A finalized plan exists and needs building                          | `360-execute`                |
+| Backend code exists and needs auditing                              | `360-backend-audit`          |
+| Any of the above, and context or cost matters                       | add `360-token-efficiency`   |
 
 ## How the Skills Work Together
 

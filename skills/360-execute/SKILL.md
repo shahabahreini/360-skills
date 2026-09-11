@@ -1,7 +1,7 @@
 ---
 name: 360-execute
 description: Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and brief the user in chat. Use when a plan exists and work must begin, or when resuming a partial execution.
-version: 1.1.0
+version: 1.1.1
 ---
 
 # 360 Execute
@@ -39,6 +39,8 @@ Never execute a plan you have not fully read.
 - Build the full task inventory: every task ID, its priority, its dependencies, its "done when" check
 - If any task lacks an observable acceptance check, derive one and confirm it with the user before executing that task
 - If anything is ambiguous, ask before starting
+
+IMPORTAT NOTE: CLEAR THE CONVERSATION BEFORE STARTING DEVELOPMENT TO SAVE TOKENS INSTEAD OF LETTING THE AUTO COMPACT PERFORMS.
 
 ### 2. Persist the Coverage Ledger
 
