@@ -1,7 +1,7 @@
 ---
 name: 360-blueprint
-description: Create an executable plan from a new objective — clarify first, write the full plan to a file, and brief the user in chat — when a goal exists but the path is unclear or the request is "plan this".
-version: 1.6.0
+description: Create an executable plan from a new objective with explicit tasks, constraints, and verification. Use when a goal exists but the path is unclear, or the request is "plan this".
+version: 2.0.0
 ---
 
 # 360 Blueprint
@@ -10,7 +10,7 @@ version: 1.6.0
 
 Run this skill when a plan must be created from scratch. Turn an objective into an executable plan with explicit assumptions, constraints, and risks.
 
-The full plan lives in a file. Chat gets a short briefing only.
+Prefer a file for the full deliverable and a short chat briefing; use the Delivery rules below.
 
 This skill creates plans. To review and finalize one, use `360-expert-review`.
 
@@ -25,9 +25,23 @@ This skill creates plans. To review and finalize one, use `360-expert-review`.
 
 - A plan is finished when a fresh executor can act without guessing, and every task serves a real objective
 - Begin at the end. Think from first principles. Design out failure. Prefer the simplest plan that fully works
-- The file is the plan. Chat is the briefing
+- Preserve a recoverable record using the Delivery rules below
 
 ## Workflow
+
+### Entry: Optional Token Efficiency
+
+Reuse explicit approval or refusal for `360-token-efficiency` from this session. If unknown and not already offered, ask once whether to enable it for this session; continue the main task with the overlay inactive while unanswered. Explicit user invocation counts as approval; merely appearing in a generated plan does not. On approval, discover and load it through the host's supported skill mechanism, reusing already-loaded instructions. If unavailable, explain briefly and continue; do not install automatically. Refusal disables the overlay, not ordinary efficient habits. Revocation takes effect immediately. Keep consent in-session only; it does not authorize cross-session memory writes. The overlay never invokes itself or restarts the parent skill.
+
+### Shared Plan Contract
+
+Preserve stable task IDs and existing user decisions. Every task carries: ID, What, How, Where, Depends on, Skills (list or `None`), Parallel, Effort, Priority, Done when (observable). Use `Priority: must | should | could`, `Effort: S | M | L`, and `Parallel: yes | no`. Only `should` and `could` sit below the cut line. Preserve phase checkpoints, change policy, replanning triggers, and objective-to-task traceability.
+
+Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep it `Draft`; a complete unreviewed plan is `Ready for review`; a passed review sets `Reviewed and ready to execute`. Material edits after review return it to `Ready for review` (or `Draft` if blocked). Execution progress belongs in the ledger, not the readiness status. An explicit user instruction to execute a supplied plan authorizes execution without a mandatory sibling review; record that basis without claiming a review occurred.
+
+### Delivery
+
+Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
 
 ### 1. Extract the True Objective
 
@@ -91,8 +105,8 @@ For any other domain, define that domain's quality bar explicitly and enforce it
 
 - Write the full plan to a file using the work-file template
 - Reuse the existing path if known; otherwise `plans/<short-slug>.md`; create the folder if needed; ask once if the location is ambiguous
-- If the file cannot be written, stop and ask where to save — never paste the plan into chat as a fallback
-- Print only the terminal briefing
+- If the file cannot be written, use the in-session delivery fallback
+- With a saved file, print the terminal briefing and path
 - If the plan deserves adversarial review before build, say so in plain language — no skill names
 
 ## Output Format
@@ -119,6 +133,7 @@ For any other domain, define that domain's quality bar explicitly and enforce it
 - Background:
 - Constraints:
 - Stakeholders:
+- Open questions and decision points:
 
 ## 3. Strategy
 - Chosen path:
@@ -130,6 +145,7 @@ For any other domain, define that domain's quality bar explicitly and enforce it
 - Updates to existing:
 - Explicitly out of scope:
 - Change policy:
+- Cut line: <only should/could below it>
 
 ## 5. Assumptions
 | # | Assumption | Validated by |
@@ -145,9 +161,10 @@ Checkpoint:
 - How:
 - Where:
 - Depends on:
-- Parallel:
-- Effort:
-- Priority:
+- Skills: <list or None>
+- Parallel: yes | no
+- Effort: S | M | L
+- Priority: must | should | could
 - Done when:
 
 ## 7. Risks & Countermeasures
@@ -164,17 +181,21 @@ Checkpoint:
 |---|---|
 
 ## 10. Handover Summary
-- Executor must know:
-- Cut line:
-- Open questions:
-- Decision points:
+- Context:
+- Decisions:
+- State: done / pending / blocked
+- Remaining tasks: what, how, where
+- Verification:
+- Risks and how to detect them early:
 ```
+
+Handover fields: Context · Decisions · State (done / pending / blocked) · Remaining tasks (what, how, where) · Verification · Risks and how to detect them early
 
 Fill every field or write `N/A` with a one-line reason.
 
 ### Terminal briefing
 
-Use this shape. Omit any section that would be empty. Never paste the work file into chat.
+Use this shape. Omit any section that would be empty. Follow the Delivery rules for file or in-session output.
 
 ```text
 <what this plan is> — plan is ready
@@ -210,14 +231,14 @@ The plan is ready only when every answer is yes:
 - No blocking question was skipped
 - No invented technical details were presented as facts
 - Every assumption is explicit and falsifiable
-- Every task has what, how, where, done when, effort, priority, and parallel markings
+- Every task has what, how, where, done when, dependencies, skills, effort, priority, and parallel markings
 - The cut line is defined
 - Every objective maps to tasks and no orphan tasks remain
 - New work and updates to existing work are grouped separately
 - A fresh executor can act without guessing
 - Checkpoints and replanning triggers exist
 - The plan survived a premortem
-- The work file follows the template, lives at the stated path, and was not pasted into chat
+- The deliverable follows the template and accurately states its location or in-session status
 - The briefing omits empty sections and uses proven/likely/possible/uncertain, never numbers
 
 Any "no" means the plan is not finished. Refine and review again.

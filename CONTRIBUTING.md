@@ -1,16 +1,13 @@
 # Contributing to 360-skills
 
-We welcome contributions of new Agent Skills and enhancements to existing skills.
+Follow [AGENTS.md](AGENTS.md) for metadata, local contracts, optional session consent, routing, and independent installation requirements. Keep instructions and references scoped to the task; preserve user decisions and capability limits.
 
-To maintain senior-grade quality and cross-agent interoperability:
+After changing skills or documentation, regenerate and verify:
 
-- Follow the structure, naming, and quality gates defined in [AGENTS.md](AGENTS.md).
-- Ensure all skills adhere to the open [Agent Skills standard](https://agentskills.io).
-- Run the consistency checker before opening a pull request:
-  ```bash
-  node scripts/check-consistency.mjs
-  ```
-- If skills or documentation are modified, re-compile the full LLM context bundle:
-  ```bash
-  node scripts/build-llms-full.mjs
-  ```
+```bash
+node scripts/build-llms-full.mjs
+node --test scripts/*.test.mjs
+node scripts/check-consistency.mjs
+```
+
+Use Node 20 or later; no dependencies or Python packaging are required. Add validator fixtures for structural changes and realistic behavioral scenarios for instruction changes. Record actual outcomes, unavailable measurements, and regressions. See the [redesign evaluation](docs/validation/token-efficiency-redesign.md) for examples.

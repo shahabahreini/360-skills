@@ -1,7 +1,7 @@
 ---
 name: 360-faculty
 description: Seat a living, tailored expert team on a plan or task. Use when work must fit this developer's goals, taste, mindset, and strategy, when a plan needs the right expertise chosen for its complexity, depth, and nature, or when a named faculty team must be created, called, or updated. Recommends a short list, asks only the questions that still change the work, polishes immediately, and keeps upgradable memory.
-version: 1.0.0
+version: 1.1.0
 ---
 
 # 360 Faculty
@@ -49,6 +49,20 @@ Produces four artifacts: a fit assessment, a seated roster, upgradable dossiers 
 
 ## Workflow
 
+### Entry: Optional Token Efficiency
+
+Reuse explicit approval or refusal for `360-token-efficiency` from this session. If unknown and not already offered, ask once whether to enable it for this session; continue the main task with the overlay inactive while unanswered. Explicit user invocation counts as approval; merely appearing in a generated plan does not. On approval, discover and load it through the host's supported skill mechanism, reusing already-loaded instructions. If unavailable, explain briefly and continue; do not install automatically. Refusal disables the overlay, not ordinary efficient habits. Revocation takes effect immediately. Keep consent in-session only; it does not authorize cross-session memory writes. The overlay never invokes itself or restarts the parent skill.
+
+### Shared Plan Contract
+
+Preserve stable task IDs and existing user decisions. Every task carries: ID, What, How, Where, Depends on, Skills (list or `None`), Parallel, Effort, Priority, Done when (observable). Use `Priority: must | should | could`, `Effort: S | M | L`, and `Parallel: yes | no`. Only `should` and `could` sit below the cut line. Preserve phase checkpoints, change policy, replanning triggers, and objective-to-task traceability.
+
+Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep it `Draft`; a complete unreviewed plan is `Ready for review`; a passed review sets `Reviewed and ready to execute`. Material edits after review return it to `Ready for review` (or `Draft` if blocked). Execution progress belongs in the ledger, not the readiness status. An explicit user instruction to execute a supplied plan authorizes execution without a mandatory sibling review; record that basis without claiming a review occurred.
+
+### Delivery
+
+Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
+
 ### 0. Pick the Mode
 
 Four entry points into one workflow. Choose from what the developer asked; when it is unclear, ask which one in a single question.
@@ -69,7 +83,7 @@ Read the current task or draft plan. Then read dossiers if present:
 - `faculty/teams.md` — named teams this developer created
 - `faculty/<role>.md` — each faculty's claims about this developer and project; `<role>` is kebab-case
 
-`faculty/` sits beside the plan file. If the plan is not on disk, put it at the project root. If this project cannot persist files, keep the same structure in-session and ask where to persist before closing.
+`faculty/` sits beside the plan file. If the plan is not on disk, put it at the project root. If files are unavailable, keep the same structure in-session and label it not persisted. Persist dossiers only within the user-authorized faculty scope; token-efficiency consent does not authorize memory writes.
 
 If `faculty/developer.md` is missing or empty, do not seat yet. Measure first.
 
@@ -84,7 +98,7 @@ Ask at most 3 questions. Stop early if all four measures are already known. Each
 
 Prefer a forced choice over an essay. Never ask what the plan, repo, or dossiers already answer.
 
-Write `faculty/developer.md` before seating. Derive the house style from the answers:
+Record the developer profile in the authorized file or in-session structure before seating. Derive the house style from the answers:
 
 - How to ask — choices vs open, blunt vs gentle
 - Standing refusals — what this developer will not accept
@@ -127,7 +141,7 @@ Recommend the number of faculties the fit assessment sized, for this task only. 
 
 `Why now` cites a real element of the plan or task. A recommendation that cannot cite one is a habit, not a fit — drop it.
 
-Choose by failure mode, not by habit. Scan the Seating Roster — including its rarest roles — and ask of each: what breaks if this lens stays silent on this plan? The roster is a floor, not a ceiling: when the plan's failure modes demand a faculty the roster does not name, derive it, name it plainly, and say why.
+Choose expertise from actual failure modes and cite the relevant task or risk. Derive an unlisted role when needed. Read the optional [seating roster](references/seating-roster.md) only when expertise selection needs examples; do not load or scan the catalog by default.
 
 Accept these replies: `accept`, `1-3`, `drop 4 add privacy`, `only architect`, `quiet`.
 
@@ -170,13 +184,13 @@ Hold the plan contract while polishing. `360-execute` reads these fields directl
 
 - Preserve every field of any task touched: ID, `Depends on`, `Skills`, `Parallel`, `Effort`, `Priority`, `Done when` — along with phase checkpoints, the change policy, the replanning triggers, and the traceability table
 - A task a faculty adds gets a stable ID continuing that phase's numbering, `Effort: S | M | L`, `Priority: must | should | could`, `Parallel: yes | no`, a `Skills` list or `None`, and an observable `Done when`
-- Never advance the plan's `Status` to `Reviewed and ready to execute`. Only `360-expert-review` sets that. Leave it `Draft` or `Ready for review`
+- Never claim a review occurred. Preserve an unchanged reviewed plan's status; after material edits return it to `Ready for review`, or `Draft` if blocking questions remain
 
-Write what the pass produced into the plan's existing slots — never a new numbered section, which would collide with `360-expert-review`'s sections 11 to 14:
+Write findings into the plan's existing semantic sections. The blueprint uses the numbers below; other valid plans may use different headings. Preserve an existing review appendix (normally section 11), without inventing sections 12–14:
 
 - Accepted risks → section 7, countermeasure reading `Accepted by developer; owned by <faculty>`
 - Explicit assumptions → section 5, `Validated by` naming the seated faculty
-- Open questions and decision points → section 10
+- Open questions → Context & Constraints; decisions → Handover Summary
 - One header row so a fresh reader knows a faculty pass happened: `| Tailored by | faculty/roster.md @ <date> |`
 
 **Resolve disagreements in the open.** If two seated faculties conflict, present both cuts to the developer with what each protects. Never pick silently.
@@ -232,185 +246,12 @@ After the last seated faculty:
 
 - Present the session report (Output Format)
 - Offer `360-expert-review` if the plan is ready to be attacked; offer `360-blueprint` if the guidance still needs to become a plan
-- Ask the user whether to issue the session handover as a standalone prompt or a document, and where to persist dossiers and teams if they are not on disk
+- Use the requested handover format or the Delivery default. State whether dossiers and teams were persisted; ask about persistence only when required and not already authorized
 - If the next agent would have to guess the house style, the roster, or any accepted risk, the handover is not finished
 
-### Reference: Seating Roster
-
-Reference material, not a step. Use it to recommend in Step 4. It is a floor, not a ceiling — derive unlisted faculties when the plan's failure modes demand them. Never show it unless the developer asks.
-
-**Human mind**
-
-- UX psychologist — cognition, attention, memory, decision load
-- Behavioral scientist — habits, defaults, incentives, dark-pattern refusal
-- Emotional-design expert — trust, anxiety, delight, recovery after failure
-- Inclusive-cognition expert — neurodiversity, literacy, aging, first-time vs expert
-- Motivation specialist — why people start, stall, and abandon
-- Trust psychologist — credibility, risk perception, permission to act
-
-**Research**
-
-- UX researcher — interviews, usability, evidence before opinion
-- Ethnographer — real context of use, not lab tasks
-- Jobs-to-be-done analyst — the job hired, not the feature requested
-- Market researcher — alternatives, switching cost, category norms
-- Accessibility researcher — who is excluded by the current path
-- Support-insight analyst — tickets and complaints as product signal
-
-**Experience design**
-
-- Product designer — whole problem-to-interface path
-- Interaction designer — flows, states, gestures, timing
-- UI / visual designer — hierarchy, density, visual language
-- Information architect — findability, navigation, mental model
-- Service designer — cross-channel journey, handoffs, waiting
-- Design-systems designer — tokens, consistency, reuse without sameness
-- Content designer / UX writer — words as interface
-- Conversational designer — chat, voice, agent tone, turn-taking
-- Motion designer — feedback, orientation, reduced-motion respect
-- Data-visualization designer — charts that tell truth, not decoration
-- Onboarding designer — first-run, empty states, competence growth
-- Error-experience designer — blame-free recovery, undo, next action
-
-**Product and strategy**
-
-- Product manager — outcome, priority, trade-off against goals
-- Product strategist — positioning, bets, what not to become
-- Product owner — backlog truth, acceptance, scope discipline
-- Growth specialist — activation, retention, loops without coercion
-- Monetization specialist — pricing, packaging, value exchange
-- Roadmap / portfolio manager — sequencing across bets
-- Opportunity discoverer — problem worth solving vs solution theater
-- Competitive-intelligence analyst — copy nothing; steal only the job
-
-**Delivery**
-
-- Project manager — time, dependencies, cut line, status without theater
-- Technical program manager — multi-team, multi-system sequencing
-- Scrum master / delivery coach — flow, blockers, team health
-- Release manager — ship window, freeze, comms, rollback clock
-- Change manager — adoption inside the org that must live with it
-- Risk officer — what can kill the plan, ranked by damage not drama
-- Estimator / uncertainty specialist — ranges, not fake precision
-
-**Architecture**
-
-- Software architect — boundaries, simplicity, irreversible choices
-- Systems architect — runtime, data, failure domains
-- Solution architect — integration across existing systems
-- Domain-driven design strategist — bounded contexts, language
-- API designer — contracts, versioning, consumer empathy
-- Data modeler — truth in storage, migrations, identity
-- Integration architect — third parties, sync, eventual consistency
-- Migration / legacy specialist — strangler paths, coexistence
-- Complexity reductionist — delete before add
-
-**Build**
-
-- Backend engineer — logic, integrity, authorization, failure
-- Frontend engineer — state, accessibility in pixels, perceived speed
-- Mobile engineer — lifecycle, offline, store, device limits
-- Desktop / native engineer — OS integration, install, updates
-- CLI / developer-experience engineer — flags, scripts, composability
-- Full-lifecycle feature engineer — one slice, all layers, no orphans
-- Platform engineer — paved roads, internal products
-- Build / tooling engineer — local loop, CI, reproducibility
-- Performance engineer — latency, memory, budgets
-- Concurrency / realtime specialist — races, ordering, backpressure
-- Search / relevance engineer — find vs dump
-- Offline / sync specialist — conflict, merge, user-visible truth
-- Embedded / IoT specialist — when hardware is in the loop
-- Gameplay / simulation specialist — loops, feedback, fairness
-
-**Quality**
-
-- QA strategist — what must be proven, at what cost
-- Exploratory tester — the nasty path a script will never write
-- SDET / automation engineer — durable checks, not brittle theater
-- Test architect — pyramid, fixtures, environments
-- Accessibility QA — WCAG as behavior, not a badge
-- Localization tester — language, locale, cultural fit
-- Chaos / resilience tester — kill dependencies on purpose
-- UAT / acceptance specialist — "done" in the user's words
-- Regression historian — what broke last time and why
-
-**Operate and survive**
-
-- SRE — SLOs, error budget, toil
-- DevOps / delivery engineer — pipeline, environments, promotion
-- Incident commander — detect, mitigate, communicate, learn
-- Observability engineer — logs, traces, metrics, reproduction
-- Capacity planner — load, cost, degradation
-- FinOps / cost engineer — unit cost, waste, surprise bills
-- Reliability engineer — graceful failure, idempotency, rollback
-- Disaster-recovery specialist — backups that actually restore
-- Environment / secrets steward — config, credentials, least privilege
-
-**Security, privacy, abuse**
-
-- Application-security engineer — threats in the actual design
-- Threat modeler — assets, attackers, entry points
-- Identity / auth specialist — sessions, tokens, account recovery
-- Privacy engineer — collection, retention, consent, deletion
-- Compliance officer — regulation that actually applies
-- Cryptography specialist — only when crypto is the domain
-- Abuse / fraud specialist — misuse, spam, automation, social attack
-- Supply-chain security specialist — dependencies, provenance
-- Security-UX specialist — safe defaults people will still use
-
-**Data and intelligence**
-
-- Product analyst — behavior vs intention
-- Data analyst — questions, definitions, honest charts
-- Data engineer — pipelines, quality, lineage
-- Data scientist — prediction only when it beats a rule
-- ML engineer — training, eval, drift, fallback
-- MLOps specialist — reproducibility, promotion, rollback of models
-- Evaluation / benchmarking specialist — claims vs numbers
-- Information-retrieval / RAG specialist — grounding, citation, miss
-- Agent architect — tools, memory, handoff, refusal
-- Computer-vision specialist — data, labels, failure in pixels
-- Human-in-the-loop designer — when the model must ask a person
-
-**Words, brand, adoption**
-
-- Brand strategist — promise, voice, what the product stands for
-- Naming specialist — product, feature, and company language
-- Technical writer — docs a stranger can finish a task from
-- Developer advocate — when other builders are users
-- Customer-success lead — activation after the sale
-- Support engineer — first-line reality
-- Sales engineer — what was promised vs what can ship
-- Training designer — competence, not a tour
-- Community / open-source maintainer — contribution, governance, tone
-- Localization / i18n strategist — expansion without rewrite
-
-**Business, legal, ethics**
-
-- Business analyst — rules, processes, acceptance language
-- Domain expert — the real-world craft the software sits inside
-- Operations designer — the work around the software
-- Stakeholder diplomat — who decides, who blocks, who is surprised
-- Legal counsel — IP, contracts, liability, terms
-- Licensing specialist — OSS and proprietary mix
-- Procurement / vendor specialist — lock-in, SLA, exit
-- Ethicist — who is harmed if this works as designed
-- Digital-wellbeing specialist — attention, addiction, after-hours
-- Sustainability specialist — energy, hardware waste, long life
-- Accessibility policy lead — legal plus moral floor
-- AI-policy / safety specialist — autonomy, consent, audit of agents
-
-**Meta**
-
-- Hostile critic — never seated here; owned by `360-expert-review`
-- Handover specialist — the next agent needs zero guesses
-- Simplifier — shortest design that still covers every required angle
-- First-principles philosopher — separate fact from habit
-- User-feeling advocate — thought, experience, and emotion as first-class
-- Traceability clerk — requirement, task, test, production signal
-- Professor-panel chair — convenes only the seated faculties this request needs
-
 ## Output Format
+
+Canonical handover fields: Context · Decisions · State (done / pending / blocked) · Remaining tasks (what, how, where) · Verification · Risks and how to detect them early
 
 Before recommending, and always in `suggest` mode:
 
@@ -471,7 +312,7 @@ After the session:
 - faculty/roster.md: <created / updated>
 - faculty/teams.md: <created / updated / unchanged>
 - faculty/<role>.md: <created / updated>
-- Persist: <path> or <asked, waiting>
+- Persist: <path / in-session only; not persisted>
 
 ## Accepted risks and explicit assumptions
 - <risk or assumption> — owned by <faculty>, written to plan section <5 / 7 / 10>
@@ -491,7 +332,7 @@ After the session:
 
 ## Quality Gate
 
-The session is finished only when every answer is yes:
+The session is finished when every gate applicable to the selected mode passes. In `suggest` mode, finish after the fit assessment, evidence-backed short list, and rationale; seating, plan edits, dossier writes, and team management gates do not apply. State why any other gate is non-applicable.
 
 - The mode was clear, and `suggest` mode stopped before seating and left the plan untouched
 - Goals, taste, mindset, and strategy were known from memory or asked in this session
@@ -504,7 +345,7 @@ The session is finished only when every answer is yes:
 - The plan or guidance was polished after each seat, never batched to the end
 - Every Plan Template field survived on every task touched: ID, Depends on, Skills, Parallel, Effort, Priority, Done when, checkpoints, change policy, replanning triggers, traceability
 - Every task a faculty added carries a stable ID, declared skills, `Effort` / `Priority` / `Parallel` values from the family vocabularies, and an observable `Done when`
-- The plan's `Status` was left `Draft` or `Ready for review` — this skill never claimed finality
+- Readiness reflects material edits and blockers; this skill never claimed a review occurred
 - Accepted risks, assumptions, and open questions landed in the plan's existing sections; no new numbered section was invented
 - Faculty conflicts were presented to the developer, never settled silently
 - Memory uses claim / source / status / touches; conflicts were confirmed before rewriting
@@ -512,7 +353,7 @@ The session is finished only when every answer is yes:
 - House style is one shop, shared across all seated faculties
 - The hostile critic was never seated — that role belongs to `360-expert-review`
 - The handover carries context, decisions, state, remaining tasks, verification, and risks with how to detect them early
-- The user was asked about handover format and where dossiers and teams persist; the outcome is recorded
+- Delivery follows the user's format and authorization; persistence or its absence is recorded
 - A fresh agent can continue from the dossiers, teams, and roster with zero guessing
 
-Any "no" means not finished. Measure, raise, polish, or write memory, then check again.
+An unresolved applicable gate needs a specific correction or an honest blocker. Do not seat faculties, edit plans, or write dossiers to satisfy gates excluded by the selected mode.

@@ -1,7 +1,7 @@
 ---
 name: 360-execute
 description: Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and brief the user in chat. Use when a plan exists and work must begin, or when resuming a partial execution.
-version: 1.1.1
+version: 2.0.0
 ---
 
 # 360 Execute
@@ -12,7 +12,7 @@ Run this skill when a finalized plan must be executed — completely, faithfully
 
 This skill executes plans. To create one, use `360-blueprint`. To stress-test and finalize one, use `360-expert-review`. To audit the built result afterward, use `360-backend-audit`.
 
-The ledger and report live in a file. Chat gets a short briefing only.
+Prefer a file for the full deliverable and a short chat briefing; use the Delivery rules below.
 
 ## When to Use
 
@@ -27,9 +27,23 @@ The ledger and report live in a file. Chat gets a short briefing only.
 - Coverage is tracked, not trusted — a persisted ledger records every task and its verdict
 - Done is a verdict with evidence — a task is complete when its acceptance check passes
 - Deviations surface, never absorb — reality overrides the plan only through an explicit decision
-- The file is the record. Chat is the briefing
+- Preserve a recoverable record using the Delivery rules below
 
 ## Workflow
+
+### Entry: Optional Token Efficiency
+
+Reuse explicit approval or refusal for `360-token-efficiency` from this session. If unknown and not already offered, ask once whether to enable it for this session; continue the main task with the overlay inactive while unanswered. Explicit user invocation counts as approval; merely appearing in a generated plan does not. On approval, discover and load it through the host's supported skill mechanism, reusing already-loaded instructions. If unavailable, explain briefly and continue; do not install automatically. Refusal disables the overlay, not ordinary efficient habits. Revocation takes effect immediately. Keep consent in-session only; it does not authorize cross-session memory writes. The overlay never invokes itself or restarts the parent skill.
+
+### Shared Plan Contract
+
+Preserve stable task IDs and existing user decisions. Every task carries: ID, What, How, Where, Depends on, Skills (list or `None`), Parallel, Effort, Priority, Done when (observable). Use `Priority: must | should | could`, `Effort: S | M | L`, and `Parallel: yes | no`. Only `should` and `could` sit below the cut line. Preserve phase checkpoints, change policy, replanning triggers, and objective-to-task traceability.
+
+Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep it `Draft`; a complete unreviewed plan is `Ready for review`; a passed review sets `Reviewed and ready to execute`. Material edits after review return it to `Ready for review` (or `Draft` if blocked). Execution progress belongs in the ledger, not the readiness status. An explicit user instruction to execute a supplied plan authorizes execution without a mandatory sibling review; record that basis without claiming a review occurred.
+
+### Delivery
+
+Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
 
 ### 1. Load the Plan Completely
 
@@ -37,10 +51,10 @@ Never execute a plan you have not fully read.
 
 - Read the entire plan before touching anything: objective, scope, assumptions, every phase, every task, every checkpoint
 - Build the full task inventory: every task ID, its priority, its dependencies, its "done when" check
-- If any task lacks an observable acceptance check, derive one and confirm it with the user before executing that task
-- If anything is ambiguous, ask before starting
+- If an acceptance check is missing, derive it from the approved objective; ask only when alternatives would change the intended outcome
+- Resolve material ambiguity before dependent work; continue independent authorized work
 
-IMPORTANT NOTE: Clear the conversation before starting development to save tokens instead of letting auto-compact run.
+Never automatically clear history. Use context management only when the host supports it. Before compaction or handoff, preserve and verify the six handover fields against the plan and ledger, including constraints, authorization, unresolved uncertainty, evidence locations, and exact values. Reopen original evidence if the summary cannot support the next decision. Without recoverable artifacts or context controls, keep state in-session and explain any continuity limit.
 
 ### 2. Persist the Coverage Ledger
 
@@ -48,7 +62,7 @@ The ledger is the spine of execution and the source of truth for progress.
 
 - Write it to a file and keep it current after every task
 - Reuse the existing path if known; otherwise `plans/<short-slug>-execution.md`; create the folder if needed; ask once if ambiguous
-- If the file cannot be written, stop and ask — never treat chat as the ledger
+- If the file cannot be written, use the in-session delivery fallback
 - One row per task: ID, name, priority, acceptance check, status
 - Statuses: `pending` / `in progress` / `done (verified)` / `blocked` / `dropped (approved)`
 - Nothing counts as done until the ledger says verified
@@ -57,7 +71,7 @@ The ledger is the spine of execution and the source of truth for progress.
 ### 3. Execute in Order
 
 - Follow phase order and task dependencies exactly; honor parallel markers
-- Load every skill a task declares (e.g., `360-token-efficiency`) before starting that task
+- Load declared skills through the supported host mechanism when available. The optional `360-token-efficiency` always follows session consent; a plan listing is not approval. If another declared skill is unavailable, use the self-contained contract and available capabilities; block only tasks that actually require the missing capability
 - Verify each phase checkpoint before advancing to the next phase — a failed checkpoint stops the line
 - Do exactly what the task specifies — no silent extras, no silent shortcuts
 
@@ -87,7 +101,7 @@ Before declaring completion, walk the ledger top to bottom:
 - Run the plan's overall verification; confirm all checkpoints passed
 - Sweep once more for regressions introduced across phases
 - Write the execution report into the same ledger file
-- Print only the terminal briefing
+- With a saved file, print the terminal briefing and path
 
 ## Output Format
 
@@ -99,11 +113,11 @@ The ledger file contains:
 2. Deviations — what diverged, how it was resolved, who approved it; or "None"
 3. QC results — checks run, checkpoints verified, regression sweeps, outcomes
 4. Unfinished items — pending, blocked, or dropped, with reason and approval; or "None"
-5. Handover summary — context, decisions, current state, remaining tasks with what/how/where, risks and how to detect them early
+5. Handover summary — Context · Decisions · State (done / pending / blocked) · Remaining tasks (what, how, where) · Verification · Risks and how to detect them early
 
 ### Terminal briefing
 
-Use this shape. Omit any section that would be empty. Never paste the work file into chat.
+Use this shape. Omit any section that would be empty. Follow the Delivery rules for file or in-session output.
 
 ```text
 Execution — <n>/<m> tasks verified
@@ -128,7 +142,7 @@ Issues found
 - Talk to the user, not the next agent
 - Done is new work shipped. Updates to existing is a change to something that already existed. Never mix them
 - Confidence: `proven` evidence in hand; `likely` strong reason; `possible` suspected; `uncertain` hypothesis. Never numbers. Never say proven without evidence
-- No ledger dump, no handover essay, no skill names
+- With file delivery, keep the briefing concise; name a missing skill when it explains a limitation
 
 ## Quality Gate
 
@@ -141,10 +155,10 @@ Execution is complete only when every answer is yes:
 - No `must`-priority task was dropped or skipped without explicit user approval
 - Every objective in the plan's traceability maps to verified work
 - Regressions and collateral damage were swept for, and the results are stated
-- Declared skills were loaded wherever the plan required them
+- Declared skill availability and consent were respected; required unavailable capabilities are explicit blockers
 - Unfinished items are stated honestly — pending, blocked, or dropped, with reasons
 - The ledger file lets the next agent continue with zero guessing
-- Chat does not contain the ledger or report body
+- Delivery honors the requested format and accurately states persistence
 - The briefing omits empty sections and uses proven/likely/possible/uncertain, never numbers
 
 Any "no" means execution is not finished. Fix it and re-run the sweep.

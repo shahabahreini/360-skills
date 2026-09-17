@@ -6,12 +6,12 @@ Skills follow the open Agent Skills format (https://agentskills.io) and install 
 
 ## Full Documentation
 
-- [llms-full.txt](https://raw.githubusercontent.com/shahabahreini/360-skills/main/llms-full.txt): Complete repository documentation, contributor guide (AGENTS.md), and all skill instructions compiled into a single file for direct, full-context LLM ingestion.
+- [llms-full.txt](https://raw.githubusercontent.com/shahabahreini/360-skills/main/llms-full.txt): Complete repository documentation, contributor guide (AGENTS.md), and all skill instructions with supporting references compiled into a single file for direct, full-context LLM ingestion.
 
 ## Skills
 
 ### Planning & Architecture
-- [360-blueprint](https://github.com/shahabahreini/360-skills/blob/main/skills/360-blueprint/SKILL.md): Create an executable plan from a new objective — clarify first, write the full plan to a file, and brief the user in chat — when a goal exists but the path is unclear or the request is "plan this".
+- [360-blueprint](https://github.com/shahabahreini/360-skills/blob/main/skills/360-blueprint/SKILL.md): Create an executable plan from a new objective with explicit tasks, constraints, and verification. Use when a goal exists but the path is unclear, or the request is "plan this".
 - [360-faculty](https://github.com/shahabahreini/360-skills/blob/main/skills/360-faculty/SKILL.md): Seat a living, tailored expert team on a plan or task. Use when work must fit this developer's goals, taste, mindset, and strategy, when a plan needs the right expertise chosen for its complexity, depth, and nature, or when a named faculty team must be created, called, or updated. Recommends a short list, asks only the questions that still change the work, polishes immediately, and keeps upgradable memory.
 
 ### Hardening & Quality Gates
@@ -23,7 +23,7 @@ Skills follow the open Agent Skills format (https://agentskills.io) and install 
 - [360-optimize](https://github.com/shahabahreini/360-skills/blob/main/skills/360-optimize/SKILL.md): Audit working code for zero-cost speed, weight, and reliability gains — measure first, rank drop-in upgrades and restructures, and report conservative expected effects on this system. Use when existing code must run faster, lighter, or more robustly without changing what it does.
 
 ### Token & Cost Optimization
-- [360-token-efficiency](https://github.com/shahabahreini/360-skills/blob/main/skills/360-token-efficiency/SKILL.md): Runtime skill that reduces token waste during AI-agent tasks without dropping facts, changing requirements, or weakening correctness. Use continuously alongside other skills when token cost matters.
+- [360-token-efficiency](https://github.com/shahabahreini/360-skills/blob/main/skills/360-token-efficiency/SKILL.md): Reduce avoidable context and tool-output overhead with capability-aware retrieval, reuse, and verified handovers. Use as an optional, session-approved companion when token cost or context growth matters, with strict preservation of task requirements by default.
 
 ## Documentation
 

@@ -1,7 +1,7 @@
 ---
 name: 360-optimize
 description: Audit working code for zero-cost speed, weight, and reliability gains — measure first, rank drop-in upgrades and restructures, and report conservative expected effects on this system. Use when existing code must run faster, lighter, or more robustly without changing what it does.
-version: 1.1.0
+version: 2.0.0
 ---
 
 # 360 Optimize
@@ -16,7 +16,7 @@ This skill writes an audit, not a rewrite. To plan approved work, use `360-bluep
 
 Reported expectations must be realistic for this system. A sold gain that this load will not see is a defect.
 
-The full audit lives in a file. Chat gets ranked highlights only.
+Prefer a file for the full deliverable and a short chat briefing; use the Delivery rules below.
 
 ## When to Use
 
@@ -35,9 +35,23 @@ The full audit lives in a file. Chat gets ranked highlights only.
 - Local win is not end-to-end win. Do not stack overlapping gains
 - Delete waste before you swap tools. Swap tools before you reshape the system
 - Robust beats emergent. Emergent enters only behind an adapter, with rollback, and with evidence
-- The file is the audit. Chat is the briefing
+- Preserve a recoverable record using the Delivery rules below
 
 ## Workflow
+
+### Entry: Optional Token Efficiency
+
+Reuse explicit approval or refusal for `360-token-efficiency` from this session. If unknown and not already offered, ask once whether to enable it for this session; continue the main task with the overlay inactive while unanswered. Explicit user invocation counts as approval; merely appearing in a generated plan does not. On approval, discover and load it through the host's supported skill mechanism, reusing already-loaded instructions. If unavailable, explain briefly and continue; do not install automatically. Refusal disables the overlay, not ordinary efficient habits. Revocation takes effect immediately. Keep consent in-session only; it does not authorize cross-session memory writes. The overlay never invokes itself or restarts the parent skill.
+
+### Shared Plan Contract
+
+Preserve stable task IDs and existing user decisions. Every task carries: ID, What, How, Where, Depends on, Skills (list or `None`), Parallel, Effort, Priority, Done when (observable). Use `Priority: must | should | could`, `Effort: S | M | L`, and `Parallel: yes | no`. Only `should` and `could` sit below the cut line. Preserve phase checkpoints, change policy, replanning triggers, and objective-to-task traceability.
+
+Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep it `Draft`; a complete unreviewed plan is `Ready for review`; a passed review sets `Reviewed and ready to execute`. Material edits after review return it to `Ready for review` (or `Draft` if blocked). Execution progress belongs in the ledger, not the readiness status. An explicit user instruction to execute a supplied plan authorizes execution without a mandatory sibling review; record that basis without claiming a review occurred.
+
+### Delivery
+
+Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
 
 ### 1. Lock the Contract
 
@@ -132,10 +146,10 @@ Every admitted gain gets a conservative expected effect. This step is not option
 
 - Write the full audit to a file using the work-file template
 - Reuse the existing path if known; otherwise `plans/<short-slug>-optimize.md`; create the folder if needed; ask once if ambiguous
-- If the file cannot be written, stop and ask — never paste the audit into chat
+- If the file cannot be written, use the in-session delivery fallback
 - Rank admitted gains by conservative impact versus effort versus risk
 - Keep new work and updates to existing work in separate lists
-- Print only the terminal briefing
+- With a saved file, print the terminal briefing and path
 
 ## Output Format
 
@@ -160,13 +174,13 @@ Every admitted gain gets a conservative expected effect. This step is not option
 7. Handoff bugs — correctness or dead-weight items for `360-backend-audit`; or "None"
 8. Verification — tests to run, rollback, how to detect a silent contract break
 9. Implementation plan — grouped as New vs Updates to existing
-10. Handover — context, decisions, tasks, verification, risks, state
+10. Handover — Context · Decisions · State (done / pending / blocked) · Remaining tasks (what, how, where) · Verification · Risks and how to detect them early
 
-Every finding needs evidence. Clean areas are stated as clean. No magnitude without a measurement on this system.
+Implementation tasks use the Shared Plan Contract. Every finding needs evidence. Clean areas are stated as clean. No magnitude without a measurement on this system.
 
 ### Terminal briefing
 
-Use this shape. Omit any section that would be empty. Never paste the work file into chat.
+Use this shape. Omit any section that would be empty. Follow the Delivery rules for file or in-session output.
 
 ```text
 Optimize — complete
@@ -195,7 +209,7 @@ Need from you
 - A new artifact is Features to add only if a harness or tool must be introduced; a change to current code is Updates to existing. Never mix them
 - Confidence: `proven` evidence in hand; `likely` strong reason; `possible` suspected; `uncertain` hypothesis. Never numbers. Never say proven without evidence
 - Never hype. If you cannot state a conservative expected effect, the gain is not ready to brief
-- No skill-name dump, no audit body in chat
+- Keep the briefing concise when the audit is saved to a file
 
 ## Quality Gate
 
@@ -217,7 +231,7 @@ The audit is complete only when every answer is yes:
 - Correctness bugs are handed off, not sold as optimizations
 - New work and updates to existing work are grouped separately
 - The handover lets the next agent act with zero guessing
-- The work file lives at the stated path and was not pasted into chat
+- The deliverable is saved at the stated path, or honestly labeled in-session only
 - The briefing omits empty sections, uses proven/likely/possible/uncertain, never numbers, and does not hype
 
 Any "no" means the audit is not finished. Fix it and review again.

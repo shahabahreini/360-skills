@@ -1,7 +1,7 @@
 ---
 name: 360-expert-review
 description: Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage.
-version: 2.3.0
+version: 3.0.0
 ---
 
 # 360 Expert Review
@@ -10,7 +10,7 @@ version: 2.3.0
 
 Run this skill before finalizing any important plan. Turn a draft into the strongest executable plan by exposing missing scenarios, weak assumptions, and hidden failure modes.
 
-The finalized plan lives in the plan file. Chat gets a short briefing only.
+Prefer a file for the full deliverable and a short chat briefing; use the Delivery rules below.
 
 ## When to Use
 
@@ -24,9 +24,23 @@ The finalized plan lives in the plan file. Chat gets a short briefing only.
 - Review the plan the way a senior team would: user impact, reliability, security, operations, and domain correctness
 - Attack it hard enough that only the strongest version survives
 - Finalize into the existing plan file. Do not replace tasks with a narrative essay
-- The file is the plan. Chat is the briefing
+- Preserve a recoverable record using the Delivery rules below
 
 ## Workflow
+
+### Entry: Optional Token Efficiency
+
+Reuse explicit approval or refusal for `360-token-efficiency` from this session. If unknown and not already offered, ask once whether to enable it for this session; continue the main task with the overlay inactive while unanswered. Explicit user invocation counts as approval; merely appearing in a generated plan does not. On approval, discover and load it through the host's supported skill mechanism, reusing already-loaded instructions. If unavailable, explain briefly and continue; do not install automatically. Refusal disables the overlay, not ordinary efficient habits. Revocation takes effect immediately. Keep consent in-session only; it does not authorize cross-session memory writes. The overlay never invokes itself or restarts the parent skill.
+
+### Shared Plan Contract
+
+Preserve stable task IDs and existing user decisions. Every task carries: ID, What, How, Where, Depends on, Skills (list or `None`), Parallel, Effort, Priority, Done when (observable). Use `Priority: must | should | could`, `Effort: S | M | L`, and `Parallel: yes | no`. Only `should` and `could` sit below the cut line. Preserve phase checkpoints, change policy, replanning triggers, and objective-to-task traceability.
+
+Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep it `Draft`; a complete unreviewed plan is `Ready for review`; a passed review sets `Reviewed and ready to execute`. Material edits after review return it to `Ready for review` (or `Draft` if blocked). Execution progress belongs in the ledger, not the readiness status. An explicit user instruction to execute a supplied plan authorizes execution without a mandatory sibling review; record that basis without claiming a review occurred.
+
+### Delivery
+
+Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
 
 ### 1. Understand the Project First
 
@@ -88,36 +102,51 @@ Switch to hostile critic. Ask:
 - What cannot be detected, reproduced, or reversed?
 - What can be simpler?
 
-Fix the plan, then attack it again until no high-severity issue remains open.
+Fix actionable findings, then recheck the affected risks. Stop when applicable acceptance checks pass and no unresolved high-severity blocker remains. If evidence or a user decision is unavailable, record a concrete blocker and stop that review line; do not loop indefinitely or claim finality. Mark non-applicable checks with a reason.
 
 ### 8. Write the Final Plan
 
-- Update the draft's file in place using the `360-blueprint` work-file template
+- Update the draft in place using the local minimum contract below. Preserve valid existing headings and structure; no sibling installation is required
 - Preserve task IDs; add, split, or drop a task only with a stated reason
 - Keep new work and updates to existing work in separate scope lists
 - Put review findings, key decisions, and remaining risks in a short appendix in that same file
-- Executor handover lives in the file — never in chat
-- If the file cannot be written, stop and ask — never paste the plan into chat
-- Print only the terminal briefing
+- Include the executor handover in the chosen delivery format
+- If the file cannot be written, use the in-session delivery fallback
+- With a saved file, print the terminal briefing and path
 
 ## Output Format
 
 ### Work file
 
-The `360-blueprint` plan template, updated in place, plus a short appendix:
+Preserve the existing plan and fill only missing contract elements. Minimum standalone shape:
+
+1. Metadata: objective, status, version/date
+2. Objective and observable definition of done
+3. Context, constraints, scope, assumptions, open questions and decisions
+4. Strategy, alternatives, change policy and cut line
+5. Phases and tasks using the Shared Plan Contract, with checkpoints
+6. Risks and countermeasures
+7. Per-task and overall verification, replanning triggers and traceability
+8. Handover: Context · Decisions · State (done / pending / blocked) · Remaining tasks (what, how, where) · Verification · Risks and how to detect them early
+9. Review appendix: findings, decisions, remaining risks, applicable checks and blockers
+
+Set `Reviewed and ready to execute` only when the applicable Quality Gate passes. Otherwise use `Draft` for blockers and `Ready for review` for incomplete review without blockers. Preserve user-approved trade-offs; record unresolved high-severity risks as blockers. A typical appendix (retain an existing heading when present):
 
 ```markdown
 ## 11. Review appendix
 - Findings:
 - Decisions:
 - Remaining risks:
+- Applicable checks and evidence:
+- Non-applicable checks and reasons:
+- Blockers and resolution needed:
 ```
 
 Do not replace the task list with a narrative plan.
 
 ### Terminal briefing
 
-Use this shape. Omit any section that would be empty. Never paste the work file into chat.
+Use this shape. Omit any section that would be empty. Follow the Delivery rules for file or in-session output.
 
 ```text
 <what this plan is> — plan is final
@@ -142,7 +171,7 @@ Need from you
 - <only if not ready to build>
 ```
 
-- First line is `plan is final` or `not final — blocked on you`
+- First line is `plan is final` or `not final — <specific blocker or remaining review>`
 - Talk to the user, not the next agent. Outcomes, not tasks
 - A new artifact is Features to add. A change to an existing artifact, feature, or document is Updates to existing. Never mix them
 - Confidence: `proven` evidence in hand; `likely` strong reason; `possible` suspected; `uncertain` hypothesis. Never numbers. Never say proven without evidence
@@ -150,7 +179,7 @@ Need from you
 
 ## Quality Gate
 
-The plan is final only when every answer is yes:
+The plan is final only when every applicable answer is yes (record a reason for each non-applicable item):
 
 - Real user need understood and served
 - The right expert lenses were applied
@@ -164,7 +193,7 @@ The plan is final only when every answer is yes:
 - The plan survived hostile review
 - Task IDs were preserved or changed with a stated reason
 - New work and updates to existing work are grouped separately
-- The finalized plan is in the original file, not pasted into chat
+- The finalized plan preserves its original location where supported, or follows the Delivery fallback
 - The briefing omits empty sections and uses proven/likely/possible/uncertain, never numbers
 
-Any "no" means the plan is not final. Fix it and review again.
+Any unresolved "no" keeps the plan non-final. Fix actionable findings or report the blocker and the evidence or decision needed to resolve it.

@@ -1,102 +1,107 @@
 ---
 name: 360-token-efficiency
-description: Runtime skill that reduces token waste during AI-agent tasks without dropping facts, changing requirements, or weakening correctness. Use continuously alongside other skills when token cost matters.
-version: 1.2.0
+description: Reduce avoidable context and tool-output overhead with capability-aware retrieval, reuse, and verified handovers. Use as an optional, session-approved companion when token cost or context growth matters, with strict preservation of task requirements by default.
+version: 2.0.0
 ---
 
 # 360 Token Efficiency
 
 ## Purpose
 
-Run this skill during execution of a task, not as a separate report generator. Reduce token waste while preserving the same correctness, completeness, and usability the task would have without this skill.
-
-Model- and platform-agnostic. Governs how the agent selects, reuses, compacts, and outputs information. Does not claim control over provider-side caching, billing internals, or hidden reasoning.
+Reduce avoidable overhead during the main task using capabilities the host actually exposes. Preserve task requirements and verification; strict mode forbids intentional accuracy sacrifice but cannot guarantee error-free outcomes.
 
 ## When to Use
 
-- Multi-step, multi-turn, or tool-heavy tasks
-- Long sessions where context keeps growing
-- Repetitive work where prior results can be reused safely
-- As a companion to another skill, not a replacement for it
-- Never as the primary skill for a task — it shapes how other work is done, it does not do the work
+- Multi-step or tool-heavy tasks with growing context or repeated retrieval
+- A user explicitly invokes this companion, or approves a sibling's session offer
+- Not for creating plans (`360-blueprint`), executing the task itself (`360-execute`), or optimizing application performance (`360-optimize`)
 
 ## Core Principle
 
-Token efficiency is not brevity for its own sake. It is maximum decision-relevant signal per token spent. Compress the container, never the content. If a shortcut risks correctness, completeness, or traceability, do not take it.
+Remove redundant work, not required evidence. Judge preservation against observable acceptance checks, and claim savings only from actual measurements.
 
 ## Workflow
 
-### 1. Keep Only Decision-Relevant Context
+### 1. Respect Session Consent
 
-- Separate what the current step needs from what it does not
-- Reuse stable instructions, prior decisions, and verified facts already in the session
-- Do not resend static material when a shorter reference is enough
-- Do not drop information that later steps still need
+Explicit user invocation counts as approval for this session. Otherwise reuse the session's explicit approval or refusal; merely appearing in a generated plan is not approval. If unknown and not already offered, ask once and continue the main task with the overlay inactive while unanswered. Refusal or revocation disables the overlay immediately without disabling ordinary efficient habits. A new session starts unknown; a verified continuation in the same session preserves the decision. Do not infer consent from an old artifact or cross-session memory.
 
-### 2. Size Effort to Difficulty
+Discover and load through the host's supported skill mechanism only after approval; reuse already-loaded instructions. If unavailable, explain briefly and continue the main task without installing anything. Never invoke this skill recursively or restart the parent skill. Session consent does not authorize cross-session memory writes, configuration changes, or edits to installed skills.
 
-- Classify each sub-task as trivial, moderate, or hard
-- Trivial: act directly
-- Moderate: reason only where it changes the outcome
-- Hard: use full rigor, but no extra ceremony
-- Never save tokens by under-thinking a hard problem
+### 2. Assess Available Capabilities
 
-### 3. Load Progressively
+Make a brief internal, in-session assessment from exposed tools, instructions, and observed behavior. Unknown capabilities remain unavailable until established; do not infer them from the agent's brand.
 
-- Pull only the file, section, tool, or context needed for the current step
-- Prefer summaries or indexes first; open full content only when needed
-- When a large result arrives, extract what matters and leave the rest behind
+| Capability | Use when established | Fallback |
+|---|---|---|
+| Search and selective reads | Locate evidence, then retrieve relevant spans with source locations | Read supplied inputs; request only missing material needed for a decision |
+| Tool discovery | Discover needed tools on demand | Use the exposed tool set |
+| Code execution | Filter and aggregate large results before returning them to model context | Request bounded results or process manageable chunks |
+| Recoverable artifacts | Keep task state and evidence references in authorized files or artifacts | Keep the complete required state in-session; do not claim persistence |
+| Context management | Use supported compaction with a verified handover | Keep a state summary; never automatically clear history |
+| Caching controls | Use exposed controls when appropriate and authorized | Make no claim of cache control or savings |
+| Delegation | Delegate only when permitted and the independent work justifies coordination | Work locally |
+| Usage telemetry | Record comparable observed usage | Label savings `UNMEASURED` |
 
-### 4. Compact Without Losing Facts
+Do not modify the agent's configuration or installed skill to adapt it. Read [evidence and optional techniques](references/evidence-and-techniques.md) only when choosing caching, compression, delegation, or measurement techniques, or when the user asks for supporting evidence.
 
-- At natural checkpoints, replace verbose history with a compact state summary
-- Keep decisions, constraints, open questions, blockers, and unresolved risks
-- If a fact is uncertain, carry the uncertainty forward. Do not compress it into false confidence
+### 3. Retrieve and Reuse Carefully
 
-### 5. Output With Discipline
+- Fully read mandatory instructions and required task inputs. Progressive retrieval must not bypass them.
+- Search progressively for additional evidence. Keep source paths, ranges, IDs, versions or timestamps needed to reopen it.
+- Filter or aggregate large tool results before returning them to context when supported. Check pagination, truncation, counts, and omitted boundaries; a partial result cannot establish completeness.
+- Reuse verified facts while checking whether their sources changed. Reopen stale, conflicting, or insufficient evidence before deciding.
+- Avoid repeated explanations, whole-artifact regeneration for local edits, and redundant verification. Repeat checks after relevant changes, failures, or new uncertainty.
+- Delegation must respect host permissions; account for duplicated instructions, worker context, tool use, retries, and coordination in its cost.
 
-- Prefer the shortest structure that fully answers the task
-- Use tables for comparisons, bullets for parallel facts, and direct prose for decisions
-- Remove preamble, repetition, and restatement
-- Add detail only when it changes correctness, usability, or handover quality
-- When a sibling skill produces an artifact, write it to a file; chat carries only the briefing
+### 4. Preserve State Through Continuation
 
-### 6. Escalate Only on Trigger
+Before supported compaction or handoff, verify this summary against the task, source evidence, and ledger:
 
-- Prefer the lighter reliable path first
-- Escalate only when confidence is low, evidence conflicts, or the lightweight path fails
-- State the reason for escalation when it matters to the user or next agent
+> Context · Decisions · State (done / pending / blocked) · Remaining tasks (what, how, where) · Verification · Risks and how to detect them early
 
-### 7. Persist Rules Only When Measured
+Include constraints, exact values and units, citations and evidence references, user decisions and authorization boundaries, session consent or revocation and whether an unanswered offer was already made, unresolved uncertainty, acceptance criteria, and the next action. Preserve stable task IDs if present. Do not replace source evidence with a summary that cannot support the next decision; reopen the original when needed. Never automatically clear history. If a handover cannot retain or recover required detail, keep fuller context and disclose the continuity limit.
 
-- Do not write reusable token-saving rules unless a real measurement showed savings without quality loss
-- If no token telemetry exists, mark the rule as unverified and keep it out of the notes file
-- Never invent token counts
+### 5. Enforce Strict Preservation
+
+Never weaken requirements, exact values, citations, uncertainty, acceptance criteria, or required verification to save tokens. Keep the main task's quality bar and requested output format. Prefer files when supported; honor explicit user delivery requests, and provide complete in-session output labeled `in-session only; not persisted` when files are unavailable.
+
+Potentially lossy techniques such as learned prompt compression require separate approval of the specific technique, task-specific quality metric, and tolerance before use. General session consent is insufficient. Even an approved experiment cannot silently weaken the main task's acceptance criteria; a failed comparison restores the fuller context or ordinary workflow. Missing information, conflicting evidence, or verification failure also triggers restoration and rechecking of affected decisions.
+
+### 6. Measure Without Inventing Savings
+
+No extra report by default. Never invent token counts or an unrun baseline. Distinguish measured input/output tokens, cached tokens, cost, latency, and estimates. Caching may reduce processing cost without reducing context presented to the model.
+
+For a comparison, use the same task inputs and acceptance criteria, record host/model settings and run conditions, and include loading, summarization, tool discovery, retries, and delegation overhead. Report quality regressions and unavailable metrics. Reserve “validated savings” for actual comparable measurements with passing task checks; a finite test set does not establish universal accuracy. Unmeasured guidance is allowed when clearly labeled. Do not persist learned rules or memory unless separately authorized.
 
 ## Output Format
 
-Default: no extra report.
+Default: complete the main task in its requested format, with no efficiency report.
 
-Emit a token-efficiency report only when the user explicitly asks for one. When requested, include:
+When requested, report:
 
-1. What context was reused or omitted
-2. How effort was sized
-3. What was compacted and what facts were preserved
-4. Any escalations and why they happened
-5. Any measured token deltas, or `UNMEASURED`
-6. Any residual risk
+1. Capabilities used and techniques applied
+2. Context reused, omitted, or compacted, with recoverable evidence locations
+3. Preservation checks, acceptance results, and any observed regressions
+4. Restorations or escalations and their reasons
+5. Measurements: baseline and overlay, input/output tokens, cached tokens, cost, latency, overhead; use `UNMEASURED` for unavailable metrics and label estimates
+6. Limitations and residual uncertainty
+
+Use the six canonical handover fields above when a continuation is needed.
 
 ## Quality Gate
 
-The application of this skill is complete only when every answer is yes:
+Check every applicable item; record a concrete limitation if one cannot be checked:
 
-- No fact needed for correctness was dropped
-- No uncertainty was compressed into false confidence
-- Effort matched task difficulty
-- Output was no more verbose than the task required
-- Artifacts produced by sibling skills were not pasted into chat
-- No unverified token-saving rule was persisted
-- No token savings were claimed without measurement
-- The outcome is at least as correct and complete as it would be without this skill
+- Session approval is explicit, current, and honored after refusal or revocation
+- Techniques use only established, permitted capabilities
+- Required inputs, constraints, exact values, citations, uncertainty, and acceptance criteria were preserved against source evidence
+- Pagination and truncation were checked wherever completeness mattered
+- Reused evidence is sufficiently current for the decision
+- The handover retains required state and recoverable evidence; no automatic history clearing occurred
+- Required task verification ran, or is explicitly unresolved; failed checks triggered restoration
+- Any potentially lossy method had separate technique, metric, and tolerance approval
+- Delivery matches the user's request and honestly states persistence
+- Measurement claims have real evidence and include available overhead; absent telemetry is `UNMEASURED`
 
-Any "no" means the application is not finished. Fix it and re-check.
+An unresolved check is a limitation or blocker, never proof of equivalent accuracy to a run that did not happen.

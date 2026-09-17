@@ -1,53 +1,46 @@
 #!/usr/bin/env node
-// Compiles the entire 360-skills documentation and skill catalog into a single llms-full.txt file.
-// Zero external dependencies. Normalizes line endings to LF (\n).
+// Deterministic, dependency-free compilation of public skills and their references.
+import { readdirSync, readFileSync, existsSync, writeFileSync } from 'node:fs';
+import { join, dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const SKILLS_DIR = join(ROOT, "skills");
-
-export function generateLlmsFull() {
-  const skillNames = readdirSync(SKILLS_DIR)
-    .filter((name) => !name.startsWith("."))
-    .filter((name) => statSync(join(SKILLS_DIR, name)).isDirectory())
-    .sort();
-
-  const readme = readFileSync(join(ROOT, "README.md"), "utf8").replace(/\r\n/g, "\n");
-  const agents = readFileSync(join(ROOT, "AGENTS.md"), "utf8").replace(/\r\n/g, "\n");
-
+export function generateLlmsFull(root = ROOT) {
+  const read = path => readFileSync(join(root, path), 'utf8').replace(/\r\n/g, '\n').trim();
+  const names = readdirSync(join(root, 'skills'), { withFileTypes: true })
+    .filter(item => item.isDirectory() && !item.name.startsWith('.')).map(item => item.name).sort();
+  const references = dir => {
+    if (!existsSync(join(root, dir))) return [];
+    return readdirSync(join(root, dir), { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name, 'en'))
+      .flatMap(item => item.isDirectory() ? references(`${dir}/${item.name}`) : item.name.endsWith('.md') ? [`${dir}/${item.name}`] : []);
+  };
   const lines = [
-    "# 360-skills: Complete Agent Skills Catalog & Documentation",
-    "",
-    "> 360-skills is an open-standard, MIT-licensed collection of Agent Skills for AI coding agents (Claude Code, Cursor, Codex, Copilot, Windsurf, Gemini CLI, and 70+ others via skills.sh).",
-    "",
-    "This document compiles all repository documentation, contributor specifications, and full SKILL.md instruction sets for direct, single-fetch LLM ingestion.",
-    "",
-    "## Table of Contents",
-    "- [Overview & Installation](#overview--installation)",
-    "- [Contributor Guide (AGENTS.md)](#contributor-guide-agentsmd)",
-    "- [Skills Catalog](#skills-catalog)",
+    '# 360-skills: Complete Agent Skills Catalog & Documentation', '',
+    'This bundle contains the user guide, contributor instructions, and public skill instructions with supporting Markdown references. References are included for single-fetch access; normal skill loading should retrieve them only when relevant.', '',
+    '## Table of Contents', '',
+    '- [Overview & Installation](#overview--installation)',
+    '- [Contributor Guide](#contributor-guide)',
+    '- [Contributing](#contributing)',
+    '- [Skills Catalog](#skills-catalog)',
+    ...names.map(name => `  - [${name}](#skill-${name})`), '',
+    '---', '', '## Overview & Installation', '', read('README.md'), '',
+    '---', '', '## Contributor Guide', '', read('AGENTS.md'), '',
+    '---', '', '## Contributing', '', read('CONTRIBUTING.md'), '',
+    '---', '', '## Skills Catalog', '',
   ];
-
-  for (const name of skillNames) {
-    lines.push(`  - [${name}](#skill-${name.toLowerCase()})`);
+  for (const name of names) {
+    lines.push(`### Skill: ${name}`, '', `Source: skills/${name}/SKILL.md`, '', read(`skills/${name}/SKILL.md`), '');
+    for (const reference of references(`skills/${name}/references`)) {
+      lines.push(`### Reference: ${reference}`, '', `Source: ${reference}`, '', read(reference), '');
+    }
+    lines.push('---', '');
   }
-
-  lines.push("", "---", "", "## Overview & Installation", "", readme.trim(), "", "---", "", "## Contributor Guide (AGENTS.md)", "", agents.trim(), "", "---", "", "## Skills Catalog", "");
-
-  for (const name of skillNames) {
-    const skillPath = join(SKILLS_DIR, name, "SKILL.md");
-    const skillContent = readFileSync(skillPath, "utf8").replace(/\r\n/g, "\n").trim();
-    lines.push(`### Skill: ${name}`, "", skillContent, "", "---", "");
-  }
-
-  return lines.join("\n").replace(/\r\n/g, "\n").trim() + "\n";
+  return lines.join('\n').trim() + '\n';
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const content = generateLlmsFull();
-  writeFileSync(join(ROOT, "llms-full.txt"), content, "utf8");
-  console.log(`build-llms-full: generated llms-full.txt (${(Buffer.byteLength(content, 'utf8') / 1024).toFixed(1)} KB)`);
+  writeFileSync(join(ROOT, 'llms-full.txt'), content, 'utf8');
+  console.log(`build-llms-full: generated llms-full.txt (${(Buffer.byteLength(content) / 1024).toFixed(1)} KB)`);
 }

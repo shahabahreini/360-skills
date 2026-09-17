@@ -1,12 +1,12 @@
 # 360-skills: Complete Agent Skills Catalog & Documentation
 
-> 360-skills is an open-standard, MIT-licensed collection of Agent Skills for AI coding agents (Claude Code, Cursor, Codex, Copilot, Windsurf, Gemini CLI, and 70+ others via skills.sh).
-
-This document compiles all repository documentation, contributor specifications, and full SKILL.md instruction sets for direct, single-fetch LLM ingestion.
+This bundle contains the user guide, contributor instructions, and public skill instructions with supporting Markdown references. References are included for single-fetch access; normal skill loading should retrieve them only when relevant.
 
 ## Table of Contents
+
 - [Overview & Installation](#overview--installation)
-- [Contributor Guide (AGENTS.md)](#contributor-guide-agentsmd)
+- [Contributor Guide](#contributor-guide)
+- [Contributing](#contributing)
 - [Skills Catalog](#skills-catalog)
   - [360-backend-audit](#skill-360-backend-audit)
   - [360-blueprint](#skill-360-blueprint)
@@ -34,7 +34,23 @@ This document compiles all repository documentation, contributor specifications,
 
 **360-skills is an open collection of Agent Skills that give AI coding agents senior-level expertise for specific, high-stakes tasks.**
 
-Most agents produce plausible work. Each skill in this repository packages the process, judgment, and quality gates of a senior specialist into a single installable `SKILL.md` file, so agents stop shipping the first draft and start shipping the vetted one. Skills follow the open [Agent Skills](https://agentskills.io) standard and install into Claude Code, Cursor, Codex, Copilot, Windsurf, Gemini CLI, and 70+ other agents through [skills.sh](https://skills.sh).
+Most agents produce plausible work. Each skill in this repository packages the process, judgment, and quality gates of a senior specialist into an installable skill folder, to help agents produce work that can be reviewed against explicit checks. Skills follow the open [Agent Skills](https://agentskills.io) standard and install into Claude Code, Cursor, Codex, Copilot, Windsurf, Gemini CLI, and 70+ other agents through [skills.sh](https://skills.sh).
+
+## Contents
+
+| Topic | What you will find |
+|---|---|
+| [Install](#install) | Individual skills and optional dependencies |
+| [Skills](#skills) | Descriptions and versions |
+| [Routing](#which-skill-do-i-need) | Choose the right skill |
+| [Workflow](#how-the-skills-work-together) | Shared plans and handovers |
+| [Token efficiency](#optional-token-efficiency) | Consent, capabilities, accuracy and measurement |
+| [Design principles](#design-principles) | Quality expectations |
+| [Skill loading](#how-agent-skills-work) | Progressive disclosure |
+| [Repository structure](#repository-structure) | Files and references |
+| [Contributing](#contributing) | Validation commands |
+| [FAQ](#faq) | Common questions |
+| [License](#license) | MIT terms |
 
 ## Install
 
@@ -48,42 +64,42 @@ The installer lists every skill in this repository and lets you choose which age
 npx skills add shahabahreini/360-skills --skill 360-expert-review --agent claude-code
 ```
 
+Each skill works individually. Review includes its own minimum plan contract; blueprint is not a required dependency. Install `360-token-efficiency` separately if you want the optional companion. A missing companion never blocks the primary task and is never installed automatically. Keep each skill's supporting `references/` directory with it.
+
 ## Skills
 
-| Skill                                                 | Description                                                                                                                                                                                                                                                                                                                                                                                                               | Version |
-| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| [`360-blueprint`](skills/360-blueprint)               | Create an executable plan from a new objective — clarify first, write the full plan to a file, and brief the user in chat — when a goal exists but the path is unclear or the request is "plan this".                                                                                                                                                                                                                     | 1.6.0   |
-| [`360-faculty`](skills/360-faculty)                   | Seat a living, tailored expert team on a plan or task. Use when work must fit this developer's goals, taste, mindset, and strategy, when a plan needs the right expertise chosen for its complexity, depth, and nature, or when a named faculty team must be created, called, or updated. Recommends a short list, asks only the questions that still change the work, polishes immediately, and keeps upgradable memory. | 1.0.0   |
-| [`360-expert-review`](skills/360-expert-review)       | Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage.                                                                                                                                                                                                                               | 2.3.0   |
-| [`360-execute`](skills/360-execute)                   | Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and brief the user in chat. Use when a plan exists and work must begin, or when resuming a partial execution.                                                                                                                                                                                                    | 1.1.1   |
-| [`360-backend-audit`](skills/360-backend-audit)       | Deep-audit backend code, write the full report to a file, and brief the user in chat with bugs, updates, and dead weight. Use before or after significant backend work, or when inheriting, refactoring, or handing off services.                                                                                                                                                                                         | 1.2.0   |
-| [`360-optimize`](skills/360-optimize)                 | Audit working code for zero-cost speed, weight, and reliability gains — measure first, rank drop-in upgrades and restructures, and report conservative expected effects on this system. Use when existing code must run faster, lighter, or more robustly without changing what it does.                                                                                                                                   | 1.1.0   |
-| [`360-token-efficiency`](skills/360-token-efficiency) | Runtime skill that reduces token waste during AI-agent tasks without dropping facts, changing requirements, or weakening correctness. Use continuously alongside other skills when token cost matters.                                                                                                                                                                                     | 1.2.0   |
+| Skill | Description | Version |
+|---|---|---|
+| [`360-backend-audit`](skills/360-backend-audit) | Deep-audit backend code, write the full report to a file, and brief the user in chat with bugs, updates, and dead weight. Use before or after significant backend work, or when inheriting, refactoring, or handing off services. | 2.0.0 |
+| [`360-blueprint`](skills/360-blueprint) | Create an executable plan from a new objective with explicit tasks, constraints, and verification. Use when a goal exists but the path is unclear, or the request is "plan this". | 2.0.0 |
+| [`360-execute`](skills/360-execute) | Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and brief the user in chat. Use when a plan exists and work must begin, or when resuming a partial execution. | 2.0.0 |
+| [`360-expert-review`](skills/360-expert-review) | Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage. | 3.0.0 |
+| [`360-faculty`](skills/360-faculty) | Seat a living, tailored expert team on a plan or task. Use when work must fit this developer's goals, taste, mindset, and strategy, when a plan needs the right expertise chosen for its complexity, depth, and nature, or when a named faculty team must be created, called, or updated. Recommends a short list, asks only the questions that still change the work, polishes immediately, and keeps upgradable memory. | 1.1.0 |
+| [`360-optimize`](skills/360-optimize) | Audit working code for zero-cost speed, weight, and reliability gains — measure first, rank drop-in upgrades and restructures, and report conservative expected effects on this system. Use when existing code must run faster, lighter, or more robustly without changing what it does. | 2.0.0 |
+| [`360-token-efficiency`](skills/360-token-efficiency) | Reduce avoidable context and tool-output overhead with capability-aware retrieval, reuse, and verified handovers. Use as an optional, session-approved companion when token cost or context growth matters, with strict preservation of task requirements by default. | 2.0.0 |
 
 ## Which Skill Do I Need?
 
-| Your situation                                                      | Load                         |
-| ------------------------------------------------------------------- | ---------------------------- |
-| A goal exists, but no plan yet                                      | `360-blueprint`              |
-| Unsure which expertise the work needs, before or after planning     | `360-faculty` (suggest mode) |
-| Work must fit this developer's goals, taste, and standing decisions | `360-faculty`                |
-| A named expert team must be created, called, or updated             | `360-faculty`                |
-| A draft plan exists and needs hardening                             | `360-expert-review`          |
-| A finalized plan exists and needs building                          | `360-execute`                |
-| Backend code exists and needs auditing                              | `360-backend-audit`          |
-| Working code needs speed, weight, or reliability gains              | `360-optimize`               |
-| Any of the above, and context or cost matters                       | add `360-token-efficiency`   |
+| Your situation | Load | Not for |
+|---|---|---|
+| Backend correctness, dead weight, structure, or observability needs auditing | `360-backend-audit` | Not for planning work that does not exist yet (`360-blueprint`) or executing a plan (`360-execute`) |
+| A goal exists, but no plan yet | `360-blueprint` | Not for hardening a plan that already exists (`360-expert-review`) or building one that is already final (`360-execute`) |
+| An authorized plan needs implementation or resumption | `360-execute` | Not for creating plans (`360-blueprint`) or reviewing drafts (`360-expert-review`) |
+| A draft plan needs adversarial review | `360-expert-review` | Not for drafting plans from scratch (`360-blueprint`) or executing a finalized plan (`360-execute`) |
+| Choose expertise, tailor work to this developer, or manage a named team | `360-faculty` | Not for writing the plan itself (`360-blueprint`), attacking a finished draft (`360-expert-review`), or building one (`360-execute`) |
+| Working code needs performance or weight recommendations | `360-optimize` | Not for greenfield design (`360-blueprint`), not for executing changes (`360-execute`), not for correctness or dead-weight hunts (`360-backend-audit`) |
+| Context growth or avoidable token overhead matters; optional companion | `360-token-efficiency` | Not for creating plans (`360-blueprint`), executing the task itself (`360-execute`), or optimizing application performance (`360-optimize`) |
 
 ## How the Skills Work Together
 
-Most skills hand off to one another sequentially on the same piece of work. Two are more flexible: `360-faculty` attaches wherever expertise is needed — before planning, after a draft, or ahead of review — and `360-token-efficiency` is a runtime overlay that runs underneath any of the others rather than a step of its own.
+Most skills hand off to one another sequentially on the same piece of work. Two are more flexible: `360-faculty` attaches wherever expertise is needed — before planning, after a draft, or ahead of review — and `360-token-efficiency` is an optional companion active only with session approval.
 
 ```mermaid
 flowchart TD
     Objective([Objective to plan]) --> Blueprint["360-blueprint: draft the plan"]
     Blueprint --> Faculty["360-faculty: tailor the plan to this developer"]
     Faculty --> Review["360-expert-review: stress-test and finalize the plan"]
-    Review -->|fails the gate, revise| Blueprint
+    Review -->|concrete blocker or revision| Blueprint
     Review --> Execute["360-execute: run the finalized plan task by task"]
     Execute --> Audit["360-backend-audit: audit the resulting backend code"]
     Audit --> Optimize["360-optimize: audit for zero-cost speed and weight"]
@@ -92,7 +108,7 @@ flowchart TD
     Faculty -.->|house style before planning| Blueprint
     Faculty -.->|which lenses this review needs| Review
 
-    Efficiency["360-token-efficiency: runs underneath every step"] -.-> Blueprint
+    Efficiency["360-token-efficiency: optional with session consent"] -.-> Blueprint
     Efficiency -.-> Faculty
     Efficiency -.-> Review
     Efficiency -.-> Execute
@@ -100,7 +116,9 @@ flowchart TD
     Efficiency -.-> Optimize
 ```
 
-The four planning skills share one data contract: `360-blueprint`'s Plan Template. Every task carries a stable ID, a declared skill list, `must` / `should` / `could` priority, and an observable `Done when` check. `360-faculty` tailors the plan and `360-expert-review` hardens it, neither breaking that shape, and `360-execute` reads those exact fields. That is what lets a plan travel the whole pipeline without anyone re-typing it.
+Plan producers and consumers carry the same local contract. Every task has ID, What, How, Where, Depends on, Skills (list or `None`), `Parallel: yes | no`, `Effort: S | M | L`, `Priority: must | should | could`, and an observable Done when. Only should/could work can sit below the cut line. Preserve checkpoints, change policy, replanning triggers, traceability, stable IDs and user decisions.
+
+Readiness moves from `Draft` to `Ready for review` to `Reviewed and ready to execute`. Material edits invalidate prior review; execution progress stays in the coverage ledger. A direct user instruction to execute a supplied plan is sufficient authorization without forcing another skill review; record that basis honestly. Handover fields are Context, Decisions, State (done / pending / blocked), Remaining tasks (what, how, where), Verification, and Risks and how to detect them early.
 
 - **`360-blueprint`** turns a vague goal into a complete, unambiguous plan written directly to a file, briefing the user in chat with key decisions, assumptions, and risks.
 - **`360-faculty`** seats a short list of named experts fitted to this developer and to the plan's own complexity, depth, and nature, tailoring it surgically, remembering what it learns, and saving reusable teams that can be called by name later.
@@ -108,9 +126,21 @@ The four planning skills share one data contract: `360-blueprint`'s Plan Templat
 - **`360-execute`** builds it, tracking every task in a coverage ledger written to disk, verifying each against its own acceptance check with evidence, and briefing progress in chat.
 - **`360-backend-audit`** audits the resulting backend code for correctness, duplication, performance risks, and observability, writing the full report to a file and briefing findings in chat.
 - **`360-optimize`** audits working code for zero-cost speed, weight, and reliability gains, ranking drop-in upgrades and restructures with conservative expected effects written to a file and briefing highlights in chat.
-- **`360-token-efficiency`** runs continuously alongside whichever skill is active, reducing token waste without dropping facts, changing requirements, or weakening correctness.
+- **`360-token-efficiency`** runs alongside the active task with session consent, reducing avoidable overhead while preserving requirements and required checks.
 
 Each skill also works standalone: ask `360-faculty` which expertise a plan needs without seating anyone, skip straight to `360-expert-review` for a plan someone else drafted, point `360-execute` at a plan someone else finalized, run `360-backend-audit` on existing code with no plan involved at all, audit working code for performance and weight with `360-optimize`, or apply `360-token-efficiency` to any task regardless of which other skills are in play.
+
+## Optional Token Efficiency
+
+Every sibling offers the companion once per session and reuses your approval or refusal across handoffs. Explicitly invoking it approves it for that session; a generated plan listing it does not. Unanswered offers leave it inactive. You can revoke consent immediately. A new session starts without approval, and consent does not authorize cross-session memory writes. Declining still permits ordinary efficient work.
+
+The companion chooses techniques from capabilities the host actually exposes: search, selective reads, tool discovery, result processing, recoverable artifacts, context management, caching controls, delegation, and telemetry. Unknown capabilities stay unavailable. It does not rewrite agent configuration or installed instructions.
+
+Strict accuracy is the default: never intentionally weaken requirements, exact values, evidence, uncertainty, or verification to save tokens. This is a working rule, not a guarantee that an AI cannot make mistakes. Potentially lossy compression requires separate approval of the technique, task-specific metric and tolerance. Missing or conflicting evidence triggers fuller retrieval or the ordinary workflow.
+
+Caching can reduce processing cost without reducing context size. Savings reports are optional; absent telemetry is labeled `UNMEASURED`. Comparisons include skill loading, summarization, retries and delegation overhead, and use the same acceptance checks. See [evidence and limitations](skills/360-token-efficiency/references/evidence-and-techniques.md) and the [evaluation record](docs/validation/token-efficiency-redesign.md).
+
+All skills prefer files where supported, honor explicit output requests, and provide complete in-session deliverables when files are unavailable. They label that fallback honestly.
 
 ## Design Principles
 
@@ -133,17 +163,20 @@ A skill is a folder containing a `SKILL.md` file with a `name`, a `description`,
 ├── llms.txt                   Machine-readable index for AI engines
 ├── llms-full.txt              Full compiled context for single-fetch LLM ingestion
 ├── LICENSE                    MIT license
-├── faculty/                   Tailored expert dossiers and developer profile
+├── docs/validation/           Redesign coverage and behavioral evaluation record
 ├── scripts/
 │   ├── build-llms-full.mjs    Compiles full documentation into llms-full.txt
-│   └── check-consistency.mjs Validates skills against README and llms.txt
+│   ├── check-consistency.mjs Validates metadata, contracts, links and indexes
+│   ├── lib/                   Shared validator conventions
+│   └── consistency.test.mjs   Valid and invalid repository fixtures
 ├── .github/workflows/
-│   └── consistency.yml        Runs the validator on every push and PR
+│   └── consistency.yml        Tests and validates on main pushes and PRs
 └── skills/
     ├── 360-blueprint/
     │   └── SKILL.md           Skill definition and instructions
     ├── 360-faculty/
-    │   └── SKILL.md           Skill definition and instructions
+    │   ├── SKILL.md           Skill definition and instructions
+    │   └── references/        Optional seating roster
     ├── 360-expert-review/
     │   └── SKILL.md           Skill definition and instructions
     ├── 360-execute/
@@ -153,8 +186,11 @@ A skill is a folder containing a `SKILL.md` file with a `name`, a `description`,
     ├── 360-optimize/
     │   └── SKILL.md           Skill definition and instructions
     └── 360-token-efficiency/
-        └── SKILL.md           Skill definition and instructions
+        ├── SKILL.md           Skill definition and instructions
+        └── references/        Evidence and optional techniques
 ```
+
+Supporting references: faculty has an optional [seating roster](skills/360-faculty/references/seating-roster.md); token efficiency has optional evidence and technique guidance. Runtime faculty dossiers belong beside the user's plan and are not part of this catalog.
 
 ## Contributing
 
@@ -163,10 +199,12 @@ New skills must follow the structure, naming, and quality bar defined in [AGENTS
 Before opening a pull request, run the consistency validator:
 
 ```bash
+node scripts/build-llms-full.mjs
+node --test scripts/*.test.mjs
 node scripts/check-consistency.mjs
 ```
 
-It fails the build when a skill is missing from the README table or `llms.txt`, when a version or description has drifted from its `SKILL.md` frontmatter, when `llms-full.txt` is stale, or when a skill's section order is wrong.
+The checker validates exact frontmatter fields, naming, section order, shared contracts, negative routing, local links, index registration, and compiled documentation (including references). Tests cover valid and invalid fixtures; they do not establish runtime accuracy. Behavioral scenarios and observed limitations live in the evaluation record.
 
 ## FAQ
 
@@ -188,7 +226,7 @@ Read [AGENTS.md](AGENTS.md), create `skills/360-<name>/SKILL.md` following the r
 
 ---
 
-## Contributor Guide (AGENTS.md)
+## Contributor Guide
 
 # AGENTS.md: Contributor Guide for Agents
 
@@ -216,14 +254,15 @@ Every `SKILL.md` starts with YAML frontmatter containing exactly these fields:
 ```yaml
 ---
 name: 360-example-skill
-description: One sentence. Action-oriented. States what it does and when to use it.
+description: Perform a concrete action with a defined output. Use when a specific task needs that action.
 version: 1.0.0
 ---
 ```
 
 - `name`: must exactly match the folder name
 - `description`: two or three sentences, action-oriented, covering both what the skill does and when to reach for it. This is the only text an agent sees before deciding to load the skill, so it is the trigger surface: make it specific enough to win the right tasks and lose the wrong ones.
-- `version`: semantic version (`MAJOR.MINOR.PATCH`). Bump major when a skill's output shape changes, since other skills consume it.
+- `version`: semantic version (`MAJOR.MINOR.PATCH`). Bump major when a skill's output shape changes, since other skills consume it; use minor for compatible workflow additions.
+- Use single-line scalar values for these three fields; no extra keys, duplicate keys, YAML blocks, or implicit objects.
 
 ## Required Skill Body Structure
 
@@ -245,20 +284,39 @@ Every `SKILL.md` follows this section order:
 
 ## Family Conventions
 
-Skills in this repository hand work to each other, so shared vocabulary is a contract, not a preference. A skill that emits or consumes a plan uses these exact values:
+Skills install individually. Repeat the following contract locally in every skill that emits or consumes plans; do not require another skill's installation or template. Preserve valid existing plan structure.
 
-- `Priority: must | should | could`. Only `should` and `could` sit below the cut line.
-- `Effort: S | M | L`
-- `Parallel: yes | no`
-- Every task carries a stable ID (`1.1`, `1.2`) that downstream skills reference.
+### Shared Plan Contract
 
-Every skill that produces a handover uses the same field list:
+Preserve stable task IDs and existing user decisions. Every task carries: ID, What, How, Where, Depends on, Skills (list or `None`), Parallel, Effort, Priority, Done when (observable). Use `Priority: must | should | could`, `Effort: S | M | L`, and `Parallel: yes | no`. Only `should` and `could` sit below the cut line. Preserve phase checkpoints, change policy, replanning triggers, and objective-to-task traceability.
+
+Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep it `Draft`; a complete unreviewed plan is `Ready for review`; a passed review sets `Reviewed and ready to execute`. Material edits after review return it to `Ready for review` (or `Draft` if blocked). Execution progress belongs in the ledger, not the readiness status. An explicit user instruction to execute a supplied plan authorizes execution without a mandatory sibling review; record that basis without claiming a review occurred.
+
+Every skill that produces a handover uses these six fields:
 
 > Context · Decisions · State (done / pending / blocked) · Remaining tasks (what, how, where) · Verification · Risks and how to detect them early
 
-Skills install individually into arbitrary agents, so there is no include mechanism. Each skill carries its own copy of these conventions, and that duplication is deliberate.
+Each skill's **When to Use** ends with a single `- Not for ...` line naming its neighboring skills in backticks. Copy that line (without the bullet) into the README routing table's **Not for** column. The validator checks both destinations and exact synchronization.
 
-Each skill's **When to Use** ends with a negative trigger naming the neighboring skills it should not be confused with. Keep those lines in sync with the routing table in `README.md`.
+### Optional Companion Convention
+
+Every sibling skill, including future additions, starts its Workflow with this identical entry step. Token efficiency carries its own non-recursive consent handling.
+
+### Entry: Optional Token Efficiency
+
+Reuse explicit approval or refusal for `360-token-efficiency` from this session. If unknown and not already offered, ask once whether to enable it for this session; continue the main task with the overlay inactive while unanswered. Explicit user invocation counts as approval; merely appearing in a generated plan does not. On approval, discover and load it through the host's supported skill mechanism, reusing already-loaded instructions. If unavailable, explain briefly and continue; do not install automatically. Refusal disables the overlay, not ordinary efficient habits. Revocation takes effect immediately. Keep consent in-session only; it does not authorize cross-session memory writes. The overlay never invokes itself or restarts the parent skill.
+
+Consent is a session decision, not a prerequisite for the main task. Keep unknown/offered, approved, refused, and revoked state in-session across skill handoffs. An unanswered offer is not approval and must not be repeated on each handoff. A new session starts unknown. Do not persist consent in faculty dossiers or other cross-session memory.
+
+### Portable Delivery and Verification
+
+Every sibling repeats these Delivery rules inside Workflow:
+
+### Delivery
+
+Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
+
+Use observable preservation and acceptance checks. Structural validation cannot prove behavior or accuracy; evaluate realistic consent, capability, recovery, and handoff scenarios separately. Document unavailable telemetry and regressions; do not infer universal accuracy or token savings from finite tests.
 
 ## Registering a New Skill
 
@@ -273,7 +331,7 @@ Skills under `skills/.experimental/` are not registered anywhere until promoted.
 
 ## Before You're Done
 
-Run `node scripts/check-consistency.mjs`. It enforces most of this list mechanically and exits non-zero with the specific violation.
+Run `node scripts/build-llms-full.mjs`, `node --test scripts/*.test.mjs`, and `node scripts/check-consistency.mjs`. The checker validates public and experimental skill structure, local reference links, consent and plan contracts, routing/index registration, and compiled documentation. Experimental skills are excluded from indexes and the bundle. Fixture tests exercise both valid inputs and specific failures.
 
 - [ ] Folder name is kebab-case and starts with `360-`
 - [ ] Frontmatter `name` matches the folder name exactly
@@ -284,27 +342,49 @@ Run `node scripts/check-consistency.mjs`. It enforces most of this list mechanic
 - [ ] `README.md` index, `README.md` routing table, and `llms.txt` are all updated (unless experimental)
 - [ ] `node scripts/check-consistency.mjs` exits 0
 
+Supporting Markdown references belong inside the skill directory and must be linked from its entrypoint or another reachable reference. Load them only when relevant. The compiled bundle includes these references for single-fetch use; routine skill loading does not.
+
+---
+
+## Contributing
+
+# Contributing to 360-skills
+
+Follow [AGENTS.md](AGENTS.md) for metadata, local contracts, optional session consent, routing, and independent installation requirements. Keep instructions and references scoped to the task; preserve user decisions and capability limits.
+
+After changing skills or documentation, regenerate and verify:
+
+```bash
+node scripts/build-llms-full.mjs
+node --test scripts/*.test.mjs
+node scripts/check-consistency.mjs
+```
+
+Use Node 20 or later; no dependencies or Python packaging are required. Add validator fixtures for structural changes and realistic behavioral scenarios for instruction changes. Record actual outcomes, unavailable measurements, and regressions. See the [redesign evaluation](docs/validation/token-efficiency-redesign.md) for examples.
+
 ---
 
 ## Skills Catalog
 
 ### Skill: 360-backend-audit
 
+Source: skills/360-backend-audit/SKILL.md
+
 ---
 name: 360-backend-audit
 description: Deep-audit backend code, write the full report to a file, and brief the user in chat with bugs, updates, and dead weight. Use before or after significant backend work, or when inheriting, refactoring, or handing off services.
-version: 1.2.0
+version: 2.0.0
 ---
 
 # 360 Backend Audit
 
 ## Purpose
 
-Run this skill on backend code: APIs, services, business logic, data access layers, integrations, background jobs, and pipelines. Turn working backend code into correct, lean, observable, and transferable code without breaking what already works.
+Run this skill on backend code: APIs, services, business logic, data access layers, integrations, background jobs, and pipelines. Identify correctness, structure, performance, and observability risks with evidence and actionable recommendations.
 
 Technology-agnostic: audit logic, structure, and data flow, not stack syntax.
 
-The full audit lives in a file. Chat gets a short briefing only.
+Prefer a file for the full deliverable and a short chat briefing; use the Delivery rules below.
 
 ## When to Use
 
@@ -320,11 +400,27 @@ Working backend code is not finished code. Audit what exists that should not, wh
 
 Functionality, reliability, and accuracy are untouchable. A fast bug is still a bug.
 
-The file is the audit. Chat is the briefing.
+Preserve a recoverable audit using the Delivery rules below.
 
 ## Workflow
 
-### 1. Map Before You Cut
+### Entry: Optional Token Efficiency
+
+Reuse explicit approval or refusal for `360-token-efficiency` from this session. If unknown and not already offered, ask once whether to enable it for this session; continue the main task with the overlay inactive while unanswered. Explicit user invocation counts as approval; merely appearing in a generated plan does not. On approval, discover and load it through the host's supported skill mechanism, reusing already-loaded instructions. If unavailable, explain briefly and continue; do not install automatically. Refusal disables the overlay, not ordinary efficient habits. Revocation takes effect immediately. Keep consent in-session only; it does not authorize cross-session memory writes. The overlay never invokes itself or restarts the parent skill.
+
+### Shared Plan Contract
+
+Preserve stable task IDs and existing user decisions. Every task carries: ID, What, How, Where, Depends on, Skills (list or `None`), Parallel, Effort, Priority, Done when (observable). Use `Priority: must | should | could`, `Effort: S | M | L`, and `Parallel: yes | no`. Only `should` and `could` sit below the cut line. Preserve phase checkpoints, change policy, replanning triggers, and objective-to-task traceability.
+
+Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep it `Draft`; a complete unreviewed plan is `Ready for review`; a passed review sets `Reviewed and ready to execute`. Material edits after review return it to `Ready for review` (or `Draft` if blocked). Execution progress belongs in the ledger, not the readiness status. An explicit user instruction to execute a supplied plan authorizes execution without a mandatory sibling review; record that basis without claiming a review occurred.
+
+### Delivery
+
+Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
+
+### 1. Map the Audit Scope
+
+Read-only by default: do not change application code, dependencies, configuration, or observability unless implementation is explicitly requested. Writing the audit artifact is allowed. Use non-mutating inspection and authorized isolated tests; record checks that cannot safely run.
 
 - Establish what the code does: purpose, inputs, outputs, side effects
 - Identify callers, dependencies, state changes, and trust boundaries
@@ -341,11 +437,11 @@ Scrutinize business logic, data integrity, numeric accuracy, concurrency, trust 
 
 If you cannot prove a bug exists, mark it `possible` or `uncertain` with reasoning. Never say `proven` without evidence.
 
-### 4. Unify and Modularize
+### 4. Recommend Structural Improvements
 
-- Unify duplicated business logic only when it is truly the same
-- Replace reinvented wheels with mature, maintained, lighter alternatives when justified
-- Separate transport, domain logic, and data access cleanly
+- Recommend unifying duplicated business logic only when it is truly the same
+- Recommend replacing reinvented wheels with mature, maintained, lighter alternatives when justified
+- Assess separation of transport, domain logic, and data access cleanly
 - Avoid premature abstraction
 
 ### 5. Assess Performance Honestly
@@ -356,26 +452,26 @@ Find real computational and data-access risks: N+1 access, missing indexes, unbo
 - If you did not measure it, call it a risk, not a measured result
 - Rank opportunities by impact versus effort
 
-### 6. Make It Observable
+### 6. Assess Observability
 
 Audit the debugging surface: structured logs, correct log levels, useful error context, correlation IDs, audit trails for critical writes, metrics for latency, errors, and throughput.
 
-Observability changes must be additive and non-breaking.
+Proposed observability changes should be additive and non-breaking; do not implement them during the audit.
 
-### 7. Verify Nothing Broke
+### 7. Record Verification and Gaps
 
-- Existing tests must pass
+- Report results of existing tests when they can run within scope; otherwise state the limitation
 - Where coverage is thin, propose missing tests first: boundary, failure, and concurrency cases
-- Classify every change as safe now, needs tests first, or needs human decision
-- When in doubt, deliver the audit as a plan and wait for approval
+- Classify every recommendation as safe now, needs tests first, or needs human decision
+- Deliver recommendations as an audit; execute only separately requested implementation within its authorized scope
 
 ### 8. Write the Audit
 
 - Write the full audit to a file using the work-file template
 - Reuse the existing path if known; otherwise `plans/<short-slug>-audit.md`; create the folder if needed; ask once if ambiguous
-- If the file cannot be written, stop and ask — never paste the audit into chat
+- If the file cannot be written, use the in-session delivery fallback
 - Keep new work and updates to existing work in separate lists
-- Print only the terminal briefing
+- With a saved file, print the terminal briefing and path
 
 ## Output Format
 
@@ -389,13 +485,13 @@ Observability changes must be additive and non-breaking.
 6. Observability
 7. Risk register
 8. Implementation plan — grouped as New vs Updates to existing
-9. Handover plan — context, decisions, tasks, verification, risks, state
+9. Handover — Context · Decisions · State (done / pending / blocked) · Remaining tasks (what, how, where) · Verification · Risks and how to detect them early
 
-Every finding needs evidence. Clean areas are stated as clean.
+Every finding needs evidence and an inspection boundary. Call an area clean only within verified coverage; mark uninspected areas explicitly. Implementation tasks use the Shared Plan Contract. Label all proposed changes as recommendations, not completed fixes.
 
 ### Terminal briefing
 
-Use this shape. Omit any section that would be empty. Never paste the work file into chat.
+Use this shape. Omit any section that would be empty. Follow the Delivery rules for file or in-session output.
 
 ```text
 Backend audit — complete
@@ -429,13 +525,13 @@ The audit is complete only when every answer is yes:
 - Clean areas are stated as clean
 - Accuracy risks are verified or marked possible/uncertain
 - No recommendation trades away functionality, reliability, accuracy, or precision without an explicit trade-off
-- Duplication is unified only where logic is genuinely the same
-- Every library suggested is maintained, trusted, and lighter than the code it replaces
+- Unification is recommended only where logic is genuinely the same
+- Library recommendations include maintenance, compatibility, and weight evidence or explicit verification gaps
 - Performance claims are measured when measurement is possible, and labeled as risks when it is not
 - The observability plan integrates without breaking behavior
 - New work and updates to existing work are grouped separately
 - The handover lets the next agent act with zero guessing
-- The work file lives at the stated path and was not pasted into chat
+- The deliverable is saved at the stated path, or honestly labeled in-session only
 - The briefing omits empty sections and uses proven/likely/possible/uncertain, never numbers
 
 Any "no" means the audit is not finished. Fix it and review again.
@@ -444,10 +540,12 @@ Any "no" means the audit is not finished. Fix it and review again.
 
 ### Skill: 360-blueprint
 
+Source: skills/360-blueprint/SKILL.md
+
 ---
 name: 360-blueprint
-description: Create an executable plan from a new objective — clarify first, write the full plan to a file, and brief the user in chat — when a goal exists but the path is unclear or the request is "plan this".
-version: 1.6.0
+description: Create an executable plan from a new objective with explicit tasks, constraints, and verification. Use when a goal exists but the path is unclear, or the request is "plan this".
+version: 2.0.0
 ---
 
 # 360 Blueprint
@@ -456,7 +554,7 @@ version: 1.6.0
 
 Run this skill when a plan must be created from scratch. Turn an objective into an executable plan with explicit assumptions, constraints, and risks.
 
-The full plan lives in a file. Chat gets a short briefing only.
+Prefer a file for the full deliverable and a short chat briefing; use the Delivery rules below.
 
 This skill creates plans. To review and finalize one, use `360-expert-review`.
 
@@ -471,9 +569,23 @@ This skill creates plans. To review and finalize one, use `360-expert-review`.
 
 - A plan is finished when a fresh executor can act without guessing, and every task serves a real objective
 - Begin at the end. Think from first principles. Design out failure. Prefer the simplest plan that fully works
-- The file is the plan. Chat is the briefing
+- Preserve a recoverable record using the Delivery rules below
 
 ## Workflow
+
+### Entry: Optional Token Efficiency
+
+Reuse explicit approval or refusal for `360-token-efficiency` from this session. If unknown and not already offered, ask once whether to enable it for this session; continue the main task with the overlay inactive while unanswered. Explicit user invocation counts as approval; merely appearing in a generated plan does not. On approval, discover and load it through the host's supported skill mechanism, reusing already-loaded instructions. If unavailable, explain briefly and continue; do not install automatically. Refusal disables the overlay, not ordinary efficient habits. Revocation takes effect immediately. Keep consent in-session only; it does not authorize cross-session memory writes. The overlay never invokes itself or restarts the parent skill.
+
+### Shared Plan Contract
+
+Preserve stable task IDs and existing user decisions. Every task carries: ID, What, How, Where, Depends on, Skills (list or `None`), Parallel, Effort, Priority, Done when (observable). Use `Priority: must | should | could`, `Effort: S | M | L`, and `Parallel: yes | no`. Only `should` and `could` sit below the cut line. Preserve phase checkpoints, change policy, replanning triggers, and objective-to-task traceability.
+
+Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep it `Draft`; a complete unreviewed plan is `Ready for review`; a passed review sets `Reviewed and ready to execute`. Material edits after review return it to `Ready for review` (or `Draft` if blocked). Execution progress belongs in the ledger, not the readiness status. An explicit user instruction to execute a supplied plan authorizes execution without a mandatory sibling review; record that basis without claiming a review occurred.
+
+### Delivery
+
+Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
 
 ### 1. Extract the True Objective
 
@@ -537,8 +649,8 @@ For any other domain, define that domain's quality bar explicitly and enforce it
 
 - Write the full plan to a file using the work-file template
 - Reuse the existing path if known; otherwise `plans/<short-slug>.md`; create the folder if needed; ask once if the location is ambiguous
-- If the file cannot be written, stop and ask where to save — never paste the plan into chat as a fallback
-- Print only the terminal briefing
+- If the file cannot be written, use the in-session delivery fallback
+- With a saved file, print the terminal briefing and path
 - If the plan deserves adversarial review before build, say so in plain language — no skill names
 
 ## Output Format
@@ -565,6 +677,7 @@ For any other domain, define that domain's quality bar explicitly and enforce it
 - Background:
 - Constraints:
 - Stakeholders:
+- Open questions and decision points:
 
 ## 3. Strategy
 - Chosen path:
@@ -576,6 +689,7 @@ For any other domain, define that domain's quality bar explicitly and enforce it
 - Updates to existing:
 - Explicitly out of scope:
 - Change policy:
+- Cut line: <only should/could below it>
 
 ## 5. Assumptions
 | # | Assumption | Validated by |
@@ -591,9 +705,10 @@ Checkpoint:
 - How:
 - Where:
 - Depends on:
-- Parallel:
-- Effort:
-- Priority:
+- Skills: <list or None>
+- Parallel: yes | no
+- Effort: S | M | L
+- Priority: must | should | could
 - Done when:
 
 ## 7. Risks & Countermeasures
@@ -610,17 +725,21 @@ Checkpoint:
 |---|---|
 
 ## 10. Handover Summary
-- Executor must know:
-- Cut line:
-- Open questions:
-- Decision points:
+- Context:
+- Decisions:
+- State: done / pending / blocked
+- Remaining tasks: what, how, where
+- Verification:
+- Risks and how to detect them early:
 ```
+
+Handover fields: Context · Decisions · State (done / pending / blocked) · Remaining tasks (what, how, where) · Verification · Risks and how to detect them early
 
 Fill every field or write `N/A` with a one-line reason.
 
 ### Terminal briefing
 
-Use this shape. Omit any section that would be empty. Never paste the work file into chat.
+Use this shape. Omit any section that would be empty. Follow the Delivery rules for file or in-session output.
 
 ```text
 <what this plan is> — plan is ready
@@ -656,14 +775,14 @@ The plan is ready only when every answer is yes:
 - No blocking question was skipped
 - No invented technical details were presented as facts
 - Every assumption is explicit and falsifiable
-- Every task has what, how, where, done when, effort, priority, and parallel markings
+- Every task has what, how, where, done when, dependencies, skills, effort, priority, and parallel markings
 - The cut line is defined
 - Every objective maps to tasks and no orphan tasks remain
 - New work and updates to existing work are grouped separately
 - A fresh executor can act without guessing
 - Checkpoints and replanning triggers exist
 - The plan survived a premortem
-- The work file follows the template, lives at the stated path, and was not pasted into chat
+- The deliverable follows the template and accurately states its location or in-session status
 - The briefing omits empty sections and uses proven/likely/possible/uncertain, never numbers
 
 Any "no" means the plan is not finished. Refine and review again.
@@ -672,10 +791,12 @@ Any "no" means the plan is not finished. Refine and review again.
 
 ### Skill: 360-execute
 
+Source: skills/360-execute/SKILL.md
+
 ---
 name: 360-execute
 description: Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and brief the user in chat. Use when a plan exists and work must begin, or when resuming a partial execution.
-version: 1.1.1
+version: 2.0.0
 ---
 
 # 360 Execute
@@ -686,7 +807,7 @@ Run this skill when a finalized plan must be executed — completely, faithfully
 
 This skill executes plans. To create one, use `360-blueprint`. To stress-test and finalize one, use `360-expert-review`. To audit the built result afterward, use `360-backend-audit`.
 
-The ledger and report live in a file. Chat gets a short briefing only.
+Prefer a file for the full deliverable and a short chat briefing; use the Delivery rules below.
 
 ## When to Use
 
@@ -701,9 +822,23 @@ The ledger and report live in a file. Chat gets a short briefing only.
 - Coverage is tracked, not trusted — a persisted ledger records every task and its verdict
 - Done is a verdict with evidence — a task is complete when its acceptance check passes
 - Deviations surface, never absorb — reality overrides the plan only through an explicit decision
-- The file is the record. Chat is the briefing
+- Preserve a recoverable record using the Delivery rules below
 
 ## Workflow
+
+### Entry: Optional Token Efficiency
+
+Reuse explicit approval or refusal for `360-token-efficiency` from this session. If unknown and not already offered, ask once whether to enable it for this session; continue the main task with the overlay inactive while unanswered. Explicit user invocation counts as approval; merely appearing in a generated plan does not. On approval, discover and load it through the host's supported skill mechanism, reusing already-loaded instructions. If unavailable, explain briefly and continue; do not install automatically. Refusal disables the overlay, not ordinary efficient habits. Revocation takes effect immediately. Keep consent in-session only; it does not authorize cross-session memory writes. The overlay never invokes itself or restarts the parent skill.
+
+### Shared Plan Contract
+
+Preserve stable task IDs and existing user decisions. Every task carries: ID, What, How, Where, Depends on, Skills (list or `None`), Parallel, Effort, Priority, Done when (observable). Use `Priority: must | should | could`, `Effort: S | M | L`, and `Parallel: yes | no`. Only `should` and `could` sit below the cut line. Preserve phase checkpoints, change policy, replanning triggers, and objective-to-task traceability.
+
+Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep it `Draft`; a complete unreviewed plan is `Ready for review`; a passed review sets `Reviewed and ready to execute`. Material edits after review return it to `Ready for review` (or `Draft` if blocked). Execution progress belongs in the ledger, not the readiness status. An explicit user instruction to execute a supplied plan authorizes execution without a mandatory sibling review; record that basis without claiming a review occurred.
+
+### Delivery
+
+Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
 
 ### 1. Load the Plan Completely
 
@@ -711,10 +846,10 @@ Never execute a plan you have not fully read.
 
 - Read the entire plan before touching anything: objective, scope, assumptions, every phase, every task, every checkpoint
 - Build the full task inventory: every task ID, its priority, its dependencies, its "done when" check
-- If any task lacks an observable acceptance check, derive one and confirm it with the user before executing that task
-- If anything is ambiguous, ask before starting
+- If an acceptance check is missing, derive it from the approved objective; ask only when alternatives would change the intended outcome
+- Resolve material ambiguity before dependent work; continue independent authorized work
 
-IMPORTANT NOTE: Clear the conversation before starting development to save tokens instead of letting auto-compact run.
+Never automatically clear history. Use context management only when the host supports it. Before compaction or handoff, preserve and verify the six handover fields against the plan and ledger, including constraints, authorization, unresolved uncertainty, evidence locations, and exact values. Reopen original evidence if the summary cannot support the next decision. Without recoverable artifacts or context controls, keep state in-session and explain any continuity limit.
 
 ### 2. Persist the Coverage Ledger
 
@@ -722,7 +857,7 @@ The ledger is the spine of execution and the source of truth for progress.
 
 - Write it to a file and keep it current after every task
 - Reuse the existing path if known; otherwise `plans/<short-slug>-execution.md`; create the folder if needed; ask once if ambiguous
-- If the file cannot be written, stop and ask — never treat chat as the ledger
+- If the file cannot be written, use the in-session delivery fallback
 - One row per task: ID, name, priority, acceptance check, status
 - Statuses: `pending` / `in progress` / `done (verified)` / `blocked` / `dropped (approved)`
 - Nothing counts as done until the ledger says verified
@@ -731,7 +866,7 @@ The ledger is the spine of execution and the source of truth for progress.
 ### 3. Execute in Order
 
 - Follow phase order and task dependencies exactly; honor parallel markers
-- Load every skill a task declares (e.g., `360-token-efficiency`) before starting that task
+- Load declared skills through the supported host mechanism when available. The optional `360-token-efficiency` always follows session consent; a plan listing is not approval. If another declared skill is unavailable, use the self-contained contract and available capabilities; block only tasks that actually require the missing capability
 - Verify each phase checkpoint before advancing to the next phase — a failed checkpoint stops the line
 - Do exactly what the task specifies — no silent extras, no silent shortcuts
 
@@ -761,7 +896,7 @@ Before declaring completion, walk the ledger top to bottom:
 - Run the plan's overall verification; confirm all checkpoints passed
 - Sweep once more for regressions introduced across phases
 - Write the execution report into the same ledger file
-- Print only the terminal briefing
+- With a saved file, print the terminal briefing and path
 
 ## Output Format
 
@@ -773,11 +908,11 @@ The ledger file contains:
 2. Deviations — what diverged, how it was resolved, who approved it; or "None"
 3. QC results — checks run, checkpoints verified, regression sweeps, outcomes
 4. Unfinished items — pending, blocked, or dropped, with reason and approval; or "None"
-5. Handover summary — context, decisions, current state, remaining tasks with what/how/where, risks and how to detect them early
+5. Handover summary — Context · Decisions · State (done / pending / blocked) · Remaining tasks (what, how, where) · Verification · Risks and how to detect them early
 
 ### Terminal briefing
 
-Use this shape. Omit any section that would be empty. Never paste the work file into chat.
+Use this shape. Omit any section that would be empty. Follow the Delivery rules for file or in-session output.
 
 ```text
 Execution — <n>/<m> tasks verified
@@ -802,7 +937,7 @@ Issues found
 - Talk to the user, not the next agent
 - Done is new work shipped. Updates to existing is a change to something that already existed. Never mix them
 - Confidence: `proven` evidence in hand; `likely` strong reason; `possible` suspected; `uncertain` hypothesis. Never numbers. Never say proven without evidence
-- No ledger dump, no handover essay, no skill names
+- With file delivery, keep the briefing concise; name a missing skill when it explains a limitation
 
 ## Quality Gate
 
@@ -815,10 +950,10 @@ Execution is complete only when every answer is yes:
 - No `must`-priority task was dropped or skipped without explicit user approval
 - Every objective in the plan's traceability maps to verified work
 - Regressions and collateral damage were swept for, and the results are stated
-- Declared skills were loaded wherever the plan required them
+- Declared skill availability and consent were respected; required unavailable capabilities are explicit blockers
 - Unfinished items are stated honestly — pending, blocked, or dropped, with reasons
 - The ledger file lets the next agent continue with zero guessing
-- Chat does not contain the ledger or report body
+- Delivery honors the requested format and accurately states persistence
 - The briefing omits empty sections and uses proven/likely/possible/uncertain, never numbers
 
 Any "no" means execution is not finished. Fix it and re-run the sweep.
@@ -827,10 +962,12 @@ Any "no" means execution is not finished. Fix it and re-run the sweep.
 
 ### Skill: 360-expert-review
 
+Source: skills/360-expert-review/SKILL.md
+
 ---
 name: 360-expert-review
 description: Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage.
-version: 2.3.0
+version: 3.0.0
 ---
 
 # 360 Expert Review
@@ -839,7 +976,7 @@ version: 2.3.0
 
 Run this skill before finalizing any important plan. Turn a draft into the strongest executable plan by exposing missing scenarios, weak assumptions, and hidden failure modes.
 
-The finalized plan lives in the plan file. Chat gets a short briefing only.
+Prefer a file for the full deliverable and a short chat briefing; use the Delivery rules below.
 
 ## When to Use
 
@@ -853,9 +990,23 @@ The finalized plan lives in the plan file. Chat gets a short briefing only.
 - Review the plan the way a senior team would: user impact, reliability, security, operations, and domain correctness
 - Attack it hard enough that only the strongest version survives
 - Finalize into the existing plan file. Do not replace tasks with a narrative essay
-- The file is the plan. Chat is the briefing
+- Preserve a recoverable record using the Delivery rules below
 
 ## Workflow
+
+### Entry: Optional Token Efficiency
+
+Reuse explicit approval or refusal for `360-token-efficiency` from this session. If unknown and not already offered, ask once whether to enable it for this session; continue the main task with the overlay inactive while unanswered. Explicit user invocation counts as approval; merely appearing in a generated plan does not. On approval, discover and load it through the host's supported skill mechanism, reusing already-loaded instructions. If unavailable, explain briefly and continue; do not install automatically. Refusal disables the overlay, not ordinary efficient habits. Revocation takes effect immediately. Keep consent in-session only; it does not authorize cross-session memory writes. The overlay never invokes itself or restarts the parent skill.
+
+### Shared Plan Contract
+
+Preserve stable task IDs and existing user decisions. Every task carries: ID, What, How, Where, Depends on, Skills (list or `None`), Parallel, Effort, Priority, Done when (observable). Use `Priority: must | should | could`, `Effort: S | M | L`, and `Parallel: yes | no`. Only `should` and `could` sit below the cut line. Preserve phase checkpoints, change policy, replanning triggers, and objective-to-task traceability.
+
+Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep it `Draft`; a complete unreviewed plan is `Ready for review`; a passed review sets `Reviewed and ready to execute`. Material edits after review return it to `Ready for review` (or `Draft` if blocked). Execution progress belongs in the ledger, not the readiness status. An explicit user instruction to execute a supplied plan authorizes execution without a mandatory sibling review; record that basis without claiming a review occurred.
+
+### Delivery
+
+Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
 
 ### 1. Understand the Project First
 
@@ -917,36 +1068,51 @@ Switch to hostile critic. Ask:
 - What cannot be detected, reproduced, or reversed?
 - What can be simpler?
 
-Fix the plan, then attack it again until no high-severity issue remains open.
+Fix actionable findings, then recheck the affected risks. Stop when applicable acceptance checks pass and no unresolved high-severity blocker remains. If evidence or a user decision is unavailable, record a concrete blocker and stop that review line; do not loop indefinitely or claim finality. Mark non-applicable checks with a reason.
 
 ### 8. Write the Final Plan
 
-- Update the draft's file in place using the `360-blueprint` work-file template
+- Update the draft in place using the local minimum contract below. Preserve valid existing headings and structure; no sibling installation is required
 - Preserve task IDs; add, split, or drop a task only with a stated reason
 - Keep new work and updates to existing work in separate scope lists
 - Put review findings, key decisions, and remaining risks in a short appendix in that same file
-- Executor handover lives in the file — never in chat
-- If the file cannot be written, stop and ask — never paste the plan into chat
-- Print only the terminal briefing
+- Include the executor handover in the chosen delivery format
+- If the file cannot be written, use the in-session delivery fallback
+- With a saved file, print the terminal briefing and path
 
 ## Output Format
 
 ### Work file
 
-The `360-blueprint` plan template, updated in place, plus a short appendix:
+Preserve the existing plan and fill only missing contract elements. Minimum standalone shape:
+
+1. Metadata: objective, status, version/date
+2. Objective and observable definition of done
+3. Context, constraints, scope, assumptions, open questions and decisions
+4. Strategy, alternatives, change policy and cut line
+5. Phases and tasks using the Shared Plan Contract, with checkpoints
+6. Risks and countermeasures
+7. Per-task and overall verification, replanning triggers and traceability
+8. Handover: Context · Decisions · State (done / pending / blocked) · Remaining tasks (what, how, where) · Verification · Risks and how to detect them early
+9. Review appendix: findings, decisions, remaining risks, applicable checks and blockers
+
+Set `Reviewed and ready to execute` only when the applicable Quality Gate passes. Otherwise use `Draft` for blockers and `Ready for review` for incomplete review without blockers. Preserve user-approved trade-offs; record unresolved high-severity risks as blockers. A typical appendix (retain an existing heading when present):
 
 ```markdown
 ## 11. Review appendix
 - Findings:
 - Decisions:
 - Remaining risks:
+- Applicable checks and evidence:
+- Non-applicable checks and reasons:
+- Blockers and resolution needed:
 ```
 
 Do not replace the task list with a narrative plan.
 
 ### Terminal briefing
 
-Use this shape. Omit any section that would be empty. Never paste the work file into chat.
+Use this shape. Omit any section that would be empty. Follow the Delivery rules for file or in-session output.
 
 ```text
 <what this plan is> — plan is final
@@ -971,7 +1137,7 @@ Need from you
 - <only if not ready to build>
 ```
 
-- First line is `plan is final` or `not final — blocked on you`
+- First line is `plan is final` or `not final — <specific blocker or remaining review>`
 - Talk to the user, not the next agent. Outcomes, not tasks
 - A new artifact is Features to add. A change to an existing artifact, feature, or document is Updates to existing. Never mix them
 - Confidence: `proven` evidence in hand; `likely` strong reason; `possible` suspected; `uncertain` hypothesis. Never numbers. Never say proven without evidence
@@ -979,7 +1145,7 @@ Need from you
 
 ## Quality Gate
 
-The plan is final only when every answer is yes:
+The plan is final only when every applicable answer is yes (record a reason for each non-applicable item):
 
 - Real user need understood and served
 - The right expert lenses were applied
@@ -993,19 +1159,21 @@ The plan is final only when every answer is yes:
 - The plan survived hostile review
 - Task IDs were preserved or changed with a stated reason
 - New work and updates to existing work are grouped separately
-- The finalized plan is in the original file, not pasted into chat
+- The finalized plan preserves its original location where supported, or follows the Delivery fallback
 - The briefing omits empty sections and uses proven/likely/possible/uncertain, never numbers
 
-Any "no" means the plan is not final. Fix it and review again.
+Any unresolved "no" keeps the plan non-final. Fix actionable findings or report the blocker and the evidence or decision needed to resolve it.
 
 ---
 
 ### Skill: 360-faculty
 
+Source: skills/360-faculty/SKILL.md
+
 ---
 name: 360-faculty
 description: Seat a living, tailored expert team on a plan or task. Use when work must fit this developer's goals, taste, mindset, and strategy, when a plan needs the right expertise chosen for its complexity, depth, and nature, or when a named faculty team must be created, called, or updated. Recommends a short list, asks only the questions that still change the work, polishes immediately, and keeps upgradable memory.
-version: 1.0.0
+version: 1.1.0
 ---
 
 # 360 Faculty
@@ -1053,6 +1221,20 @@ Produces four artifacts: a fit assessment, a seated roster, upgradable dossiers 
 
 ## Workflow
 
+### Entry: Optional Token Efficiency
+
+Reuse explicit approval or refusal for `360-token-efficiency` from this session. If unknown and not already offered, ask once whether to enable it for this session; continue the main task with the overlay inactive while unanswered. Explicit user invocation counts as approval; merely appearing in a generated plan does not. On approval, discover and load it through the host's supported skill mechanism, reusing already-loaded instructions. If unavailable, explain briefly and continue; do not install automatically. Refusal disables the overlay, not ordinary efficient habits. Revocation takes effect immediately. Keep consent in-session only; it does not authorize cross-session memory writes. The overlay never invokes itself or restarts the parent skill.
+
+### Shared Plan Contract
+
+Preserve stable task IDs and existing user decisions. Every task carries: ID, What, How, Where, Depends on, Skills (list or `None`), Parallel, Effort, Priority, Done when (observable). Use `Priority: must | should | could`, `Effort: S | M | L`, and `Parallel: yes | no`. Only `should` and `could` sit below the cut line. Preserve phase checkpoints, change policy, replanning triggers, and objective-to-task traceability.
+
+Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep it `Draft`; a complete unreviewed plan is `Ready for review`; a passed review sets `Reviewed and ready to execute`. Material edits after review return it to `Ready for review` (or `Draft` if blocked). Execution progress belongs in the ledger, not the readiness status. An explicit user instruction to execute a supplied plan authorizes execution without a mandatory sibling review; record that basis without claiming a review occurred.
+
+### Delivery
+
+Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
+
 ### 0. Pick the Mode
 
 Four entry points into one workflow. Choose from what the developer asked; when it is unclear, ask which one in a single question.
@@ -1073,7 +1255,7 @@ Read the current task or draft plan. Then read dossiers if present:
 - `faculty/teams.md` — named teams this developer created
 - `faculty/<role>.md` — each faculty's claims about this developer and project; `<role>` is kebab-case
 
-`faculty/` sits beside the plan file. If the plan is not on disk, put it at the project root. If this project cannot persist files, keep the same structure in-session and ask where to persist before closing.
+`faculty/` sits beside the plan file. If the plan is not on disk, put it at the project root. If files are unavailable, keep the same structure in-session and label it not persisted. Persist dossiers only within the user-authorized faculty scope; token-efficiency consent does not authorize memory writes.
 
 If `faculty/developer.md` is missing or empty, do not seat yet. Measure first.
 
@@ -1088,7 +1270,7 @@ Ask at most 3 questions. Stop early if all four measures are already known. Each
 
 Prefer a forced choice over an essay. Never ask what the plan, repo, or dossiers already answer.
 
-Write `faculty/developer.md` before seating. Derive the house style from the answers:
+Record the developer profile in the authorized file or in-session structure before seating. Derive the house style from the answers:
 
 - How to ask — choices vs open, blunt vs gentle
 - Standing refusals — what this developer will not accept
@@ -1131,7 +1313,7 @@ Recommend the number of faculties the fit assessment sized, for this task only. 
 
 `Why now` cites a real element of the plan or task. A recommendation that cannot cite one is a habit, not a fit — drop it.
 
-Choose by failure mode, not by habit. Scan the Seating Roster — including its rarest roles — and ask of each: what breaks if this lens stays silent on this plan? The roster is a floor, not a ceiling: when the plan's failure modes demand a faculty the roster does not name, derive it, name it plainly, and say why.
+Choose expertise from actual failure modes and cite the relevant task or risk. Derive an unlisted role when needed. Read the optional [seating roster](references/seating-roster.md) only when expertise selection needs examples; do not load or scan the catalog by default.
 
 Accept these replies: `accept`, `1-3`, `drop 4 add privacy`, `only architect`, `quiet`.
 
@@ -1174,13 +1356,13 @@ Hold the plan contract while polishing. `360-execute` reads these fields directl
 
 - Preserve every field of any task touched: ID, `Depends on`, `Skills`, `Parallel`, `Effort`, `Priority`, `Done when` — along with phase checkpoints, the change policy, the replanning triggers, and the traceability table
 - A task a faculty adds gets a stable ID continuing that phase's numbering, `Effort: S | M | L`, `Priority: must | should | could`, `Parallel: yes | no`, a `Skills` list or `None`, and an observable `Done when`
-- Never advance the plan's `Status` to `Reviewed and ready to execute`. Only `360-expert-review` sets that. Leave it `Draft` or `Ready for review`
+- Never claim a review occurred. Preserve an unchanged reviewed plan's status; after material edits return it to `Ready for review`, or `Draft` if blocking questions remain
 
-Write what the pass produced into the plan's existing slots — never a new numbered section, which would collide with `360-expert-review`'s sections 11 to 14:
+Write findings into the plan's existing semantic sections. The blueprint uses the numbers below; other valid plans may use different headings. Preserve an existing review appendix (normally section 11), without inventing sections 12–14:
 
 - Accepted risks → section 7, countermeasure reading `Accepted by developer; owned by <faculty>`
 - Explicit assumptions → section 5, `Validated by` naming the seated faculty
-- Open questions and decision points → section 10
+- Open questions → Context & Constraints; decisions → Handover Summary
 - One header row so a fresh reader knows a faculty pass happened: `| Tailored by | faculty/roster.md @ <date> |`
 
 **Resolve disagreements in the open.** If two seated faculties conflict, present both cuts to the developer with what each protects. Never pick silently.
@@ -1236,12 +1418,125 @@ After the last seated faculty:
 
 - Present the session report (Output Format)
 - Offer `360-expert-review` if the plan is ready to be attacked; offer `360-blueprint` if the guidance still needs to become a plan
-- Ask the user whether to issue the session handover as a standalone prompt or a document, and where to persist dossiers and teams if they are not on disk
+- Use the requested handover format or the Delivery default. State whether dossiers and teams were persisted; ask about persistence only when required and not already authorized
 - If the next agent would have to guess the house style, the roster, or any accepted risk, the handover is not finished
 
-### Reference: Seating Roster
+## Output Format
 
-Reference material, not a step. Use it to recommend in Step 4. It is a floor, not a ceiling — derive unlisted faculties when the plan's failure modes demand them. Never show it unless the developer asks.
+Canonical handover fields: Context · Decisions · State (done / pending / blocked) · Remaining tasks (what, how, where) · Verification · Risks and how to detect them early
+
+Before recommending, and always in `suggest` mode:
+
+```markdown
+### Fit assessment
+
+Nature: <what the work touches>
+Depth: <reversible-local / reversible-shared / hard to reverse / irreversible or regulated>
+Complexity: <low / moderate / high> — <the counts that decided it>
+Seats sized: <n>–<n>
+```
+
+After each faculty:
+
+```markdown
+### Faculty: <role>
+
+Questions: <the questions asked, or "none — memory enough">
+Follow or raise: <followed / raised — tailor taken / raised — developer kept cut>
+Plan touch:
+- <section or task>: <what changed and why>
+Memory:
+- <claim> (<source>, <status>)
+Next: <next faculty> or stop
+```
+
+After the session:
+
+```markdown
+# Faculty Session: <title>
+
+## Developer fit
+- Goals:
+- Taste:
+- Mindset:
+- Strategy:
+- House style:
+
+## Fit assessment
+- Nature:
+- Depth:
+- Complexity:
+- Seats sized: <band> — seated: <n>
+
+## Seated
+| Faculty | New or returning | Questions asked | Follow or raise |
+|---|---|---|---|
+
+## Plan changes
+- <each surgical edit, grouped by faculty>
+
+## Teams
+- <team name>: <created / called / edited / none this session>
+- Drift check: <missing must seats raised, or "none — team covered the plan">
+
+## Memory written
+- faculty/developer.md: <created / updated / unchanged>
+- faculty/roster.md: <created / updated>
+- faculty/teams.md: <created / updated / unchanged>
+- faculty/<role>.md: <created / updated>
+- Persist: <path / in-session only; not persisted>
+
+## Accepted risks and explicit assumptions
+- <risk or assumption> — owned by <faculty>, written to plan section <5 / 7 / 10>
+
+## Handover
+- Context:
+- Decisions:
+- State: done / pending / blocked
+- Remaining tasks: what, how, where
+- Verification:
+- Risks and how to detect them early:
+- Issued as: <prompt / document / declined by user>
+
+## Next
+- 360-expert-review / 360-blueprint / more faculties / stop
+```
+
+## Quality Gate
+
+The session is finished when every gate applicable to the selected mode passes. In `suggest` mode, finish after the fit assessment, evidence-backed short list, and rationale; seating, plan edits, dossier writes, and team management gates do not apply. State why any other gate is non-applicable.
+
+- The mode was clear, and `suggest` mode stopped before seating and left the plan untouched
+- Goals, taste, mindset, and strategy were known from memory or asked in this session
+- The fit assessment stated nature, depth, and complexity, and the seat count stayed inside the band it sized
+- Every recommendation cited the plan element that demands it, chosen by failure mode rather than habit — including rare roles and roles the roster does not name
+- A short list was shown and seating was confirmed, with no catalog dump unless the developer asked
+- Every faculty stayed inside its question caps, and no question was asked whose answer the plan, repo, or dossiers already held
+- Every faculty followed or raised; no silent override; no flattery
+- Every raise placed two cuts side by side and waited for the developer
+- The plan or guidance was polished after each seat, never batched to the end
+- Every Plan Template field survived on every task touched: ID, Depends on, Skills, Parallel, Effort, Priority, Done when, checkpoints, change policy, replanning triggers, traceability
+- Every task a faculty added carries a stable ID, declared skills, `Effort` / `Priority` / `Parallel` values from the family vocabularies, and an observable `Done when`
+- Readiness reflects material edits and blockers; this skill never claimed a review occurred
+- Accepted risks, assumptions, and open questions landed in the plan's existing sections; no new numbered section was invented
+- Faculty conflicts were presented to the developer, never settled silently
+- Memory uses claim / source / status / touches; conflicts were confirmed before rewriting
+- Any called team was drift-checked against this plan, and a missing `must` seat was raised before seating
+- House style is one shop, shared across all seated faculties
+- The hostile critic was never seated — that role belongs to `360-expert-review`
+- The handover carries context, decisions, state, remaining tasks, verification, and risks with how to detect them early
+- Delivery follows the user's format and authorization; persistence or its absence is recorded
+- A fresh agent can continue from the dossiers, teams, and roster with zero guessing
+
+An unresolved applicable gate needs a specific correction or an honest blocker. Do not seat faculties, edit plans, or write dossiers to satisfy gates excluded by the selected mode.
+
+### Reference: skills/360-faculty/references/seating-roster.md
+
+Source: skills/360-faculty/references/seating-roster.md
+
+# Seating Roster
+
+Optional examples. Read only when a task's risks leave a gap in expertise selection. It is a floor, not a ceiling — derive unlisted faculties when the plan's failure modes demand them. Never show it unless the developer asks.
 
 **Human mind**
 
@@ -1414,121 +1709,16 @@ Reference material, not a step. Use it to recommend in Step 4. It is a floor, no
 - Traceability clerk — requirement, task, test, production signal
 - Professor-panel chair — convenes only the seated faculties this request needs
 
-## Output Format
-
-Before recommending, and always in `suggest` mode:
-
-```markdown
-### Fit assessment
-
-Nature: <what the work touches>
-Depth: <reversible-local / reversible-shared / hard to reverse / irreversible or regulated>
-Complexity: <low / moderate / high> — <the counts that decided it>
-Seats sized: <n>–<n>
-```
-
-After each faculty:
-
-```markdown
-### Faculty: <role>
-
-Questions: <the questions asked, or "none — memory enough">
-Follow or raise: <followed / raised — tailor taken / raised — developer kept cut>
-Plan touch:
-- <section or task>: <what changed and why>
-Memory:
-- <claim> (<source>, <status>)
-Next: <next faculty> or stop
-```
-
-After the session:
-
-```markdown
-# Faculty Session: <title>
-
-## Developer fit
-- Goals:
-- Taste:
-- Mindset:
-- Strategy:
-- House style:
-
-## Fit assessment
-- Nature:
-- Depth:
-- Complexity:
-- Seats sized: <band> — seated: <n>
-
-## Seated
-| Faculty | New or returning | Questions asked | Follow or raise |
-|---|---|---|---|
-
-## Plan changes
-- <each surgical edit, grouped by faculty>
-
-## Teams
-- <team name>: <created / called / edited / none this session>
-- Drift check: <missing must seats raised, or "none — team covered the plan">
-
-## Memory written
-- faculty/developer.md: <created / updated / unchanged>
-- faculty/roster.md: <created / updated>
-- faculty/teams.md: <created / updated / unchanged>
-- faculty/<role>.md: <created / updated>
-- Persist: <path> or <asked, waiting>
-
-## Accepted risks and explicit assumptions
-- <risk or assumption> — owned by <faculty>, written to plan section <5 / 7 / 10>
-
-## Handover
-- Context:
-- Decisions:
-- State: done / pending / blocked
-- Remaining tasks: what, how, where
-- Verification:
-- Risks and how to detect them early:
-- Issued as: <prompt / document / declined by user>
-
-## Next
-- 360-expert-review / 360-blueprint / more faculties / stop
-```
-
-## Quality Gate
-
-The session is finished only when every answer is yes:
-
-- The mode was clear, and `suggest` mode stopped before seating and left the plan untouched
-- Goals, taste, mindset, and strategy were known from memory or asked in this session
-- The fit assessment stated nature, depth, and complexity, and the seat count stayed inside the band it sized
-- Every recommendation cited the plan element that demands it, chosen by failure mode rather than habit — including rare roles and roles the roster does not name
-- A short list was shown and seating was confirmed, with no catalog dump unless the developer asked
-- Every faculty stayed inside its question caps, and no question was asked whose answer the plan, repo, or dossiers already held
-- Every faculty followed or raised; no silent override; no flattery
-- Every raise placed two cuts side by side and waited for the developer
-- The plan or guidance was polished after each seat, never batched to the end
-- Every Plan Template field survived on every task touched: ID, Depends on, Skills, Parallel, Effort, Priority, Done when, checkpoints, change policy, replanning triggers, traceability
-- Every task a faculty added carries a stable ID, declared skills, `Effort` / `Priority` / `Parallel` values from the family vocabularies, and an observable `Done when`
-- The plan's `Status` was left `Draft` or `Ready for review` — this skill never claimed finality
-- Accepted risks, assumptions, and open questions landed in the plan's existing sections; no new numbered section was invented
-- Faculty conflicts were presented to the developer, never settled silently
-- Memory uses claim / source / status / touches; conflicts were confirmed before rewriting
-- Any called team was drift-checked against this plan, and a missing `must` seat was raised before seating
-- House style is one shop, shared across all seated faculties
-- The hostile critic was never seated — that role belongs to `360-expert-review`
-- The handover carries context, decisions, state, remaining tasks, verification, and risks with how to detect them early
-- The user was asked about handover format and where dossiers and teams persist; the outcome is recorded
-- A fresh agent can continue from the dossiers, teams, and roster with zero guessing
-
-Any "no" means not finished. Measure, raise, polish, or write memory, then check again.
-
 ---
 
 ### Skill: 360-optimize
 
+Source: skills/360-optimize/SKILL.md
+
 ---
 name: 360-optimize
 description: Audit working code for zero-cost speed, weight, and reliability gains — measure first, rank drop-in upgrades and restructures, and report conservative expected effects on this system. Use when existing code must run faster, lighter, or more robustly without changing what it does.
-version: 1.1.0
+version: 2.0.0
 ---
 
 # 360 Optimize
@@ -1543,7 +1733,7 @@ This skill writes an audit, not a rewrite. To plan approved work, use `360-bluep
 
 Reported expectations must be realistic for this system. A sold gain that this load will not see is a defect.
 
-The full audit lives in a file. Chat gets ranked highlights only.
+Prefer a file for the full deliverable and a short chat briefing; use the Delivery rules below.
 
 ## When to Use
 
@@ -1562,9 +1752,23 @@ The full audit lives in a file. Chat gets ranked highlights only.
 - Local win is not end-to-end win. Do not stack overlapping gains
 - Delete waste before you swap tools. Swap tools before you reshape the system
 - Robust beats emergent. Emergent enters only behind an adapter, with rollback, and with evidence
-- The file is the audit. Chat is the briefing
+- Preserve a recoverable record using the Delivery rules below
 
 ## Workflow
+
+### Entry: Optional Token Efficiency
+
+Reuse explicit approval or refusal for `360-token-efficiency` from this session. If unknown and not already offered, ask once whether to enable it for this session; continue the main task with the overlay inactive while unanswered. Explicit user invocation counts as approval; merely appearing in a generated plan does not. On approval, discover and load it through the host's supported skill mechanism, reusing already-loaded instructions. If unavailable, explain briefly and continue; do not install automatically. Refusal disables the overlay, not ordinary efficient habits. Revocation takes effect immediately. Keep consent in-session only; it does not authorize cross-session memory writes. The overlay never invokes itself or restarts the parent skill.
+
+### Shared Plan Contract
+
+Preserve stable task IDs and existing user decisions. Every task carries: ID, What, How, Where, Depends on, Skills (list or `None`), Parallel, Effort, Priority, Done when (observable). Use `Priority: must | should | could`, `Effort: S | M | L`, and `Parallel: yes | no`. Only `should` and `could` sit below the cut line. Preserve phase checkpoints, change policy, replanning triggers, and objective-to-task traceability.
+
+Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep it `Draft`; a complete unreviewed plan is `Ready for review`; a passed review sets `Reviewed and ready to execute`. Material edits after review return it to `Ready for review` (or `Draft` if blocked). Execution progress belongs in the ledger, not the readiness status. An explicit user instruction to execute a supplied plan authorizes execution without a mandatory sibling review; record that basis without claiming a review occurred.
+
+### Delivery
+
+Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
 
 ### 1. Lock the Contract
 
@@ -1659,10 +1863,10 @@ Every admitted gain gets a conservative expected effect. This step is not option
 
 - Write the full audit to a file using the work-file template
 - Reuse the existing path if known; otherwise `plans/<short-slug>-optimize.md`; create the folder if needed; ask once if ambiguous
-- If the file cannot be written, stop and ask — never paste the audit into chat
+- If the file cannot be written, use the in-session delivery fallback
 - Rank admitted gains by conservative impact versus effort versus risk
 - Keep new work and updates to existing work in separate lists
-- Print only the terminal briefing
+- With a saved file, print the terminal briefing and path
 
 ## Output Format
 
@@ -1687,13 +1891,13 @@ Every admitted gain gets a conservative expected effect. This step is not option
 7. Handoff bugs — correctness or dead-weight items for `360-backend-audit`; or "None"
 8. Verification — tests to run, rollback, how to detect a silent contract break
 9. Implementation plan — grouped as New vs Updates to existing
-10. Handover — context, decisions, tasks, verification, risks, state
+10. Handover — Context · Decisions · State (done / pending / blocked) · Remaining tasks (what, how, where) · Verification · Risks and how to detect them early
 
-Every finding needs evidence. Clean areas are stated as clean. No magnitude without a measurement on this system.
+Implementation tasks use the Shared Plan Contract. Every finding needs evidence. Clean areas are stated as clean. No magnitude without a measurement on this system.
 
 ### Terminal briefing
 
-Use this shape. Omit any section that would be empty. Never paste the work file into chat.
+Use this shape. Omit any section that would be empty. Follow the Delivery rules for file or in-session output.
 
 ```text
 Optimize — complete
@@ -1722,7 +1926,7 @@ Need from you
 - A new artifact is Features to add only if a harness or tool must be introduced; a change to current code is Updates to existing. Never mix them
 - Confidence: `proven` evidence in hand; `likely` strong reason; `possible` suspected; `uncertain` hypothesis. Never numbers. Never say proven without evidence
 - Never hype. If you cannot state a conservative expected effect, the gain is not ready to brief
-- No skill-name dump, no audit body in chat
+- Keep the briefing concise when the audit is saved to a file
 
 ## Quality Gate
 
@@ -1744,7 +1948,7 @@ The audit is complete only when every answer is yes:
 - Correctness bugs are handed off, not sold as optimizations
 - New work and updates to existing work are grouped separately
 - The handover lets the next agent act with zero guessing
-- The work file lives at the stated path and was not pasted into chat
+- The deliverable is saved at the stated path, or honestly labeled in-session only
 - The briefing omits empty sections, uses proven/likely/possible/uncertain, never numbers, and does not hype
 
 Any "no" means the audit is not finished. Fix it and review again.
@@ -1753,107 +1957,158 @@ Any "no" means the audit is not finished. Fix it and review again.
 
 ### Skill: 360-token-efficiency
 
+Source: skills/360-token-efficiency/SKILL.md
+
 ---
 name: 360-token-efficiency
-description: Runtime skill that reduces token waste during AI-agent tasks without dropping facts, changing requirements, or weakening correctness. Use continuously alongside other skills when token cost matters.
-version: 1.2.0
+description: Reduce avoidable context and tool-output overhead with capability-aware retrieval, reuse, and verified handovers. Use as an optional, session-approved companion when token cost or context growth matters, with strict preservation of task requirements by default.
+version: 2.0.0
 ---
 
 # 360 Token Efficiency
 
 ## Purpose
 
-Run this skill during execution of a task, not as a separate report generator. Reduce token waste while preserving the same correctness, completeness, and usability the task would have without this skill.
-
-Model- and platform-agnostic. Governs how the agent selects, reuses, compacts, and outputs information. Does not claim control over provider-side caching, billing internals, or hidden reasoning.
+Reduce avoidable overhead during the main task using capabilities the host actually exposes. Preserve task requirements and verification; strict mode forbids intentional accuracy sacrifice but cannot guarantee error-free outcomes.
 
 ## When to Use
 
-- Multi-step, multi-turn, or tool-heavy tasks
-- Long sessions where context keeps growing
-- Repetitive work where prior results can be reused safely
-- As a companion to another skill, not a replacement for it
-- Never as the primary skill for a task — it shapes how other work is done, it does not do the work
+- Multi-step or tool-heavy tasks with growing context or repeated retrieval
+- A user explicitly invokes this companion, or approves a sibling's session offer
+- Not for creating plans (`360-blueprint`), executing the task itself (`360-execute`), or optimizing application performance (`360-optimize`)
 
 ## Core Principle
 
-Token efficiency is not brevity for its own sake. It is maximum decision-relevant signal per token spent. Compress the container, never the content. If a shortcut risks correctness, completeness, or traceability, do not take it.
+Remove redundant work, not required evidence. Judge preservation against observable acceptance checks, and claim savings only from actual measurements.
 
 ## Workflow
 
-### 1. Keep Only Decision-Relevant Context
+### 1. Respect Session Consent
 
-- Separate what the current step needs from what it does not
-- Reuse stable instructions, prior decisions, and verified facts already in the session
-- Do not resend static material when a shorter reference is enough
-- Do not drop information that later steps still need
+Explicit user invocation counts as approval for this session. Otherwise reuse the session's explicit approval or refusal; merely appearing in a generated plan is not approval. If unknown and not already offered, ask once and continue the main task with the overlay inactive while unanswered. Refusal or revocation disables the overlay immediately without disabling ordinary efficient habits. A new session starts unknown; a verified continuation in the same session preserves the decision. Do not infer consent from an old artifact or cross-session memory.
 
-### 2. Size Effort to Difficulty
+Discover and load through the host's supported skill mechanism only after approval; reuse already-loaded instructions. If unavailable, explain briefly and continue the main task without installing anything. Never invoke this skill recursively or restart the parent skill. Session consent does not authorize cross-session memory writes, configuration changes, or edits to installed skills.
 
-- Classify each sub-task as trivial, moderate, or hard
-- Trivial: act directly
-- Moderate: reason only where it changes the outcome
-- Hard: use full rigor, but no extra ceremony
-- Never save tokens by under-thinking a hard problem
+### 2. Assess Available Capabilities
 
-### 3. Load Progressively
+Make a brief internal, in-session assessment from exposed tools, instructions, and observed behavior. Unknown capabilities remain unavailable until established; do not infer them from the agent's brand.
 
-- Pull only the file, section, tool, or context needed for the current step
-- Prefer summaries or indexes first; open full content only when needed
-- When a large result arrives, extract what matters and leave the rest behind
+| Capability | Use when established | Fallback |
+|---|---|---|
+| Search and selective reads | Locate evidence, then retrieve relevant spans with source locations | Read supplied inputs; request only missing material needed for a decision |
+| Tool discovery | Discover needed tools on demand | Use the exposed tool set |
+| Code execution | Filter and aggregate large results before returning them to model context | Request bounded results or process manageable chunks |
+| Recoverable artifacts | Keep task state and evidence references in authorized files or artifacts | Keep the complete required state in-session; do not claim persistence |
+| Context management | Use supported compaction with a verified handover | Keep a state summary; never automatically clear history |
+| Caching controls | Use exposed controls when appropriate and authorized | Make no claim of cache control or savings |
+| Delegation | Delegate only when permitted and the independent work justifies coordination | Work locally |
+| Usage telemetry | Record comparable observed usage | Label savings `UNMEASURED` |
 
-### 4. Compact Without Losing Facts
+Do not modify the agent's configuration or installed skill to adapt it. Read [evidence and optional techniques](references/evidence-and-techniques.md) only when choosing caching, compression, delegation, or measurement techniques, or when the user asks for supporting evidence.
 
-- At natural checkpoints, replace verbose history with a compact state summary
-- Keep decisions, constraints, open questions, blockers, and unresolved risks
-- If a fact is uncertain, carry the uncertainty forward. Do not compress it into false confidence
+### 3. Retrieve and Reuse Carefully
 
-### 5. Output With Discipline
+- Fully read mandatory instructions and required task inputs. Progressive retrieval must not bypass them.
+- Search progressively for additional evidence. Keep source paths, ranges, IDs, versions or timestamps needed to reopen it.
+- Filter or aggregate large tool results before returning them to context when supported. Check pagination, truncation, counts, and omitted boundaries; a partial result cannot establish completeness.
+- Reuse verified facts while checking whether their sources changed. Reopen stale, conflicting, or insufficient evidence before deciding.
+- Avoid repeated explanations, whole-artifact regeneration for local edits, and redundant verification. Repeat checks after relevant changes, failures, or new uncertainty.
+- Delegation must respect host permissions; account for duplicated instructions, worker context, tool use, retries, and coordination in its cost.
 
-- Prefer the shortest structure that fully answers the task
-- Use tables for comparisons, bullets for parallel facts, and direct prose for decisions
-- Remove preamble, repetition, and restatement
-- Add detail only when it changes correctness, usability, or handover quality
-- When a sibling skill produces an artifact, write it to a file; chat carries only the briefing
+### 4. Preserve State Through Continuation
 
-### 6. Escalate Only on Trigger
+Before supported compaction or handoff, verify this summary against the task, source evidence, and ledger:
 
-- Prefer the lighter reliable path first
-- Escalate only when confidence is low, evidence conflicts, or the lightweight path fails
-- State the reason for escalation when it matters to the user or next agent
+> Context · Decisions · State (done / pending / blocked) · Remaining tasks (what, how, where) · Verification · Risks and how to detect them early
 
-### 7. Persist Rules Only When Measured
+Include constraints, exact values and units, citations and evidence references, user decisions and authorization boundaries, session consent or revocation and whether an unanswered offer was already made, unresolved uncertainty, acceptance criteria, and the next action. Preserve stable task IDs if present. Do not replace source evidence with a summary that cannot support the next decision; reopen the original when needed. Never automatically clear history. If a handover cannot retain or recover required detail, keep fuller context and disclose the continuity limit.
 
-- Do not write reusable token-saving rules unless a real measurement showed savings without quality loss
-- If no token telemetry exists, mark the rule as unverified and keep it out of the notes file
-- Never invent token counts
+### 5. Enforce Strict Preservation
+
+Never weaken requirements, exact values, citations, uncertainty, acceptance criteria, or required verification to save tokens. Keep the main task's quality bar and requested output format. Prefer files when supported; honor explicit user delivery requests, and provide complete in-session output labeled `in-session only; not persisted` when files are unavailable.
+
+Potentially lossy techniques such as learned prompt compression require separate approval of the specific technique, task-specific quality metric, and tolerance before use. General session consent is insufficient. Even an approved experiment cannot silently weaken the main task's acceptance criteria; a failed comparison restores the fuller context or ordinary workflow. Missing information, conflicting evidence, or verification failure also triggers restoration and rechecking of affected decisions.
+
+### 6. Measure Without Inventing Savings
+
+No extra report by default. Never invent token counts or an unrun baseline. Distinguish measured input/output tokens, cached tokens, cost, latency, and estimates. Caching may reduce processing cost without reducing context presented to the model.
+
+For a comparison, use the same task inputs and acceptance criteria, record host/model settings and run conditions, and include loading, summarization, tool discovery, retries, and delegation overhead. Report quality regressions and unavailable metrics. Reserve “validated savings” for actual comparable measurements with passing task checks; a finite test set does not establish universal accuracy. Unmeasured guidance is allowed when clearly labeled. Do not persist learned rules or memory unless separately authorized.
 
 ## Output Format
 
-Default: no extra report.
+Default: complete the main task in its requested format, with no efficiency report.
 
-Emit a token-efficiency report only when the user explicitly asks for one. When requested, include:
+When requested, report:
 
-1. What context was reused or omitted
-2. How effort was sized
-3. What was compacted and what facts were preserved
-4. Any escalations and why they happened
-5. Any measured token deltas, or `UNMEASURED`
-6. Any residual risk
+1. Capabilities used and techniques applied
+2. Context reused, omitted, or compacted, with recoverable evidence locations
+3. Preservation checks, acceptance results, and any observed regressions
+4. Restorations or escalations and their reasons
+5. Measurements: baseline and overlay, input/output tokens, cached tokens, cost, latency, overhead; use `UNMEASURED` for unavailable metrics and label estimates
+6. Limitations and residual uncertainty
+
+Use the six canonical handover fields above when a continuation is needed.
 
 ## Quality Gate
 
-The application of this skill is complete only when every answer is yes:
+Check every applicable item; record a concrete limitation if one cannot be checked:
 
-- No fact needed for correctness was dropped
-- No uncertainty was compressed into false confidence
-- Effort matched task difficulty
-- Output was no more verbose than the task required
-- Artifacts produced by sibling skills were not pasted into chat
-- No unverified token-saving rule was persisted
-- No token savings were claimed without measurement
-- The outcome is at least as correct and complete as it would be without this skill
+- Session approval is explicit, current, and honored after refusal or revocation
+- Techniques use only established, permitted capabilities
+- Required inputs, constraints, exact values, citations, uncertainty, and acceptance criteria were preserved against source evidence
+- Pagination and truncation were checked wherever completeness mattered
+- Reused evidence is sufficiently current for the decision
+- The handover retains required state and recoverable evidence; no automatic history clearing occurred
+- Required task verification ran, or is explicitly unresolved; failed checks triggered restoration
+- Any potentially lossy method had separate technique, metric, and tolerance approval
+- Delivery matches the user's request and honestly states persistence
+- Measurement claims have real evidence and include available overhead; absent telemetry is `UNMEASURED`
 
-Any "no" means the application is not finished. Fix it and re-check.
+An unresolved check is a limitation or blocker, never proof of equivalent accuracy to a run that did not happen.
+
+### Reference: skills/360-token-efficiency/references/evidence-and-techniques.md
+
+Source: skills/360-token-efficiency/references/evidence-and-techniques.md
+
+# Evidence, limitations, and optional techniques
+
+Read only for a relevant technique or an evidence request. These sources support conditional techniques; they do not establish zero accuracy loss for every task or agent. Consult current host documentation before relying on a platform-specific control.
+
+## Retrieval and compaction
+
+Anthropic describes just-in-time retrieval using lightweight references and progressively loaded evidence. It also warns that aggressive compaction can lose subtle but critical context. Apply this as a reason to preserve exact constraints, evidence locations, uncertainty, and task state, then verify the handover against original inputs. Mandatory instructions and required inputs still need full reads. [Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents).
+
+A summary is useful only when enough original evidence remains recoverable for the next decision. If retrieval is unavailable, retaining fuller context is safer than assuming a summary is sufficient. Check pagination and truncation before concluding that a search covered everything.
+
+## Tool discovery and programmatic processing
+
+Anthropic describes deferred tool discovery and programmatic tool calling, including filtering tool results before they reach model context. These techniques depend on host support; a skill cannot create those capabilities by instruction. Count discovery and execution overhead, and retain source identifiers and completeness checks when filtering. [Introducing advanced tool use](https://www.anthropic.com/engineering/advanced-tool-use).
+
+## Caching
+
+Google documents explicit and implicit context caching, model-dependent eligibility, and cache usage metadata. Cached content still forms part of the model's input context; pricing and reuse differ from removing input. Verify exposed controls and current usage metadata instead of assuming a cache hit. Report cached tokens separately from total input tokens, processing cost, and latency. [Gemini context caching](https://ai.google.dev/gemini-api/docs/caching).
+
+Changing cache settings is optional and remains subject to host permissions and task authorization. Do not change agent configuration for this overlay.
+
+## Learned compression
+
+LLMLingua-2 learns token retention using distilled data and reports evaluations across selected tasks and models. Those benchmarks do not prove losslessness for arbitrary requirements or unseen tasks. Treat learned token removal as potentially lossy: obtain separate approval for the technique, a task-specific metric, and a tolerance; preserve original inputs, compare against the ordinary workflow, and restore on failure. [LLMLingua-2 research](https://arxiv.org/abs/2403.12968).
+
+Do not use an aggregate score to excuse a lost exact value, citation, authorization boundary, or mandatory acceptance criterion.
+
+## Delegation and comparisons
+
+Delegate only within permissions and when independent work justifies the extra context and coordination. Small tasks can cost more with multiple agents. Include parent and worker usage, skill loading, tool calls, summaries, retries, and coordination when telemetry exists.
+
+A useful comparison records:
+
+- Same task inputs, acceptance checks, host/model settings, and tool access
+- Baseline and overlay outputs, evidence, acceptance results, and observed regressions
+- Observed input/output tokens, cache usage, cost and elapsed time, with unavailable metrics explicitly marked
+- All available overhead; no assumed free summarization, discovery, retries, or delegation
+- Run count and variation; no extrapolation to universal accuracy or savings
+
+A manual or scripted walkthrough can expose instruction defects. It is not a measured model benchmark. Artifact byte or word counts measure document size, not billed tokens or task-level savings.
 
 ---
