@@ -1,6 +1,6 @@
 # 360-skills
 
-> 360-skills is an open-standard, MIT-licensed collection of Agent Skills: installable `SKILL.md` packages that equip AI coding agents (Claude Code, Cursor, Codex, Copilot, Windsurf, Gemini CLI, and 70+ others via skills.sh) with senior-level planning, expert review, execution, backend auditing, and token efficiency.
+> 360-skills is an open-standard, MIT-licensed collection of Agent Skills: installable `SKILL.md` packages that equip AI coding agents (Claude Code, Cursor, Codex, Copilot, Windsurf, Gemini CLI, and 70+ others via skills.sh) with senior-level planning, expert review, execution, backend auditing, code optimization, and token efficiency.
 
 Skills follow the open Agent Skills format (https://agentskills.io) and install with a single command via the skills.sh CLI (https://skills.sh). Every skill lives at `skills/<name>/SKILL.md` and is self-contained: install it, and the target agent gains that capability on demand through progressive disclosure.
 
@@ -17,9 +17,10 @@ Skills follow the open Agent Skills format (https://agentskills.io) and install 
 ### Hardening & Quality Gates
 - [360-expert-review](https://github.com/shahabahreini/360-skills/blob/main/skills/360-expert-review/SKILL.md): Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage.
 
-### Execution & Code Auditing
+### Execution, Code Auditing & Optimization
 - [360-execute](https://github.com/shahabahreini/360-skills/blob/main/skills/360-execute/SKILL.md): Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and brief the user in chat. Use when a plan exists and work must begin, or when resuming a partial execution.
 - [360-backend-audit](https://github.com/shahabahreini/360-skills/blob/main/skills/360-backend-audit/SKILL.md): Deep-audit backend code, write the full report to a file, and brief the user in chat with bugs, updates, and dead weight. Use before or after significant backend work, or when inheriting, refactoring, or handing off services.
+- [360-optimize](https://github.com/shahabahreini/360-skills/blob/main/skills/360-optimize/SKILL.md): Audit working code for zero-cost speed, weight, and reliability gains — measure first, rank drop-in upgrades and restructures, and report conservative expected effects on this system. Use when existing code must run faster, lighter, or more robustly without changing what it does.
 
 ### Token & Cost Optimization
 - [360-token-efficiency](https://github.com/shahabahreini/360-skills/blob/main/skills/360-token-efficiency/SKILL.md): Runtime skill that reduces token waste during AI-agent tasks without dropping facts, changing requirements, or weakening correctness. Use continuously alongside other skills when token cost matters.

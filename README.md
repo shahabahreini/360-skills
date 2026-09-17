@@ -35,7 +35,8 @@ npx skills add shahabahreini/360-skills --skill 360-expert-review --agent claude
 | [`360-expert-review`](skills/360-expert-review)       | Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage.                                                                                                                                                                                                                               | 2.3.0   |
 | [`360-execute`](skills/360-execute)                   | Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and brief the user in chat. Use when a plan exists and work must begin, or when resuming a partial execution.                                                                                                                                                                                                    | 1.1.1   |
 | [`360-backend-audit`](skills/360-backend-audit)       | Deep-audit backend code, write the full report to a file, and brief the user in chat with bugs, updates, and dead weight. Use before or after significant backend work, or when inheriting, refactoring, or handing off services.                                                                                                                                                                                         | 1.2.0   |
-| [`360-token-efficiency`](skills/360-token-efficiency) | Runtime skill that reduces token waste during AI-agent tasks without dropping facts, changing requirements, or weakening correctness. Use continuously alongside other skills when token cost matters.                                                                                                                                                                                                                    | 1.2.0   |
+| [`360-optimize`](skills/360-optimize)                 | Audit working code for zero-cost speed, weight, and reliability gains — measure first, rank drop-in upgrades and restructures, and report conservative expected effects on this system. Use when existing code must run faster, lighter, or more robustly without changing what it does.                                                                                                                                   | 1.1.0   |
+| [`360-token-efficiency`](skills/360-token-efficiency) | Runtime skill that reduces token waste during AI-agent tasks without dropping facts, changing requirements, or weakening correctness. Use continuously alongside other skills when token cost matters.                                                                                                                                                                                     | 1.2.0   |
 
 ## Which Skill Do I Need?
 
@@ -48,6 +49,7 @@ npx skills add shahabahreini/360-skills --skill 360-expert-review --agent claude
 | A draft plan exists and needs hardening                             | `360-expert-review`          |
 | A finalized plan exists and needs building                          | `360-execute`                |
 | Backend code exists and needs auditing                              | `360-backend-audit`          |
+| Working code needs speed, weight, or reliability gains              | `360-optimize`               |
 | Any of the above, and context or cost matters                       | add `360-token-efficiency`   |
 
 ## How the Skills Work Together
@@ -62,7 +64,8 @@ flowchart TD
     Review -->|fails the gate, revise| Blueprint
     Review --> Execute["360-execute: run the finalized plan task by task"]
     Execute --> Audit["360-backend-audit: audit the resulting backend code"]
-    Audit -->|findings seed the next objective| Objective
+    Audit --> Optimize["360-optimize: audit for zero-cost speed and weight"]
+    Optimize -->|findings seed the next objective| Objective
 
     Faculty -.->|house style before planning| Blueprint
     Faculty -.->|which lenses this review needs| Review
@@ -72,6 +75,7 @@ flowchart TD
     Efficiency -.-> Review
     Efficiency -.-> Execute
     Efficiency -.-> Audit
+    Efficiency -.-> Optimize
 ```
 
 The four planning skills share one data contract: `360-blueprint`'s Plan Template. Every task carries a stable ID, a declared skill list, `must` / `should` / `could` priority, and an observable `Done when` check. `360-faculty` tailors the plan and `360-expert-review` hardens it, neither breaking that shape, and `360-execute` reads those exact fields. That is what lets a plan travel the whole pipeline without anyone re-typing it.
@@ -81,9 +85,10 @@ The four planning skills share one data contract: `360-blueprint`'s Plan Templat
 - **`360-expert-review`** attacks that plan from every expert angle until only the strongest version survives, writing the finalized plan back to the file and briefing the user in chat.
 - **`360-execute`** builds it, tracking every task in a coverage ledger written to disk, verifying each against its own acceptance check with evidence, and briefing progress in chat.
 - **`360-backend-audit`** audits the resulting backend code for correctness, duplication, performance risks, and observability, writing the full report to a file and briefing findings in chat.
+- **`360-optimize`** audits working code for zero-cost speed, weight, and reliability gains, ranking drop-in upgrades and restructures with conservative expected effects written to a file and briefing highlights in chat.
 - **`360-token-efficiency`** runs continuously alongside whichever skill is active, reducing token waste without dropping facts, changing requirements, or weakening correctness.
 
-Each skill also works standalone: ask `360-faculty` which expertise a plan needs without seating anyone, skip straight to `360-expert-review` for a plan someone else drafted, point `360-execute` at a plan someone else finalized, run `360-backend-audit` on existing code with no plan involved at all, or apply `360-token-efficiency` to any task regardless of which other skills are in play.
+Each skill also works standalone: ask `360-faculty` which expertise a plan needs without seating anyone, skip straight to `360-expert-review` for a plan someone else drafted, point `360-execute` at a plan someone else finalized, run `360-backend-audit` on existing code with no plan involved at all, audit working code for performance and weight with `360-optimize`, or apply `360-token-efficiency` to any task regardless of which other skills are in play.
 
 ## Design Principles
 
@@ -122,6 +127,8 @@ A skill is a folder containing a `SKILL.md` file with a `name`, a `description`,
     ├── 360-execute/
     │   └── SKILL.md           Skill definition and instructions
     ├── 360-backend-audit/
+    │   └── SKILL.md           Skill definition and instructions
+    ├── 360-optimize/
     │   └── SKILL.md           Skill definition and instructions
     └── 360-token-efficiency/
         └── SKILL.md           Skill definition and instructions
