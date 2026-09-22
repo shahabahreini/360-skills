@@ -1,7 +1,7 @@
 ---
 name: 360-blueprint
 description: Create an executable plan from a new objective with explicit tasks, constraints, and verification. Use when a goal exists but the path is unclear, or the request is "plan this".
-version: 2.0.0
+version: 2.1.0
 ---
 
 # 360 Blueprint
@@ -25,6 +25,7 @@ This skill creates plans. To review and finalize one, use `360-expert-review`.
 
 - A plan is finished when a fresh executor can act without guessing, and every task serves a real objective
 - Begin at the end. Think from first principles. Design out failure. Prefer the simplest plan that fully works
+- Prompt questions with concrete choices or a request for a note before finishing; never dump trailing questions at the end of the conversation
 - Preserve a recoverable record using the Delivery rules below
 
 ## Workflow
@@ -49,13 +50,16 @@ Prefer a recoverable file when supported, using the existing path or the default
 - Restate the objective in the user's terms
 - Check legitimacy and feasibility before planning
 - Surface constraints, deadlines, dependencies, and hidden goals
-- If the objective is ambiguous, ask before generating
+- If the objective or path is ambiguous, ask before generating; provide concrete choices or ask for a note
 
 ### 2. Confirm Before Generating
 
-- If critical facts are missing, stop after clarification and wait for confirmation
-- Do not both ask blocking questions and deliver a plan in the same turn
-- If the user asks for a draft despite uncertainty, label it `Draft` and list open questions explicitly
+- If critical facts, design trade-offs, or scope boundaries are unconfirmed, stop after clarification and wait for confirmation
+- When asking questions, provide structured choices (highlighting recommendations) or ask the user to leave a note; use interactive prompt tools (such as `ask_question`) when available
+- Do not both ask questions and deliver a plan in the same turn
+- Do not claim an ambiguity or question only affects task shape or details to avoid prompting before delivery
+- Never dump open questions or decisions at the end of the conversation (such as trailing bullets or a `Need from you` section) while concluding the turn
+- If the user explicitly asks for a draft despite uncertainty, label it `Draft` and record open questions in the plan file, but actively prompt any decision needed to proceed
 
 ### 3. See From Every Angle
 
@@ -108,6 +112,7 @@ For any other domain, define that domain's quality bar explicitly and enforce it
 - If the file cannot be written, use the in-session delivery fallback
 - With a saved file, print the terminal briefing and path
 - If the plan deserves adversarial review before build, say so in plain language — no skill names
+- Ensure all questions and decisions were resolved or actively prompted before delivery; never conclude by dumping passive questions at the end of the conversation
 
 ## Output Format
 
@@ -212,9 +217,6 @@ Not adding
 
 Issues found
 - <problem or uncertainty> — <proven|likely|possible|uncertain>
-
-Need from you
-- <blocking decision only>
 ```
 
 - First line is `plan is ready` or `draft — open questions remain`
@@ -222,13 +224,15 @@ Need from you
 - A new artifact is Features to add. A change to an existing artifact, feature, or document is Updates to existing. Never mix them
 - Confidence: `proven` evidence in hand; `likely` strong reason; `possible` suspected; `uncertain` hypothesis. Never numbers
 - No phases, tasks, MoSCoW, status tables, handover, or skill names
+- Never append open questions, design choices, or trailing bullet lists at the end of the conversation (no `Need from you` dump). Actively prompt every question with concrete choices or ask for a note before concluding
 
 ## Quality Gate
 
 The plan is ready only when every answer is yes:
 
 - The objective is clear and confirmed, or the output is explicitly marked `Draft`
-- No blocking question was skipped
+- No blocking question or decision was skipped
+- Every question, ambiguity, and decision was actively prompted with concrete choices or an option to leave a note before completing, never dumped as trailing bullets at the end of the turn
 - No invented technical details were presented as facts
 - Every assumption is explicit and falsifiable
 - Every task has what, how, where, done when, dependencies, skills, effort, priority, and parallel markings

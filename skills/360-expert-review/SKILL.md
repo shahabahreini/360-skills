@@ -1,7 +1,7 @@
 ---
 name: 360-expert-review
 description: Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage.
-version: 3.0.0
+version: 3.1.0
 ---
 
 # 360 Expert Review
@@ -24,6 +24,7 @@ Prefer a file for the full deliverable and a short chat briefing; use the Delive
 - Review the plan the way a senior team would: user impact, reliability, security, operations, and domain correctness
 - Attack it hard enough that only the strongest version survives
 - Finalize into the existing plan file. Do not replace tasks with a narrative essay
+- Prompt questions with concrete choices or a request for a note before finishing; never dump trailing questions at the end of the conversation
 - Preserve a recoverable record using the Delivery rules below
 
 ## Workflow
@@ -46,7 +47,7 @@ Prefer a recoverable file when supported, using the existing path or the default
 
 - Identify the real problem, not just the requested task
 - Identify users, stakeholders, constraints, dependencies, and what must not break
-- Ask questions until the plan can be judged without guessing
+- Ask questions until the plan can be judged without guessing. Present questions with concrete choices (highlighting recommendations) or ask to leave a note; use interactive prompt tools (such as `ask_question`) when available
 
 ### 2. Review Through Expert Lenses
 
@@ -102,7 +103,7 @@ Switch to hostile critic. Ask:
 - What cannot be detected, reproduced, or reversed?
 - What can be simpler?
 
-Fix actionable findings, then recheck the affected risks. Stop when applicable acceptance checks pass and no unresolved high-severity blocker remains. If evidence or a user decision is unavailable, record a concrete blocker and stop that review line; do not loop indefinitely or claim finality. Mark non-applicable checks with a reason.
+Fix actionable findings, then recheck the affected risks. Stop when applicable acceptance checks pass and no unresolved high-severity blocker remains. If evidence or a user decision is unavailable, record a concrete blocker and stop that review line; do not loop indefinitely or claim finality. When a decision, design trade-off, or ambiguity requires user input (even for task-level shapes or non-blocking details), actively prompt the user with concrete choices or ask to leave a note before finishing; do not dump questions as trailing chat bullets. Mark non-applicable checks with a reason.
 
 ### 8. Write the Final Plan
 
@@ -113,6 +114,7 @@ Fix actionable findings, then recheck the affected risks. Stop when applicable a
 - Include the executor handover in the chosen delivery format
 - If the file cannot be written, use the in-session delivery fallback
 - With a saved file, print the terminal briefing and path
+- Ensure all questions and decisions were resolved or actively prompted before delivery; never conclude by dumping passive questions at the end of the conversation
 
 ## Output Format
 
@@ -166,9 +168,6 @@ Issues found
 
 Remaining risks
 - <accepted risk> — <likely|possible|uncertain>
-
-Need from you
-- <only if not ready to build>
 ```
 
 - First line is `plan is final` or `not final — <specific blocker or remaining review>`
@@ -176,6 +175,7 @@ Need from you
 - A new artifact is Features to add. A change to an existing artifact, feature, or document is Updates to existing. Never mix them
 - Confidence: `proven` evidence in hand; `likely` strong reason; `possible` suspected; `uncertain` hypothesis. Never numbers. Never say proven without evidence
 - No phases, tasks, skill names, or review-essay dump
+- Never append open questions, design choices, or trailing bullet lists at the end of the conversation (no `Need from you` dump). Actively prompt every question with concrete choices or ask for a note before concluding
 
 ## Quality Gate
 
@@ -191,6 +191,7 @@ The plan is final only when every applicable answer is yes (record a reason for 
 - Testing matches the risk
 - Release and rollback are safe
 - The plan survived hostile review
+- Every blocker, ambiguity, and decision requiring user input was actively prompted with concrete choices or an option to leave a note before completing, never dumped as trailing bullets at the end of the turn
 - Task IDs were preserved or changed with a stated reason
 - New work and updates to existing work are grouped separately
 - The finalized plan preserves its original location where supported, or follows the Delivery fallback
