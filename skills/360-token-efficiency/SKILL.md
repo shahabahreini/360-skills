@@ -1,7 +1,7 @@
 ---
 name: 360-token-efficiency
 description: Reduce avoidable context and tool-output overhead with capability-aware retrieval, reuse, and verified handovers. Use as an optional, session-approved companion when token cost or context growth matters, with strict preservation of task requirements by default.
-version: 2.0.0
+version: 2.1.0
 ---
 
 # 360 Token Efficiency
@@ -74,6 +74,17 @@ No extra report by default. Never invent token counts or an unrun baseline. Dist
 
 For a comparison, use the same task inputs and acceptance criteria, record host/model settings and run conditions, and include loading, summarization, tool discovery, retries, and delegation overhead. Report quality regressions and unavailable metrics. Reserve “validated savings” for actual comparable measurements with passing task checks; a finite test set does not establish universal accuracy. Unmeasured guidance is allowed when clearly labeled. Do not persist learned rules or memory unless separately authorized.
 
+### Completion: Choose the Next Action
+
+- Finish and verify the current deliverable first; make the result and its location available before asking about follow-on work. Keep artifact readiness separate from the next-action choice: an unanswered suggestion does not reopen completed work, and a blocked job is not complete
+- Check the result, current project stage, remaining risks, and prior user instructions. Recommend the next useful action from the local routing guidance below; skip irrelevant stages and prefer stopping when no useful work remains
+- Use an available interactive question tool to offer one concise next-action choice. Put the best recommendation first, explain why it fits this result, and include a stop/pause choice. Always allow a free-text note or custom direction, including work outside the 360 flow; never force the user into a sibling skill
+- If interactive tools are unavailable, offer equivalent numbered choices with the recommendation, rationale, and explicit custom-note option in chat. This completion prompt is separate from the deliverable briefing; skill names are allowed here, and it is not a passive list of unresolved task questions
+- Reuse an already explicit next-step instruction instead of asking again; continue work it authorizes. Otherwise wait for the user's choice before starting follow-on work. Silence, a preselected recommendation, and elapsed time are not authorization. An explicit stop or request for no suggestions suppresses the prompt
+- When the user chooses, follow that direction and clarify only missing information needed for it. Discover and load a selected skill through the host's supported mechanism; do not assume it is installed or install it automatically. If unavailable, explain and offer an equivalent action. Carry forward artifact paths, decisions, verification, remaining risks, and session consent without restarting intake
+
+Local routing: While accompanying another skill, let the parent own the single completion prompt; do not issue a duplicate or interrupt its work. For a standalone efficiency task, recommend resuming the main task or addressing an evidenced remaining issue, and allow stopping. Never recommend invoking this overlay recursively.
+
 ## Output Format
 
 Default: complete the main task in its requested format, with no efficiency report.
@@ -90,6 +101,8 @@ When requested, report:
 Use the six canonical handover fields above when a continuation is needed.
 
 ## Quality Gate
+
+- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
 
 Check every applicable item; record a concrete limitation if one cannot be checked:
 

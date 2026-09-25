@@ -70,13 +70,13 @@ Each skill works individually. Review includes its own minimum plan contract; bl
 
 | Skill | Description | Version |
 |---|---|---|
-| [`360-backend-audit`](skills/360-backend-audit) | Deep-audit backend code, write the full report to a file, and brief the user in chat with bugs, updates, and dead weight. Use before or after significant backend work, or when inheriting, refactoring, or handing off services. | 2.0.0 |
-| [`360-blueprint`](skills/360-blueprint) | Create an executable plan from a new objective with explicit tasks, constraints, and verification. Use when a goal exists but the path is unclear, or the request is "plan this". | 2.1.0 |
-| [`360-execute`](skills/360-execute) | Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and brief the user in chat. Use when a plan exists and work must begin, or when resuming a partial execution. | 2.0.0 |
-| [`360-expert-review`](skills/360-expert-review) | Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage. | 3.1.0 |
-| [`360-faculty`](skills/360-faculty) | Seat a living, tailored expert team on a plan or task. Use when work must fit this developer's goals, taste, mindset, and strategy, when a plan needs the right expertise chosen for its complexity, depth, and nature, or when a named faculty team must be created, called, or updated. Recommends a short list, asks only the questions that still change the work, polishes immediately, and keeps upgradable memory. | 1.1.0 |
-| [`360-optimize`](skills/360-optimize) | Audit working code for zero-cost speed, weight, and reliability gains — measure first, rank drop-in upgrades and restructures, and report conservative expected effects on this system. Use when existing code must run faster, lighter, or more robustly without changing what it does. | 2.0.0 |
-| [`360-token-efficiency`](skills/360-token-efficiency) | Reduce avoidable context and tool-output overhead with capability-aware retrieval, reuse, and verified handovers. Use as an optional, session-approved companion when token cost or context growth matters, with strict preservation of task requirements by default. | 2.0.0 |
+| [`360-backend-audit`](skills/360-backend-audit) | Deep-audit backend code, write the full report to a file, and brief the user in chat with bugs, updates, and dead weight. Use before or after significant backend work, or when inheriting, refactoring, or handing off services. | 2.1.0 |
+| [`360-blueprint`](skills/360-blueprint) | Create an executable plan from a new objective with explicit tasks, constraints, and verification. Use when a goal exists but the path is unclear, or the request is "plan this". | 2.3.0 |
+| [`360-execute`](skills/360-execute) | Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and brief the user in chat. Use when a plan exists and work must begin, or when resuming a partial execution. | 2.1.0 |
+| [`360-expert-review`](skills/360-expert-review) | Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage. | 3.3.0 |
+| [`360-faculty`](skills/360-faculty) | Seat a living, tailored expert team on a plan or task. Use when work must fit this developer's goals, taste, mindset, and strategy, when a plan needs the right expertise chosen for its complexity, depth, and nature, or when a named faculty team must be created, called, or updated. Recommends a short list, asks only the questions that still change the work, polishes immediately, and keeps upgradable memory. | 1.2.0 |
+| [`360-optimize`](skills/360-optimize) | Audit working code for zero-cost speed, weight, and reliability gains — measure first, rank drop-in upgrades and restructures, and report conservative expected effects on this system. Use when existing code must run faster, lighter, or more robustly without changing what it does. | 2.1.0 |
+| [`360-token-efficiency`](skills/360-token-efficiency) | Reduce avoidable context and tool-output overhead with capability-aware retrieval, reuse, and verified handovers. Use as an optional, session-approved companion when token cost or context growth matters, with strict preservation of task requirements by default. | 2.1.0 |
 
 ## Which Skill Do I Need?
 
@@ -91,6 +91,8 @@ Each skill works individually. Review includes its own minimum plan contract; bl
 | Context growth or avoidable token overhead matters; optional companion | `360-token-efficiency` | Not for creating plans (`360-blueprint`), executing the task itself (`360-execute`), or optimizing application performance (`360-optimize`) |
 
 ## How the Skills Work Together
+
+On completion, each skill offers an interactive next-action recommendation based on the actual result and project stage. Choose the suggested step, stop, or write a custom direction outside the flow. Existing next-step instructions are honored without another prompt; the token-efficiency companion shares its parent’s prompt. Suggestions never authorize work by themselves.
 
 Most skills hand off to one another sequentially on the same piece of work. Two are more flexible: `360-faculty` attaches wherever expertise is needed — before planning, after a draft, or ahead of review — and `360-token-efficiency` is an optional companion active only with session approval.
 
@@ -127,6 +129,8 @@ Readiness moves from `Draft` to `Ready for review` to `Reviewed and ready to exe
 - **`360-backend-audit`** audits the resulting backend code for correctness, duplication, performance risks, and observability, writing the full report to a file and briefing findings in chat.
 - **`360-optimize`** audits working code for zero-cost speed, weight, and reliability gains, ranking drop-in upgrades and restructures with conservative expected effects written to a file and briefing highlights in chat.
 - **`360-token-efficiency`** runs alongside the active task with session consent, reducing avoidable overhead while preserving requirements and required checks.
+
+Blueprint and expert review inspect the current project stage and completed work before asking questions. They clarify remaining gaps in interactive rounds with evidence-backed recommendations and a free-text note option, continuing until goals, scope, outline, and required details are clear. When interactive tools are unavailable, they use equivalent choices and notes in chat.
 
 Each skill also works standalone: ask `360-faculty` which expertise a plan needs without seating anyone, skip straight to `360-expert-review` for a plan someone else drafted, point `360-execute` at a plan someone else finalized, run `360-backend-audit` on existing code with no plan involved at all, audit working code for performance and weight with `360-optimize`, or apply `360-token-efficiency` to any task regardless of which other skills are in play.
 
@@ -318,6 +322,19 @@ Prefer a recoverable file when supported, using the existing path or the default
 
 Use observable preservation and acceptance checks. Structural validation cannot prove behavior or accuracy; evaluate realistic consent, capability, recovery, and handoff scenarios separately. Document unavailable telemetry and regressions; do not infer universal accuracy or token savings from finite tests.
 
+### Interactive Completion Convention
+
+Every skill, including future additions, ends its Workflow with the following completion step and local, result-dependent routing guidance. The token-efficiency companion shares its parent’s prompt; standalone use still offers a next action. Include a matching Quality Gate item. Preserve deliverable formats; this is a separate interaction.
+
+### Completion: Choose the Next Action
+
+- Finish and verify the current deliverable first; make the result and its location available before asking about follow-on work. Keep artifact readiness separate from the next-action choice: an unanswered suggestion does not reopen completed work, and a blocked job is not complete
+- Check the result, current project stage, remaining risks, and prior user instructions. Recommend the next useful action from the local routing guidance below; skip irrelevant stages and prefer stopping when no useful work remains
+- Use an available interactive question tool to offer one concise next-action choice. Put the best recommendation first, explain why it fits this result, and include a stop/pause choice. Always allow a free-text note or custom direction, including work outside the 360 flow; never force the user into a sibling skill
+- If interactive tools are unavailable, offer equivalent numbered choices with the recommendation, rationale, and explicit custom-note option in chat. This completion prompt is separate from the deliverable briefing; skill names are allowed here, and it is not a passive list of unresolved task questions
+- Reuse an already explicit next-step instruction instead of asking again; continue work it authorizes. Otherwise wait for the user's choice before starting follow-on work. Silence, a preselected recommendation, and elapsed time are not authorization. An explicit stop or request for no suggestions suppresses the prompt
+- When the user chooses, follow that direction and clarify only missing information needed for it. Discover and load a selected skill through the host's supported mechanism; do not assume it is installed or install it automatically. If unavailable, explain and offer an equivalent action. Carry forward artifact paths, decisions, verification, remaining risks, and session consent without restarting intake
+
 ## Registering a New Skill
 
 Adding a skill to `skills/` (not `.experimental/`) is not complete until both of these are updated:
@@ -373,7 +390,7 @@ Source: skills/360-backend-audit/SKILL.md
 ---
 name: 360-backend-audit
 description: Deep-audit backend code, write the full report to a file, and brief the user in chat with bugs, updates, and dead weight. Use before or after significant backend work, or when inheriting, refactoring, or handing off services.
-version: 2.0.0
+version: 2.1.0
 ---
 
 # 360 Backend Audit
@@ -473,6 +490,17 @@ Proposed observability changes should be additive and non-breaking; do not imple
 - Keep new work and updates to existing work in separate lists
 - With a saved file, print the terminal briefing and path
 
+### Completion: Choose the Next Action
+
+- Finish and verify the current deliverable first; make the result and its location available before asking about follow-on work. Keep artifact readiness separate from the next-action choice: an unanswered suggestion does not reopen completed work, and a blocked job is not complete
+- Check the result, current project stage, remaining risks, and prior user instructions. Recommend the next useful action from the local routing guidance below; skip irrelevant stages and prefer stopping when no useful work remains
+- Use an available interactive question tool to offer one concise next-action choice. Put the best recommendation first, explain why it fits this result, and include a stop/pause choice. Always allow a free-text note or custom direction, including work outside the 360 flow; never force the user into a sibling skill
+- If interactive tools are unavailable, offer equivalent numbered choices with the recommendation, rationale, and explicit custom-note option in chat. This completion prompt is separate from the deliverable briefing; skill names are allowed here, and it is not a passive list of unresolved task questions
+- Reuse an already explicit next-step instruction instead of asking again; continue work it authorizes. Otherwise wait for the user's choice before starting follow-on work. Silence, a preselected recommendation, and elapsed time are not authorization. An explicit stop or request for no suggestions suppresses the prompt
+- When the user chooses, follow that direction and clarify only missing information needed for it. Discover and load a selected skill through the host's supported mechanism; do not assume it is installed or install it automatically. If unavailable, explain and offer an equivalent action. Carry forward artifact paths, decisions, verification, remaining risks, and session consent without restarting intake
+
+Local routing: Recommend planning actionable correctness or reliability fixes with `360-blueprint`, or `360-execute` when a suitable authorized plan already exists. Recommend `360-optimize` when optimization is the remaining need; stop when there is no justified follow-up.
+
 ## Output Format
 
 ### Work file
@@ -519,6 +547,8 @@ Need from you
 
 ## Quality Gate
 
+- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
+
 The audit is complete only when every answer is yes:
 
 - Every finding is backed by evidence
@@ -545,7 +575,7 @@ Source: skills/360-blueprint/SKILL.md
 ---
 name: 360-blueprint
 description: Create an executable plan from a new objective with explicit tasks, constraints, and verification. Use when a goal exists but the path is unclear, or the request is "plan this".
-version: 2.1.0
+version: 2.3.0
 ---
 
 # 360 Blueprint
@@ -569,7 +599,7 @@ This skill creates plans. To review and finalize one, use `360-expert-review`.
 
 - A plan is finished when a fresh executor can act without guessing, and every task serves a real objective
 - Begin at the end. Think from first principles. Design out failure. Prefer the simplest plan that fully works
-- Prompt questions with concrete choices or a request for a note before finishing; never dump trailing questions at the end of the conversation
+- Ground questions in project evidence; provide recommended choices and a free-text note option before finishing; never dump trailing questions at the end of the conversation
 - Preserve a recoverable record using the Delivery rules below
 
 ## Workflow
@@ -588,22 +618,24 @@ Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`.
 
 Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
 
-### 1. Extract the True Objective
+### 1. Ground the Objective in the Current Project
 
-- Ask until the objective is clear: what done means, what must not happen, and how success is measured
-- Restate the objective in the user's terms
-- Check legitimacy and feasibility before planning
-- Surface constraints, deadlines, dependencies, and hidden goals
-- If the objective or path is ambiguous, ask before generating; provide concrete choices or ask for a note
+- Before asking task questions, inspect the available project context: instructions, existing plans and decisions, relevant artifacts or implementation, recent changes, verification results, and any execution ledger. Establish the current stage and what is done, pending, or blocked; cite evidence and distinguish verified state from claims. If nothing exists yet, record that; if access is unavailable, state the gap and ask only for the missing context that changes the work
+- Reuse answers already supplied by the user or established by current evidence. Do not ask generic intake questions, ask the user to rediscover accessible facts, or reopen settled decisions without new conflicting evidence
+- Build a short gap list covering the goal, success measures, scope boundaries, high-level outline, constraints, dependencies, and details needed to execute or judge the plan without guessing. Resolve discoverable facts first; ask the user only about remaining decisions, contradictions, or unavailable facts
+- Use the host's available interactive question tool for every user question. Offer small, focused rounds of one to three questions; for each decision, give concrete options, put the best supported recommendation first, and briefly explain its evidence and trade-off. Always allow a free-text note or custom answer alongside the options. For missing facts, request a note and recommend what information to include; do not invent an answer or a recommendation unsupported by evidence
+- If interactive tools are unavailable, present the same numbered choices, recommendation with rationale, and explicit free-text note option in chat, then wait for the answer
+- After each answer, update the known facts and decisions, inspect newly relevant evidence, and ask the next unresolved questions. Continue until the goal, scope, outline, and required details are clear; do not stop after a fixed questionnaire or repeat answered questions. Re-enter this loop if later planning or review exposes a new gap
+- Treat a recommendation, preselected option, silence, or elapsed time as unanswered. Continue independent inspection while waiting, but do not decide dependent work or claim readiness. Preserve explicit user deferrals or delegated choices with their limits; keep unresolved blockers in `Draft`
+- Summarize the resulting understanding and record evidence, current stage, completed work, decisions, and remaining uncertainty within the existing context, assumptions, or review sections. Ask for confirmation only where the user's answers and evidence have not already settled the issue; stop questioning when a fresh executor or reviewer can proceed without material guessing
 
 ### 2. Confirm Before Generating
 
-- If critical facts, design trade-offs, or scope boundaries are unconfirmed, stop after clarification and wait for confirmation
-- When asking questions, provide structured choices (highlighting recommendations) or ask the user to leave a note; use interactive prompt tools (such as `ask_question`) when available
-- Do not both ask questions and deliver a plan in the same turn
-- Do not claim an ambiguity or question only affects task shape or details to avoid prompting before delivery
-- Never dump open questions or decisions at the end of the conversation (such as trailing bullets or a `Need from you` section) while concluding the turn
-- If the user explicitly asks for a draft despite uncertainty, label it `Draft` and record open questions in the plan file, but actively prompt any decision needed to proceed
+- Restate the objective in the user's terms; check feasibility, what done means, and what must not happen
+- Resolve the gap list through the clarification loop before generating the plan. Do not bypass a required answer by calling it a task-shape or detail-only question
+- Do not deliver a ready plan while required answers are pending. An optional companion offer does not block delivery
+- If the user explicitly asks for a draft despite uncertainty, label it `Draft`, record open questions in the plan file, and actively prompt decisions needed to proceed
+- Never conclude with a passive list of questions or a `Need from you` section
 
 ### 3. See From Every Angle
 
@@ -656,7 +688,18 @@ For any other domain, define that domain's quality bar explicitly and enforce it
 - If the file cannot be written, use the in-session delivery fallback
 - With a saved file, print the terminal briefing and path
 - If the plan deserves adversarial review before build, say so in plain language — no skill names
-- Ensure all questions and decisions were resolved or actively prompted before delivery; never conclude by dumping passive questions at the end of the conversation
+- Ensure required answers were resolved before ready/final delivery; keep unanswered blockers in `Draft`; never conclude by dumping passive questions at the end of the conversation
+
+### Completion: Choose the Next Action
+
+- Finish and verify the current deliverable first; make the result and its location available before asking about follow-on work. Keep artifact readiness separate from the next-action choice: an unanswered suggestion does not reopen completed work, and a blocked job is not complete
+- Check the result, current project stage, remaining risks, and prior user instructions. Recommend the next useful action from the local routing guidance below; skip irrelevant stages and prefer stopping when no useful work remains
+- Use an available interactive question tool to offer one concise next-action choice. Put the best recommendation first, explain why it fits this result, and include a stop/pause choice. Always allow a free-text note or custom direction, including work outside the 360 flow; never force the user into a sibling skill
+- If interactive tools are unavailable, offer equivalent numbered choices with the recommendation, rationale, and explicit custom-note option in chat. This completion prompt is separate from the deliverable briefing; skill names are allowed here, and it is not a passive list of unresolved task questions
+- Reuse an already explicit next-step instruction instead of asking again; continue work it authorizes. Otherwise wait for the user's choice before starting follow-on work. Silence, a preselected recommendation, and elapsed time are not authorization. An explicit stop or request for no suggestions suppresses the prompt
+- When the user chooses, follow that direction and clarify only missing information needed for it. Discover and load a selected skill through the host's supported mechanism; do not assume it is installed or install it automatically. If unavailable, explain and offer an equivalent action. Carry forward artifact paths, decisions, verification, remaining risks, and session consent without restarting intake
+
+Local routing: Recommend `360-faculty` when tailoring or expertise would materially improve the prepared plan; otherwise recommend `360-expert-review`. Honor an explicit instruction to execute the supplied plan without imposing another review.
 
 ## Output Format
 
@@ -768,15 +811,19 @@ Issues found
 - A new artifact is Features to add. A change to an existing artifact, feature, or document is Updates to existing. Never mix them
 - Confidence: `proven` evidence in hand; `likely` strong reason; `possible` suspected; `uncertain` hypothesis. Never numbers
 - No phases, tasks, MoSCoW, status tables, handover, or skill names
-- Never append open questions, design choices, or trailing bullet lists at the end of the conversation (no `Need from you` dump). Actively prompt every question with concrete choices or ask for a note before concluding
+- Never append open questions, design choices, or trailing bullet lists at the end of the conversation (no `Need from you` dump). Use the clarification loop for every required question before concluding
 
 ## Quality Gate
+
+- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
 
 The plan is ready only when every answer is yes:
 
 - The objective is clear and confirmed, or the output is explicitly marked `Draft`
+- Current project stage and completed work were inspected, or unavailable evidence was explicitly recorded
+- Existing answers were reused; follow-up rounds resolved the goal, scope, outline, and required details without treating silence or recommendations as consent
 - No blocking question or decision was skipped
-- Every question, ambiguity, and decision was actively prompted with concrete choices or an option to leave a note before completing, never dumped as trailing bullets at the end of the turn
+- Every question, ambiguity, and decision was actively prompted through the evidence-grounded interactive clarification loop with recommendations and a free-text note option before completing, never dumped as trailing bullets at the end of the turn
 - No invented technical details were presented as facts
 - Every assumption is explicit and falsifiable
 - Every task has what, how, where, done when, dependencies, skills, effort, priority, and parallel markings
@@ -800,7 +847,7 @@ Source: skills/360-execute/SKILL.md
 ---
 name: 360-execute
 description: Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and brief the user in chat. Use when a plan exists and work must begin, or when resuming a partial execution.
-version: 2.0.0
+version: 2.1.0
 ---
 
 # 360 Execute
@@ -902,6 +949,17 @@ Before declaring completion, walk the ledger top to bottom:
 - Write the execution report into the same ledger file
 - With a saved file, print the terminal briefing and path
 
+### Completion: Choose the Next Action
+
+- Finish and verify the current deliverable first; make the result and its location available before asking about follow-on work. Keep artifact readiness separate from the next-action choice: an unanswered suggestion does not reopen completed work, and a blocked job is not complete
+- Check the result, current project stage, remaining risks, and prior user instructions. Recommend the next useful action from the local routing guidance below; skip irrelevant stages and prefer stopping when no useful work remains
+- Use an available interactive question tool to offer one concise next-action choice. Put the best recommendation first, explain why it fits this result, and include a stop/pause choice. Always allow a free-text note or custom direction, including work outside the 360 flow; never force the user into a sibling skill
+- If interactive tools are unavailable, offer equivalent numbered choices with the recommendation, rationale, and explicit custom-note option in chat. This completion prompt is separate from the deliverable briefing; skill names are allowed here, and it is not a passive list of unresolved task questions
+- Reuse an already explicit next-step instruction instead of asking again; continue work it authorizes. Otherwise wait for the user's choice before starting follow-on work. Silence, a preselected recommendation, and elapsed time are not authorization. An explicit stop or request for no suggestions suppresses the prompt
+- When the user chooses, follow that direction and clarify only missing information needed for it. Discover and load a selected skill through the host's supported mechanism; do not assume it is installed or install it automatically. If unavailable, explain and offer an equivalent action. Carry forward artifact paths, decisions, verification, remaining risks, and session consent without restarting intake
+
+Local routing: Recommend `360-backend-audit` after significant backend work, or `360-optimize` when working code has a relevant performance or weight concern. For other completed work, recommend a concrete domain-appropriate follow-up or stopping; do not invent backend work to fit the flow.
+
 ## Output Format
 
 ### Work file
@@ -945,6 +1003,8 @@ Issues found
 
 ## Quality Gate
 
+- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
+
 Execution is complete only when every answer is yes:
 
 - Every task in the plan appears in the ledger file with a final status — zero unaccounted items
@@ -971,7 +1031,7 @@ Source: skills/360-expert-review/SKILL.md
 ---
 name: 360-expert-review
 description: Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage.
-version: 3.1.0
+version: 3.3.0
 ---
 
 # 360 Expert Review
@@ -994,7 +1054,7 @@ Prefer a file for the full deliverable and a short chat briefing; use the Delive
 - Review the plan the way a senior team would: user impact, reliability, security, operations, and domain correctness
 - Attack it hard enough that only the strongest version survives
 - Finalize into the existing plan file. Do not replace tasks with a narrative essay
-- Prompt questions with concrete choices or a request for a note before finishing; never dump trailing questions at the end of the conversation
+- Ground questions in project evidence; provide recommended choices and a free-text note option before finishing; never dump trailing questions at the end of the conversation
 - Preserve a recoverable record using the Delivery rules below
 
 ## Workflow
@@ -1015,9 +1075,15 @@ Prefer a recoverable file when supported, using the existing path or the default
 
 ### 1. Understand the Project First
 
-- Identify the real problem, not just the requested task
-- Identify users, stakeholders, constraints, dependencies, and what must not break
-- Ask questions until the plan can be judged without guessing. Present questions with concrete choices (highlighting recommendations) or ask to leave a note; use interactive prompt tools (such as `ask_question`) when available
+- Before asking task questions, inspect the available project context: instructions, existing plans and decisions, relevant artifacts or implementation, recent changes, verification results, and any execution ledger. Establish the current stage and what is done, pending, or blocked; cite evidence and distinguish verified state from claims. If nothing exists yet, record that; if access is unavailable, state the gap and ask only for the missing context that changes the work
+- Reuse answers already supplied by the user or established by current evidence. Do not ask generic intake questions, ask the user to rediscover accessible facts, or reopen settled decisions without new conflicting evidence
+- Build a short gap list covering the goal, success measures, scope boundaries, high-level outline, constraints, dependencies, and details needed to execute or judge the plan without guessing. Resolve discoverable facts first; ask the user only about remaining decisions, contradictions, or unavailable facts
+- Use the host's available interactive question tool for every user question. Offer small, focused rounds of one to three questions; for each decision, give concrete options, put the best supported recommendation first, and briefly explain its evidence and trade-off. Always allow a free-text note or custom answer alongside the options. For missing facts, request a note and recommend what information to include; do not invent an answer or a recommendation unsupported by evidence
+- If interactive tools are unavailable, present the same numbered choices, recommendation with rationale, and explicit free-text note option in chat, then wait for the answer
+- After each answer, update the known facts and decisions, inspect newly relevant evidence, and ask the next unresolved questions. Continue until the goal, scope, outline, and required details are clear; do not stop after a fixed questionnaire or repeat answered questions. Re-enter this loop if later planning or review exposes a new gap
+- Treat a recommendation, preselected option, silence, or elapsed time as unanswered. Continue independent inspection while waiting, but do not decide dependent work or claim readiness. Preserve explicit user deferrals or delegated choices with their limits; keep unresolved blockers in `Draft`
+- Summarize the resulting understanding and record evidence, current stage, completed work, decisions, and remaining uncertainty within the existing context, assumptions, or review sections. Ask for confirmation only where the user's answers and evidence have not already settled the issue; stop questioning when a fresh executor or reviewer can proceed without material guessing
+- Compare the supplied plan with the observed project stage and completed work before judging it. Surface stale assumptions, duplicated completed tasks, and conflicts with existing decisions; preserve valid task IDs and progress records
 
 ### 2. Review Through Expert Lenses
 
@@ -1073,7 +1139,7 @@ Switch to hostile critic. Ask:
 - What cannot be detected, reproduced, or reversed?
 - What can be simpler?
 
-Fix actionable findings, then recheck the affected risks. Stop when applicable acceptance checks pass and no unresolved high-severity blocker remains. If evidence or a user decision is unavailable, record a concrete blocker and stop that review line; do not loop indefinitely or claim finality. When a decision, design trade-off, or ambiguity requires user input (even for task-level shapes or non-blocking details), actively prompt the user with concrete choices or ask to leave a note before finishing; do not dump questions as trailing chat bullets. Mark non-applicable checks with a reason.
+Fix actionable findings, then recheck the affected risks. Stop when applicable acceptance checks pass and no unresolved high-severity blocker remains. If evidence or a user decision is unavailable, record a concrete blocker and stop that review line; do not loop indefinitely or claim finality. When a decision, design trade-off, or ambiguity requires user input (even for task-level shapes or non-blocking details), return to the clarification loop and resolve the required input before finalizing; do not dump questions as trailing chat bullets. Mark non-applicable checks with a reason.
 
 ### 8. Write the Final Plan
 
@@ -1084,7 +1150,18 @@ Fix actionable findings, then recheck the affected risks. Stop when applicable a
 - Include the executor handover in the chosen delivery format
 - If the file cannot be written, use the in-session delivery fallback
 - With a saved file, print the terminal briefing and path
-- Ensure all questions and decisions were resolved or actively prompted before delivery; never conclude by dumping passive questions at the end of the conversation
+- Ensure required answers were resolved before ready/final delivery; keep unanswered blockers in `Draft`; never conclude by dumping passive questions at the end of the conversation
+
+### Completion: Choose the Next Action
+
+- Finish and verify the current deliverable first; make the result and its location available before asking about follow-on work. Keep artifact readiness separate from the next-action choice: an unanswered suggestion does not reopen completed work, and a blocked job is not complete
+- Check the result, current project stage, remaining risks, and prior user instructions. Recommend the next useful action from the local routing guidance below; skip irrelevant stages and prefer stopping when no useful work remains
+- Use an available interactive question tool to offer one concise next-action choice. Put the best recommendation first, explain why it fits this result, and include a stop/pause choice. Always allow a free-text note or custom direction, including work outside the 360 flow; never force the user into a sibling skill
+- If interactive tools are unavailable, offer equivalent numbered choices with the recommendation, rationale, and explicit custom-note option in chat. This completion prompt is separate from the deliverable briefing; skill names are allowed here, and it is not a passive list of unresolved task questions
+- Reuse an already explicit next-step instruction instead of asking again; continue work it authorizes. Otherwise wait for the user's choice before starting follow-on work. Silence, a preselected recommendation, and elapsed time are not authorization. An explicit stop or request for no suggestions suppresses the prompt
+- When the user chooses, follow that direction and clarify only missing information needed for it. Discover and load a selected skill through the host's supported mechanism; do not assume it is installed or install it automatically. If unavailable, explain and offer an equivalent action. Carry forward artifact paths, decisions, verification, remaining risks, and session consent without restarting intake
+
+Local routing: Recommend `360-execute` for a finalized executable plan. For a blocked or incomplete review, offer resolution of the concrete blocker or `360-blueprint` for substantial replanning; do not present execution as ready.
 
 ## Output Format
 
@@ -1145,13 +1222,17 @@ Remaining risks
 - A new artifact is Features to add. A change to an existing artifact, feature, or document is Updates to existing. Never mix them
 - Confidence: `proven` evidence in hand; `likely` strong reason; `possible` suspected; `uncertain` hypothesis. Never numbers. Never say proven without evidence
 - No phases, tasks, skill names, or review-essay dump
-- Never append open questions, design choices, or trailing bullet lists at the end of the conversation (no `Need from you` dump). Actively prompt every question with concrete choices or ask for a note before concluding
+- Never append open questions, design choices, or trailing bullet lists at the end of the conversation (no `Need from you` dump). Use the clarification loop for every required question before concluding
 
 ## Quality Gate
+
+- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
 
 The plan is final only when every applicable answer is yes (record a reason for each non-applicable item):
 
 - Real user need understood and served
+- Current project stage and completed work were inspected, or unavailable evidence was explicitly recorded
+- Existing answers were reused; follow-up rounds resolved the goal, scope, outline, and required details without treating silence or recommendations as consent
 - The right expert lenses were applied
 - Every important scenario and effect was mapped
 - Every risk has a countermeasure
@@ -1161,7 +1242,7 @@ The plan is final only when every applicable answer is yes (record a reason for 
 - Testing matches the risk
 - Release and rollback are safe
 - The plan survived hostile review
-- Every blocker, ambiguity, and decision requiring user input was actively prompted with concrete choices or an option to leave a note before completing, never dumped as trailing bullets at the end of the turn
+- Every blocker, ambiguity, and decision requiring user input was actively prompted through the evidence-grounded interactive clarification loop with recommendations and a free-text note option before completing, never dumped as trailing bullets at the end of the turn
 - Task IDs were preserved or changed with a stated reason
 - New work and updates to existing work are grouped separately
 - The finalized plan preserves its original location where supported, or follows the Delivery fallback
@@ -1178,7 +1259,7 @@ Source: skills/360-faculty/SKILL.md
 ---
 name: 360-faculty
 description: Seat a living, tailored expert team on a plan or task. Use when work must fit this developer's goals, taste, mindset, and strategy, when a plan needs the right expertise chosen for its complexity, depth, and nature, or when a named faculty team must be created, called, or updated. Recommends a short list, asks only the questions that still change the work, polishes immediately, and keeps upgradable memory.
-version: 1.1.0
+version: 1.2.0
 ---
 
 # 360 Faculty
@@ -1422,9 +1503,19 @@ Keep every team short enough to read cold.
 After the last seated faculty:
 
 - Present the session report (Output Format)
-- Offer `360-expert-review` if the plan is ready to be attacked; offer `360-blueprint` if the guidance still needs to become a plan
 - Use the requested handover format or the Delivery default. State whether dossiers and teams were persisted; ask about persistence only when required and not already authorized
 - If the next agent would have to guess the house style, the roster, or any accepted risk, the handover is not finished
+
+### Completion: Choose the Next Action
+
+- Finish and verify the current deliverable first; make the result and its location available before asking about follow-on work. Keep artifact readiness separate from the next-action choice: an unanswered suggestion does not reopen completed work, and a blocked job is not complete
+- Check the result, current project stage, remaining risks, and prior user instructions. Recommend the next useful action from the local routing guidance below; skip irrelevant stages and prefer stopping when no useful work remains
+- Use an available interactive question tool to offer one concise next-action choice. Put the best recommendation first, explain why it fits this result, and include a stop/pause choice. Always allow a free-text note or custom direction, including work outside the 360 flow; never force the user into a sibling skill
+- If interactive tools are unavailable, offer equivalent numbered choices with the recommendation, rationale, and explicit custom-note option in chat. This completion prompt is separate from the deliverable briefing; skill names are allowed here, and it is not a passive list of unresolved task questions
+- Reuse an already explicit next-step instruction instead of asking again; continue work it authorizes. Otherwise wait for the user's choice before starting follow-on work. Silence, a preselected recommendation, and elapsed time are not authorization. An explicit stop or request for no suggestions suppresses the prompt
+- When the user chooses, follow that direction and clarify only missing information needed for it. Discover and load a selected skill through the host's supported mechanism; do not assume it is installed or install it automatically. If unavailable, explain and offer an equivalent action. Carry forward artifact paths, decisions, verification, remaining risks, and session consent without restarting intake
+
+Local routing: Recommend `360-blueprint` when guidance still needs a plan, `360-expert-review` when a prepared plan is ready for review, or resuming the active task after an expertise-only consultation. Apply this at the end of the selected mode, including suggestion-only mode, not after each faculty seat.
 
 ## Output Format
 
@@ -1508,6 +1599,8 @@ After the session:
 ```
 
 ## Quality Gate
+
+- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
 
 The session is finished when every gate applicable to the selected mode passes. In `suggest` mode, finish after the fit assessment, evidence-backed short list, and rationale; seating, plan edits, dossier writes, and team management gates do not apply. State why any other gate is non-applicable.
 
@@ -1723,7 +1816,7 @@ Source: skills/360-optimize/SKILL.md
 ---
 name: 360-optimize
 description: Audit working code for zero-cost speed, weight, and reliability gains — measure first, rank drop-in upgrades and restructures, and report conservative expected effects on this system. Use when existing code must run faster, lighter, or more robustly without changing what it does.
-version: 2.0.0
+version: 2.1.0
 ---
 
 # 360 Optimize
@@ -1873,6 +1966,17 @@ Every admitted gain gets a conservative expected effect. This step is not option
 - Keep new work and updates to existing work in separate lists
 - With a saved file, print the terminal briefing and path
 
+### Completion: Choose the Next Action
+
+- Finish and verify the current deliverable first; make the result and its location available before asking about follow-on work. Keep artifact readiness separate from the next-action choice: an unanswered suggestion does not reopen completed work, and a blocked job is not complete
+- Check the result, current project stage, remaining risks, and prior user instructions. Recommend the next useful action from the local routing guidance below; skip irrelevant stages and prefer stopping when no useful work remains
+- Use an available interactive question tool to offer one concise next-action choice. Put the best recommendation first, explain why it fits this result, and include a stop/pause choice. Always allow a free-text note or custom direction, including work outside the 360 flow; never force the user into a sibling skill
+- If interactive tools are unavailable, offer equivalent numbered choices with the recommendation, rationale, and explicit custom-note option in chat. This completion prompt is separate from the deliverable briefing; skill names are allowed here, and it is not a passive list of unresolved task questions
+- Reuse an already explicit next-step instruction instead of asking again; continue work it authorizes. Otherwise wait for the user's choice before starting follow-on work. Silence, a preselected recommendation, and elapsed time are not authorization. An explicit stop or request for no suggestions suppresses the prompt
+- When the user chooses, follow that direction and clarify only missing information needed for it. Discover and load a selected skill through the host's supported mechanism; do not assume it is installed or install it automatically. If unavailable, explain and offer an equivalent action. Carry forward artifact paths, decisions, verification, remaining risks, and session consent without restarting intake
+
+Local routing: Recommend `360-blueprint` to turn supported findings into scoped work, or `360-execute` when a suitable authorized plan already exists. Recommend stopping if no worthwhile candidates remain; findings alone do not authorize implementation.
+
 ## Output Format
 
 ### Work file
@@ -1935,6 +2039,8 @@ Need from you
 
 ## Quality Gate
 
+- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
+
 The audit is complete only when every answer is yes:
 
 - The contract is written and treated as the floor
@@ -1967,7 +2073,7 @@ Source: skills/360-token-efficiency/SKILL.md
 ---
 name: 360-token-efficiency
 description: Reduce avoidable context and tool-output overhead with capability-aware retrieval, reuse, and verified handovers. Use as an optional, session-approved companion when token cost or context growth matters, with strict preservation of task requirements by default.
-version: 2.0.0
+version: 2.1.0
 ---
 
 # 360 Token Efficiency
@@ -2040,6 +2146,17 @@ No extra report by default. Never invent token counts or an unrun baseline. Dist
 
 For a comparison, use the same task inputs and acceptance criteria, record host/model settings and run conditions, and include loading, summarization, tool discovery, retries, and delegation overhead. Report quality regressions and unavailable metrics. Reserve “validated savings” for actual comparable measurements with passing task checks; a finite test set does not establish universal accuracy. Unmeasured guidance is allowed when clearly labeled. Do not persist learned rules or memory unless separately authorized.
 
+### Completion: Choose the Next Action
+
+- Finish and verify the current deliverable first; make the result and its location available before asking about follow-on work. Keep artifact readiness separate from the next-action choice: an unanswered suggestion does not reopen completed work, and a blocked job is not complete
+- Check the result, current project stage, remaining risks, and prior user instructions. Recommend the next useful action from the local routing guidance below; skip irrelevant stages and prefer stopping when no useful work remains
+- Use an available interactive question tool to offer one concise next-action choice. Put the best recommendation first, explain why it fits this result, and include a stop/pause choice. Always allow a free-text note or custom direction, including work outside the 360 flow; never force the user into a sibling skill
+- If interactive tools are unavailable, offer equivalent numbered choices with the recommendation, rationale, and explicit custom-note option in chat. This completion prompt is separate from the deliverable briefing; skill names are allowed here, and it is not a passive list of unresolved task questions
+- Reuse an already explicit next-step instruction instead of asking again; continue work it authorizes. Otherwise wait for the user's choice before starting follow-on work. Silence, a preselected recommendation, and elapsed time are not authorization. An explicit stop or request for no suggestions suppresses the prompt
+- When the user chooses, follow that direction and clarify only missing information needed for it. Discover and load a selected skill through the host's supported mechanism; do not assume it is installed or install it automatically. If unavailable, explain and offer an equivalent action. Carry forward artifact paths, decisions, verification, remaining risks, and session consent without restarting intake
+
+Local routing: While accompanying another skill, let the parent own the single completion prompt; do not issue a duplicate or interrupt its work. For a standalone efficiency task, recommend resuming the main task or addressing an evidenced remaining issue, and allow stopping. Never recommend invoking this overlay recursively.
+
 ## Output Format
 
 Default: complete the main task in its requested format, with no efficiency report.
@@ -2056,6 +2173,8 @@ When requested, report:
 Use the six canonical handover fields above when a continuation is needed.
 
 ## Quality Gate
+
+- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
 
 Check every applicable item; record a concrete limitation if one cannot be checked:
 
