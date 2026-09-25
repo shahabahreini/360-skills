@@ -1,6 +1,6 @@
 # Seating Roster
 
-Optional examples. Read only when a task's risks leave a gap in expertise selection. It is a floor, not a ceiling — derive unlisted faculties when the plan's failure modes demand them. Never show it unless the developer asks.
+Optional examples. Read only when a task's risks leave a gap in expertise selection. Derive unlisted faculties when concrete failure modes demand them; combine overlapping lenses and require distinct value from every seat. These are advisory lenses, not validators of facts or operational risk owners. Never show it unless the developer asks.
 
 **Human mind**
 

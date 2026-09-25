@@ -4,8 +4,8 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { generateLlmsFull } from './build-llms-full.mjs';
-import { CONSENT, PLAN_CONTRACT, HANDOVER, DELIVERY } from './lib/contracts.mjs';
-import { frontmatter, markdownLinks, sections } from './lib/markdown.mjs';
+import { CONSENT, PLAN_CONTRACT, HANDOVER, DELIVERY, COMPLETION, COMPLETION_GATE } from './lib/contracts.mjs';
+import { frontmatter, markdownLinks, sections, outsideFences } from './lib/markdown.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const SEMVER = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/;
@@ -54,6 +54,18 @@ export function checkConsistency(root = ROOT) {
       const workflow = parts.find(p => p.title === 'Workflow')?.body ?? '';
       if (name !== '360-token-efficiency' && !workflow.startsWith(CONSENT)) report('Workflow must begin with the shared session consent entry');
       if (name !== '360-token-efficiency' && !workflow.includes(DELIVERY)) report('missing portable Delivery rules');
+      const completionHeading = '### Completion: Choose the Next Action';
+      const completionHeadings = outsideFences(text).split('\n').filter(line => line === completionHeading);
+      if (completionHeadings.length !== 1) report('expected exactly one Completion block');
+      const completionAt = workflow.indexOf(COMPLETION);
+      if (completionAt < 0) report('missing or changed shared Completion block inside Workflow');
+      const routes = [...workflow.matchAll(/^Local routing: (.+)$/gm)];
+      if (routes.length !== 1 || !routes[0][1].trim()) report('Workflow must include one nonempty local routing paragraph');
+      // Canonical completion plus local guidance must end Workflow, outside fences.
+      const tail = completionAt < 0 ? '' : workflow.slice(completionAt + COMPLETION.length).trim();
+      if (completionAt >= 0 && !/^Local routing: \S[^\n]*(?:\n(?!#|Local routing:)[^\n]+)*$/.test(tail)) report('Completion and local routing must be the final Workflow step');
+      const gate = parts.find(p => p.title === 'Quality Gate')?.body ?? '';
+      if (!gate.split('\n').includes(COMPLETION_GATE)) report('missing or changed Completion Quality Gate item');
       const output = parts[4]?.body ?? '';
       // Known family members and explicit plan producers/consumers must carry their own contract.
       const usesPlan = name !== '360-token-efficiency' && (/\bplan\b/i.test(output) || /\bplan\b/i.test(fm?.description ?? ''));
@@ -166,7 +178,10 @@ export function checkConsistency(root = ROOT) {
   for (const [source, items] of [['README.md index', rows], ['README.md routing', routes], ['llms.txt', entries]]) {
     for (const name of items.keys()) if (!skills.has(name)) fail(`${source}: registered non-public or nonexistent skill ${name}`);
   }
-  if (!read('AGENTS.md').includes(CONSENT)) fail('AGENTS.md: shared consent entry missing or drifted');
+  const contributors = outsideFences(read('AGENTS.md'));
+  for (const [label, contract] of [['shared consent entry', CONSENT], ['portable Delivery rules', DELIVERY], ['shared Completion block', COMPLETION], ['Completion Quality Gate item', COMPLETION_GATE]]) {
+    if (!contributors.includes(contract)) fail(`AGENTS.md: ${label} missing or drifted`);
+  }
   const compiled = read('llms-full.txt');
   try {
     if (compiled !== generateLlmsFull(root)) fail('llms-full.txt: out of sync; run node scripts/build-llms-full.mjs');

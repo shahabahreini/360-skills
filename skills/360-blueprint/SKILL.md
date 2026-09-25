@@ -1,18 +1,14 @@
 ---
 name: 360-blueprint
 description: Create an executable plan from a new objective with explicit tasks, constraints, and verification. Use when a goal exists but the path is unclear, or the request is "plan this".
-version: 2.3.0
+version: 2.4.0
 ---
 
 # 360 Blueprint
 
 ## Purpose
 
-Run this skill when a plan must be created from scratch. Turn an objective into an executable plan with explicit assumptions, constraints, and risks.
-
-Prefer a file for the full deliverable and a short chat briefing; use the Delivery rules below.
-
-This skill creates plans. To review and finalize one, use `360-expert-review`.
+Turn a new objective into an executable plan with explicit assumptions, constraints, risks and acceptance checks.
 
 ## When to Use
 
@@ -23,10 +19,7 @@ This skill creates plans. To review and finalize one, use `360-expert-review`.
 
 ## Core Principle
 
-- A plan is finished when a fresh executor can act without guessing, and every task serves a real objective
-- Begin at the end. Think from first principles. Design out failure. Prefer the simplest plan that fully works
-- Ground questions in project evidence; provide recommended choices and a free-text note option before finishing; never dump trailing questions at the end of the conversation
-- Preserve a recoverable record using the Delivery rules below
+Resolve decisions that change success; make routine choices from evidence.
 
 ## Workflow
 
@@ -44,26 +37,25 @@ Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`.
 
 Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
 
+Use observable preservation and acceptance checks. Structural validation cannot prove behavior or accuracy; evaluate realistic consent, capability, recovery, and handoff scenarios separately. Document unavailable telemetry and regressions; do not infer universal accuracy or token savings from finite tests.
+
 ### 1. Ground the Objective in the Current Project
 
-- Before asking task questions, inspect the available project context: instructions, existing plans and decisions, relevant artifacts or implementation, recent changes, verification results, and any execution ledger. Establish the current stage and what is done, pending, or blocked; cite evidence and distinguish verified state from claims. If nothing exists yet, record that; if access is unavailable, state the gap and ask only for the missing context that changes the work
-- Reuse answers already supplied by the user or established by current evidence. Do not ask generic intake questions, ask the user to rediscover accessible facts, or reopen settled decisions without new conflicting evidence
-- Build a short gap list covering the goal, success measures, scope boundaries, high-level outline, constraints, dependencies, and details needed to execute or judge the plan without guessing. Resolve discoverable facts first; ask the user only about remaining decisions, contradictions, or unavailable facts
-- Use the host's available interactive question tool for every user question. Offer small, focused rounds of one to three questions; for each decision, give concrete options, put the best supported recommendation first, and briefly explain its evidence and trade-off. Always allow a free-text note or custom answer alongside the options. For missing facts, request a note and recommend what information to include; do not invent an answer or a recommendation unsupported by evidence
-- If interactive tools are unavailable, present the same numbered choices, recommendation with rationale, and explicit free-text note option in chat, then wait for the answer
-- After each answer, update the known facts and decisions, inspect newly relevant evidence, and ask the next unresolved questions. Continue until the goal, scope, outline, and required details are clear; do not stop after a fixed questionnaire or repeat answered questions. Re-enter this loop if later planning or review exposes a new gap
-- Treat a recommendation, preselected option, silence, or elapsed time as unanswered. Continue independent inspection while waiting, but do not decide dependent work or claim readiness. Preserve explicit user deferrals or delegated choices with their limits; keep unresolved blockers in `Draft`
-- Summarize the resulting understanding and record evidence, current stage, completed work, decisions, and remaining uncertainty within the existing context, assumptions, or review sections. Ask for confirmation only where the user's answers and evidence have not already settled the issue; stop questioning when a fresh executor or reviewer can proceed without material guessing
+- Inspect available instructions, plans, decisions, relevant artifacts, recent changes, verification and any execution ledger. Establish the current stage and done/pending/blocked work; cite sources and distinguish observed facts from claims. Record unavailable evidence
+- Reuse current evidence and user answers. Resolve discoverable facts by inspection; do not ask the user to rediscover them
+- Separate remaining gaps: material user decisions change the outcome, scope, acceptance criteria, significant cost or irreversible effects; reversible implementation defaults stay within established intent and conventions. Choose supported defaults, record the reason and revisit condition, and proceed. Do not present a default or inference as a fact
+- Ask only for unresolved material decisions, conflicting instructions, or inaccessible facts needed to judge success. Use the available interactive question tool in focused rounds of one to three questions, with the best supported recommendation, its trade-off, and a free-text/custom option. For missing facts, request the needed evidence without inventing it. If tools are unavailable, offer equivalent numbered choices and notes in chat
+- Unanswered required questions block dependent planning and readiness, not independent inspection. Silence, a recommendation, a preselected option or elapsed time is not an answer. Honor explicit delegation or deferral within its limits
+- After answers, update the existing context, assumptions or review sections and inspect newly relevant evidence. Stop questioning when material choices are settled; reopen only on new conflicting evidence
 
-### 2. Confirm Before Generating
+### 2. Establish Readiness
 
-- Restate the objective in the user's terms; check feasibility, what done means, and what must not happen
-- Resolve the gap list through the clarification loop before generating the plan. Do not bypass a required answer by calling it a task-shape or detail-only question
-- Do not deliver a ready plan while required answers are pending. An optional companion offer does not block delivery
-- If the user explicitly asks for a draft despite uncertainty, label it `Draft`, record open questions in the plan file, and actively prompt decisions needed to proceed
-- Never conclude with a passive list of questions or a `Need from you` section
+- Restate the intended outcome, observable success and what must not happen
+- Keep outcome-changing unanswered choices in `Draft`, with the required decision and affected tasks; do not relabel a blocker as a default
+- A complete plan with supported defaults may be `Ready for review`. An optional companion offer does not block it
+- If a draft is requested despite blockers, deliver it honestly and actively prompt the needed decisions
 
-### 3. See From Every Angle
+### 3. Examine Relevant Risks
 
 - First principles: what is known, what is assumed, what is unknown
 - Inversion: what would guarantee failure
@@ -85,26 +77,25 @@ Prefer a recoverable file when supported, using the existing path or the default
 - Every task states what, how, where, and done when
 - Mark effort, priority, and parallelization
 - Define the cut line
-- Do not invent stack choices, vendors, metrics, or architecture details. If a choice is required but unknown, write it as an open question
+- Use established stack choices and conventions. Record reversible defaults and falsifiable assumptions with supporting evidence or a pending validation method in `Validated by`; keep material unresolved choices as blockers
 - Keep names and terms consistent from start to finish
 - Make the plan self-contained for a fresh executor
 
 ### 6. Enforce Quality by Domain
 
-Apply the standards of the domain the plan touches.
+Turn quality goals into task-specific acceptance checks.
 
-When the plan produces code: maintainable, scalable, auditable, no duplication, no weak logic, no outdated practices.
-
-When the plan produces documentation: update before creating, one source of truth, clean structure, easy to find.
-
-For any other domain, define that domain's quality bar explicitly and enforce it.
+- Code: identify required outputs, boundaries, failure behavior and compatibility; add performance or scaling checks only for relevant workloads and constraints
+- Documentation: identify the intended reader action, facts and links to preserve, and how the result will be checked; update existing material when it serves that need
+- Other domains: state observable success and likely or severe plausible failure checks
+- Reuse existing structure where it fits. Require a concrete maintenance or correctness benefit before adding abstraction or consolidating superficially similar logic
 
 ### 7. Stress-Test Before Delivery
 
 - Walk the plan end to end
 - Run a premortem
 - Falsify assumptions
-- Check whether two executors could read the same step two different ways
+- Check whether different readings change success or safety; permit equivalent reversible implementations
 - Verify every objective maps to tasks and every task serves an objective
 
 ### 8. Deliver in Two Channels
@@ -249,16 +240,16 @@ The plan is ready only when every answer is yes:
 - Current project stage and completed work were inspected, or unavailable evidence was explicitly recorded
 - Existing answers were reused; follow-up rounds resolved the goal, scope, outline, and required details without treating silence or recommendations as consent
 - No blocking question or decision was skipped
-- Every question, ambiguity, and decision was actively prompted through the evidence-grounded interactive clarification loop with recommendations and a free-text note option before completing, never dumped as trailing bullets at the end of the turn
+- Material unresolved decisions were actively prompted with evidence, recommendations and a free-text option; reversible defaults have a reason and revisit condition
 - No invented technical details were presented as facts
 - Every assumption is explicit and falsifiable
 - Every task has what, how, where, done when, dependencies, skills, effort, priority, and parallel markings
 - The cut line is defined
 - Every objective maps to tasks and no orphan tasks remain
 - New work and updates to existing work are grouped separately
-- A fresh executor can act without guessing
+- A fresh executor can distinguish requirements, defaults, assumptions and unresolved blockers
 - Checkpoints and replanning triggers exist
-- The plan survived a premortem
+- The premortem covered relevant requirements, likely failures and severe plausible failures; inspection limits are stated
 - The deliverable follows the template and accurately states its location or in-session status
 - The briefing omits empty sections and uses proven/likely/possible/uncertain, never numbers
 

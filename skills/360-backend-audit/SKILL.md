@@ -1,18 +1,14 @@
 ---
 name: 360-backend-audit
 description: Deep-audit backend code, write the full report to a file, and brief the user in chat with bugs, updates, and dead weight. Use before or after significant backend work, or when inheriting, refactoring, or handing off services.
-version: 2.1.0
+version: 2.2.0
 ---
 
 # 360 Backend Audit
 
 ## Purpose
 
-Run this skill on backend code: APIs, services, business logic, data access layers, integrations, background jobs, and pipelines. Identify correctness, structure, performance, and observability risks with evidence and actionable recommendations.
-
-Technology-agnostic: audit logic, structure, and data flow, not stack syntax.
-
-Prefer a file for the full deliverable and a short chat briefing; use the Delivery rules below.
+Audit APIs, services, business logic, data access, integrations and jobs for correctness, structure, performance and observability risks. Produce evidence-backed recommendations within an explicit inspection boundary.
 
 ## When to Use
 
@@ -24,11 +20,7 @@ Prefer a file for the full deliverable and a short chat briefing; use the Delive
 
 ## Core Principle
 
-Working backend code is not finished code. Audit what exists that should not, what exists twice, what is subtly wrong, what may fail under load, what cannot be diagnosed when it breaks, and what the next engineer needs to continue safely.
-
-Functionality, reliability, and accuracy are untouchable. A fast bug is still a bug.
-
-Preserve a recoverable audit using the Delivery rules below.
+Judge observed behavior against the intended contract.
 
 ## Workflow
 
@@ -46,24 +38,26 @@ Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`.
 
 Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
 
+Use observable preservation and acceptance checks. Structural validation cannot prove behavior or accuracy; evaluate realistic consent, capability, recovery, and handoff scenarios separately. Document unavailable telemetry and regressions; do not infer universal accuracy or token savings from finite tests.
+
 ### 1. Map the Audit Scope
 
 Read-only by default: do not change application code, dependencies, configuration, or observability unless implementation is explicitly requested. Writing the audit artifact is allowed. Use non-mutating inspection and authorized isolated tests; record checks that cannot safely run.
 
-- Establish what the code does: purpose, inputs, outputs, side effects
+- Establish expected behavior from requirements, public contracts, tests and current user decisions; distinguish these sources from what the implementation actually does
 - Identify callers, dependencies, state changes, and trust boundaries
-- Treat current behavior as the baseline that must survive the audit
-- If behavior is unclear, mark it as a question, not a deletion
+- Record observed inputs, outputs and side effects as evidence, not proof of correctness. Preserve intended behavior when recommending changes; a defect need not be preserved
+- If the intended contract is unclear, state competing interpretations and the next useful check
 
 ### 2. Hunt Dead Weight
 
-Find and document, with evidence only: dead code, redundant code, incomplete logic, swallowed failures, stale flags, orphaned config, unused paths.
+Inspect suspected dead code, redundancy, incomplete logic, swallowed failures, stale flags, orphaned configuration and unused paths. Before recommending deletion, check indirect callers, registration, reflection or generated entrypoints, configuration and external consumers where relevant. State the search boundary. No direct callers or an inconclusive search means uncertain use, not proven dead code.
 
 ### 3. Verify Code Accuracy
 
 Scrutinize business logic, data integrity, numeric accuracy, concurrency, trust boundaries, and failure semantics.
 
-If you cannot prove a bug exists, mark it `possible` or `uncertain` with reasoning. Never say `proven` without evidence.
+For each finding, record the triggering input/state, expected versus observed behavior, consequence, source or reproduction evidence, confidence, and inspection boundary. Use `likely` for strong indirect evidence, `possible` or `uncertain` for hypotheses, and name the next check. A local reproduction proves only that local case; production impact needs evidence of reachability and relevant conditions.
 
 ### 4. Recommend Structural Improvements
 
@@ -88,7 +82,7 @@ Proposed observability changes should be additive and non-breaking; do not imple
 
 ### 7. Record Verification and Gaps
 
-- Report results of existing tests when they can run within scope; otherwise state the limitation
+- Cover relevant requirements, likely failures and severe plausible failures within scope. Report authorized tests and their results; state uninspected paths, unavailable access and the checks needed to close gaps
 - Where coverage is thin, propose missing tests first: boundary, failure, and concurrency cases
 - Classify every recommendation as safe now, needs tests first, or needs human decision
 - Deliver recommendations as an audit; execute only separately requested implementation within its authorized scope
@@ -126,7 +120,7 @@ Local routing: Recommend planning actionable correctness or reliability fixes wi
 8. Implementation plan — grouped as New vs Updates to existing
 9. Handover — Context · Decisions · State (done / pending / blocked) · Remaining tasks (what, how, where) · Verification · Risks and how to detect them early
 
-Every finding needs evidence and an inspection boundary. Call an area clean only within verified coverage; mark uninspected areas explicitly. Implementation tasks use the Shared Plan Contract. Label all proposed changes as recommendations, not completed fixes.
+Keep the finding details from Workflow 3 inside the existing report sections. Call an area clean only within verified coverage; mark uninspected areas explicitly. A completed bounded audit does not verify proposed fixes or unavailable production behavior. Implementation tasks use the Shared Plan Contract. Label all proposed changes as recommendations, not completed fixes.
 
 ### Terminal briefing
 
@@ -162,16 +156,17 @@ Need from you
 
 The audit is complete only when every answer is yes:
 
-- Every finding is backed by evidence
-- Clean areas are stated as clean
-- Accuracy risks are verified or marked possible/uncertain
+- Every finding distinguishes expected and observed behavior, trigger, consequence, evidence or hypothesis, confidence and inspection boundary
+- Clean claims are restricted to inspected coverage; unavailable checks remain limitations
+- Deletion recommendations account for indirect, registered, configured and external use, or remain uncertain
+- Local reproductions are not overstated as production impact
 - No recommendation trades away functionality, reliability, accuracy, or precision without an explicit trade-off
 - Unification is recommended only where logic is genuinely the same
 - Library recommendations include maintenance, compatibility, and weight evidence or explicit verification gaps
 - Performance claims are measured when measurement is possible, and labeled as risks when it is not
 - The observability plan integrates without breaking behavior
 - New work and updates to existing work are grouped separately
-- The handover lets the next agent act with zero guessing
+- The handover preserves evidence, limits and the next useful checks
 - The deliverable is saved at the stated path, or honestly labeled in-session only
 - The briefing omits empty sections and uses proven/likely/possible/uncertain, never numbers
 

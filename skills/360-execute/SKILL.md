@@ -1,33 +1,25 @@
 ---
 name: 360-execute
 description: Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and brief the user in chat. Use when a plan exists and work must begin, or when resuming a partial execution.
-version: 2.1.0
+version: 2.2.0
 ---
 
 # 360 Execute
 
 ## Purpose
 
-Run this skill when a finalized plan must be executed — completely, faithfully, and verifiably. Everything on the plan gets done, QCed against its own acceptance check, and accounted for.
-
-This skill executes plans. To create one, use `360-blueprint`. To stress-test and finalize one, use `360-expert-review`. To audit the built result afterward, use `360-backend-audit`.
-
-Prefer a file for the full deliverable and a short chat briefing; use the Delivery rules below.
+Execute an authorized plan against its acceptance checks and keep a recoverable coverage ledger of results, deviations and unfinished work.
 
 ## When to Use
 
 - A plan exists and work must begin — any domain, any scale
 - Any request of the form "implement this plan", "build this", "execute this"
-- Resuming a partially executed plan — the ledger file is the source of truth
+- Resuming a partially executed plan by reconciling its ledger with current evidence
 - Not for creating plans (`360-blueprint`) or reviewing drafts (`360-expert-review`)
 
 ## Core Principle
 
-- The plan is the contract — execute what it says, not what feels close enough
-- Coverage is tracked, not trusted — a persisted ledger records every task and its verdict
-- Done is a verdict with evidence — a task is complete when its acceptance check passes
-- Deviations surface, never absorb — reality overrides the plan only through an explicit decision
-- Preserve a recoverable record using the Delivery rules below
+Current evidence establishes progress; the ledger records it.
 
 ## Workflow
 
@@ -45,6 +37,8 @@ Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`.
 
 Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
 
+Use observable preservation and acceptance checks. Structural validation cannot prove behavior or accuracy; evaluate realistic consent, capability, recovery, and handoff scenarios separately. Document unavailable telemetry and regressions; do not infer universal accuracy or token savings from finite tests.
+
 ### 1. Load the Plan Completely
 
 Never execute a plan you have not fully read.
@@ -58,37 +52,39 @@ Never automatically clear history. Use context management only when the host sup
 
 ### 2. Persist the Coverage Ledger
 
-The ledger is the spine of execution and the source of truth for progress.
+Reconcile the plan, ledger, actual artifacts or external state, and relevant verification before resuming. A ledger verdict is a recorded claim until current evidence supports it.
 
-- Write it to a file and keep it current after every task
-- Reuse the existing path if known; otherwise `plans/<short-slug>-execution.md`; create the folder if needed; ask once if ambiguous
+- Write it to a file and keep it current after each task and significant partial effect
+- Reopen stale or unsupported verified rows; record what changed and invalidate affected verification, including dependent results. Recheck only the affected acceptance conditions
+- Reuse the existing path if known; otherwise `plans/<short-slug>-execution.md`; create the folder if needed; reuse repository conventions for routine location choices
 - If the file cannot be written, use the in-session delivery fallback
 - One row per task: ID, name, priority, acceptance check, status
 - Statuses: `pending` / `in progress` / `done (verified)` / `blocked` / `dropped (approved)`
-- Nothing counts as done until the ledger says verified
-- A fresh agent must be able to open the file and continue with zero guessing
+- Mark verified only when current acceptance evidence supports it; include source revision or state identifiers when relevant
+- Record remaining uncertainty and the next check so a fresh agent can resume safely
 
 ### 3. Execute in Order
 
 - Follow phase order and task dependencies exactly; honor parallel markers
 - Load declared skills through the supported host mechanism when available. The optional `360-token-efficiency` always follows session consent; a plan listing is not approval. If another declared skill is unavailable, use the self-contained contract and available capabilities; block only tasks that actually require the missing capability
-- Verify each phase checkpoint before advancing to the next phase — a failed checkpoint stops the line
-- Do exactly what the task specifies — no silent extras, no silent shortcuts
+- Verify each phase checkpoint before advancing dependent work. A failure blocks affected descendants; continue independent authorized work where dependencies and parallel markers permit
+- Keep work within the task and change policy
+- Before a non-repeatable or external action, record intent and a recoverable operation identifier or reconciliation method. After interruption, inspect partial effects and external state before retrying. Reuse confirmed results; retry only if absence or safe repeatability is established. If state cannot be determined, block that action and identify the missing check
 
 ### 4. Verify Every Task
 
 - Run the task's "done when" check and record the evidence in the ledger
 - Done means the check passed with evidence — never "looks right", never "should work"
-- If a check cannot be executed, mark the task `blocked` with the reason — never mark it done
-- Sweep for collateral damage after each task: nothing else broke, nothing unrelated changed
+- If an implementation acceptance check cannot run, mark the task `blocked` with the missing evidence. An assessment task may finish with disclosed limits only when its own acceptance criteria permit them; an unknown check never becomes a pass
+- Check affected behavior and the diff after each task; state the inspected boundary and regressions rather than claiming everything else is safe
 
 ### 5. Handle Deviations in the Open
 
 When reality disagrees with the plan — a failed assumption, missing information, a visibly better path:
 
-- Stop that line of work; do not improvise forward
-- Follow the plan's change policy or replanning triggers
-- Surface the deviation to the user with options and a recommendation
+- Classify the departure under the plan's change policy and existing authorization
+- Resolve routine reversible implementation choices within that authority; record the reason and affected checks without asking again
+- Escalate changes to outcome, scope, acceptance criteria, significant cost, irreversible effects or authorization. Stop dependent work and present concrete options; continue independent authorized tasks
 - Never silently absorb new scope, never silently skip a task
 - A `must`-priority task is never dropped without an explicit user decision; `should`/`could` tasks follow the plan's cut line
 
@@ -163,14 +159,15 @@ Execution is complete only when every answer is yes:
 
 - Every task in the plan appears in the ledger file with a final status — zero unaccounted items
 - Every `done (verified)` verdict is backed by evidence from the task's own acceptance check
-- Every phase checkpoint was verified before the next phase began
-- Every deviation was surfaced and resolved through the plan's change policy or a user decision — none silently absorbed
+- Every phase checkpoint passed before its dependent work advanced; independent work respected authorization and dependency/parallel markers
+- Every deviation was recorded and resolved within existing authorization/change policy or an explicit user decision
 - No `must`-priority task was dropped or skipped without explicit user approval
 - Every objective in the plan's traceability maps to verified work
 - Regressions and collateral damage were swept for, and the results are stated
 - Declared skill availability and consent were respected; required unavailable capabilities are explicit blockers
 - Unfinished items are stated honestly — pending, blocked, or dropped, with reasons
-- The ledger file lets the next agent continue with zero guessing
+- The ledger matches current artifacts and verification; stale verdicts and partial actions were reconciled before resumption
+- The next agent can recover evidence, uncertainty and the next check; affected verification was invalidated after relevant changes
 - Delivery honors the requested format and accurately states persistence
 - The briefing omits empty sections and uses proven/likely/possible/uncertain, never numbers
 

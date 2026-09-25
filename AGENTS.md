@@ -51,6 +51,10 @@ Every `SKILL.md` follows this section order:
 - No redundant restrictions. Say a thing once, in the place it matters.
 - Usable by any agent, not just one product's assistant.
 - Prefer concrete checklists and steps over abstract advice.
+- Use one governing idea in Core Principle, operational decisions in Workflow, and observable checks in Quality Gate.
+- Distinguish facts, reversible defaults, assumptions and unknowns. Ask about material decisions; resolve routine choices from evidence and existing authorization.
+- Check relevant requirements, likely failures and severe plausible failures; disclose inspection limits instead of promising exhaustive reliability.
+- An unknown check never passes. A bounded assessment can finish with disclosed limits; implementation requires its acceptance evidence.
 
 ## Family Conventions
 
@@ -100,6 +104,10 @@ Every skill, including future additions, ends its Workflow with the following co
 - If interactive tools are unavailable, offer equivalent numbered choices with the recommendation, rationale, and explicit custom-note option in chat. This completion prompt is separate from the deliverable briefing; skill names are allowed here, and it is not a passive list of unresolved task questions
 - Reuse an already explicit next-step instruction instead of asking again; continue work it authorizes. Otherwise wait for the user's choice before starting follow-on work. Silence, a preselected recommendation, and elapsed time are not authorization. An explicit stop or request for no suggestions suppresses the prompt
 - When the user chooses, follow that direction and clarify only missing information needed for it. Discover and load a selected skill through the host's supported mechanism; do not assume it is installed or install it automatically. If unavailable, explain and offer an equivalent action. Carry forward artifact paths, decisions, verification, remaining risks, and session consent without restarting intake
+
+Use this exact Quality Gate item in each skill:
+
+- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
 
 ## Registering a New Skill
 

@@ -32,3 +32,10 @@ These are manual rule walkthroughs against the written instructions, not live cr
 An executable text check confirmed the shared completion block is identical across all seven skills and AGENTS.md, and all seven quality gates include it. The existing consistency suite checks catalog versions, references, artifact contracts, and compiled documentation; it does not enforce the new completion behavior semantically. Run the standard build, tests, and consistency commands for structural verification.
 
 No live UI portability, agent compliance rate, token savings, or latency measurements were performed. Future host-level evaluation should check that free-text answers remain available, only one prompt appears with a companion, and an unanswered next action never starts new work. No artifact-schema change or plan-readiness regression was found in the walkthrough.
+
+
+## 2026-09-24 structural enforcement and recheck
+
+The validator now enforces the exact shared completion block once per skill, inside and at the end of Workflow with nonempty local routing, plus its matching Quality Gate item. Public and experimental fixtures cover missing, changed, misplaced, duplicate and fenced blocks, missing/empty/misplaced routing, missing/changed/misplaced/fenced gates, and Delivery verification drift. Contributor guidance uses the same constants. The existing token-efficiency completion remains byte-identical and parent-owned.
+
+The logic-revision walkthrough rechecked completed-versus-blocked outcomes, a single parent prompt, stop/custom choices, existing authorization, and complete in-session fallback. See cases C2–C3 and the fallback output in the linked [scenario record](behavioral-scenarios.md#2026-09-24-logic-revision-walkthroughs). Structural checks cannot determine whether routing advice is useful or an agent actually honors consent; those remain behavioral limits.

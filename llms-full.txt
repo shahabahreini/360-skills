@@ -70,12 +70,12 @@ Each skill works individually. Review includes its own minimum plan contract; bl
 
 | Skill | Description | Version |
 |---|---|---|
-| [`360-backend-audit`](skills/360-backend-audit) | Deep-audit backend code, write the full report to a file, and brief the user in chat with bugs, updates, and dead weight. Use before or after significant backend work, or when inheriting, refactoring, or handing off services. | 2.1.0 |
-| [`360-blueprint`](skills/360-blueprint) | Create an executable plan from a new objective with explicit tasks, constraints, and verification. Use when a goal exists but the path is unclear, or the request is "plan this". | 2.3.0 |
-| [`360-execute`](skills/360-execute) | Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and brief the user in chat. Use when a plan exists and work must begin, or when resuming a partial execution. | 2.1.0 |
-| [`360-expert-review`](skills/360-expert-review) | Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage. | 3.3.0 |
-| [`360-faculty`](skills/360-faculty) | Seat a living, tailored expert team on a plan or task. Use when work must fit this developer's goals, taste, mindset, and strategy, when a plan needs the right expertise chosen for its complexity, depth, and nature, or when a named faculty team must be created, called, or updated. Recommends a short list, asks only the questions that still change the work, polishes immediately, and keeps upgradable memory. | 1.2.0 |
-| [`360-optimize`](skills/360-optimize) | Audit working code for zero-cost speed, weight, and reliability gains — measure first, rank drop-in upgrades and restructures, and report conservative expected effects on this system. Use when existing code must run faster, lighter, or more robustly without changing what it does. | 2.1.0 |
+| [`360-backend-audit`](skills/360-backend-audit) | Deep-audit backend code, write the full report to a file, and brief the user in chat with bugs, updates, and dead weight. Use before or after significant backend work, or when inheriting, refactoring, or handing off services. | 2.2.0 |
+| [`360-blueprint`](skills/360-blueprint) | Create an executable plan from a new objective with explicit tasks, constraints, and verification. Use when a goal exists but the path is unclear, or the request is "plan this". | 2.4.0 |
+| [`360-execute`](skills/360-execute) | Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and brief the user in chat. Use when a plan exists and work must begin, or when resuming a partial execution. | 2.2.0 |
+| [`360-expert-review`](skills/360-expert-review) | Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage. | 3.4.0 |
+| [`360-faculty`](skills/360-faculty) | Seat a living, tailored expert team on a plan or task. Use when work must fit this developer's goals, taste, mindset, and strategy, when a plan needs the right expertise chosen for its complexity, depth, and nature, or when a named faculty team must be created, called, or updated. Recommends a short list, asks only the questions that still change the work, polishes immediately, and keeps upgradable memory. | 1.3.0 |
+| [`360-optimize`](skills/360-optimize) | Audit working code for zero-cost speed, weight, and reliability gains — measure first, rank drop-in upgrades and restructures, and report conservative expected effects on this system. Use when existing code must run faster, lighter, or more robustly without changing what it does. | 2.2.0 |
 | [`360-token-efficiency`](skills/360-token-efficiency) | Reduce avoidable context and tool-output overhead with capability-aware retrieval, reuse, and verified handovers. Use as an optional, session-approved companion when token cost or context growth matters, with strict preservation of task requirements by default. | 2.1.0 |
 
 ## Which Skill Do I Need?
@@ -124,13 +124,13 @@ Readiness moves from `Draft` to `Ready for review` to `Reviewed and ready to exe
 
 - **`360-blueprint`** turns a vague goal into a complete, unambiguous plan written directly to a file, briefing the user in chat with key decisions, assumptions, and risks.
 - **`360-faculty`** seats a short list of named experts fitted to this developer and to the plan's own complexity, depth, and nature, tailoring it surgically, remembering what it learns, and saving reusable teams that can be called by name later.
-- **`360-expert-review`** attacks that plan from every expert angle until only the strongest version survives, writing the finalized plan back to the file and briefing the user in chat.
+- **`360-expert-review`** tests that plan against relevant concrete failure cases, writing the finalized plan back to the file and briefing the user in chat.
 - **`360-execute`** builds it, tracking every task in a coverage ledger written to disk, verifying each against its own acceptance check with evidence, and briefing progress in chat.
 - **`360-backend-audit`** audits the resulting backend code for correctness, duplication, performance risks, and observability, writing the full report to a file and briefing findings in chat.
 - **`360-optimize`** audits working code for zero-cost speed, weight, and reliability gains, ranking drop-in upgrades and restructures with conservative expected effects written to a file and briefing highlights in chat.
 - **`360-token-efficiency`** runs alongside the active task with session consent, reducing avoidable overhead while preserving requirements and required checks.
 
-Blueprint and expert review inspect the current project stage and completed work before asking questions. They clarify remaining gaps in interactive rounds with evidence-backed recommendations and a free-text note option, continuing until goals, scope, outline, and required details are clear. When interactive tools are unavailable, they use equivalent choices and notes in chat.
+Blueprint and expert review inspect the current project stage and completed work before asking questions. They clarify remaining gaps in interactive rounds with evidence-backed recommendations and a free-text note option, resolving material decisions while recording supported reversible defaults. When interactive tools are unavailable, they use equivalent choices and notes in chat.
 
 Each skill also works standalone: ask `360-faculty` which expertise a plan needs without seating anyone, skip straight to `360-expert-review` for a plan someone else drafted, point `360-execute` at a plan someone else finalized, run `360-backend-audit` on existing code with no plan involved at all, audit working code for performance and weight with `360-optimize`, or apply `360-token-efficiency` to any task regardless of which other skills are in play.
 
@@ -148,10 +148,14 @@ All skills prefer files where supported, honor explicit output requests, and pro
 
 ## Design Principles
 
-1. **Expertise over templates**: skills simulate senior specialists, not checklists.
-2. **Coverage over speed**: every scenario, every effect, every failure mode.
-3. **Gates over suggestions**: nothing is "final" until it passes an explicit quality gate.
-4. **Simplicity over ceremony**: brief, strong instructions any agent can follow.
+Understand the intended outcome, establish the relevant facts, choose the simplest supported action, and verify the result. When evidence is insufficient, preserve uncertainty and identify the next useful check.
+
+1. **Evidence**: distinguish observed facts, supported defaults, assumptions and unknowns. Expert lenses advise; evidence validates.
+2. **Proportionate coverage**: check relevant requirements, likely failures and severe plausible failures; disclose inspection limits.
+3. **Observable gates**: an unknown check never becomes a pass. A completed assessment with limitations does not verify a proposed implementation.
+4. **Simple decisions and recovery**: resolve routine choices within authorization, ask about material departures, and reconcile current state before resuming or retrying.
+
+These rules reduce reliance on unstated judgment; they cannot guarantee flawless performance from every model. See the [logic review and scenario evidence](docs/validation/skill-logic-review.md).
 
 ## How Agent Skills Work
 
@@ -219,7 +223,7 @@ A portable, version-controlled folder that packages domain expertise and a repea
 Any agent supported by the [skills.sh](https://skills.sh) CLI, including Claude Code, Cursor, Codex, Windsurf, GitHub Copilot, OpenCode, and Gemini CLI.
 
 **Why is it called 360-skills?**
-Because the quality failures that matter most hide in the angles nobody checked. Every skill here is built to examine a problem from all sides before calling it done.
+Because the quality failures that matter most hide in the angles nobody checked. Every skill checks relevant requirements and failure cases, and states the limits of its inspection.
 
 **How do I add a new skill?**
 Read [AGENTS.md](AGENTS.md), create `skills/360-<name>/SKILL.md` following the required structure, then register it in this README's skills table.
@@ -285,6 +289,10 @@ Every `SKILL.md` follows this section order:
 - No redundant restrictions. Say a thing once, in the place it matters.
 - Usable by any agent, not just one product's assistant.
 - Prefer concrete checklists and steps over abstract advice.
+- Use one governing idea in Core Principle, operational decisions in Workflow, and observable checks in Quality Gate.
+- Distinguish facts, reversible defaults, assumptions and unknowns. Ask about material decisions; resolve routine choices from evidence and existing authorization.
+- Check relevant requirements, likely failures and severe plausible failures; disclose inspection limits instead of promising exhaustive reliability.
+- An unknown check never passes. A bounded assessment can finish with disclosed limits; implementation requires its acceptance evidence.
 
 ## Family Conventions
 
@@ -335,6 +343,10 @@ Every skill, including future additions, ends its Workflow with the following co
 - Reuse an already explicit next-step instruction instead of asking again; continue work it authorizes. Otherwise wait for the user's choice before starting follow-on work. Silence, a preselected recommendation, and elapsed time are not authorization. An explicit stop or request for no suggestions suppresses the prompt
 - When the user chooses, follow that direction and clarify only missing information needed for it. Discover and load a selected skill through the host's supported mechanism; do not assume it is installed or install it automatically. If unavailable, explain and offer an equivalent action. Carry forward artifact paths, decisions, verification, remaining risks, and session consent without restarting intake
 
+Use this exact Quality Gate item in each skill:
+
+- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
+
 ## Registering a New Skill
 
 Adding a skill to `skills/` (not `.experimental/`) is not complete until both of these are updated:
@@ -379,6 +391,8 @@ node scripts/check-consistency.mjs
 
 Use Node 20 or later; no dependencies or Python packaging are required. Add validator fixtures for structural changes and realistic behavioral scenarios for instruction changes. Record actual outcomes, unavailable measurements, and regressions. See the [redesign evaluation](docs/validation/token-efficiency-redesign.md) for examples.
 
+Tie each instruction change to a concrete failure scenario and the smallest correction. Preserve output schemas and existing user decisions; keep advisory judgment separate from evidence. Test structural conventions with positive and negative fixtures, then record bounded walkthrough observations separately from expectations. See the [skill logic review](docs/validation/skill-logic-review.md).
+
 ---
 
 ## Skills Catalog
@@ -390,18 +404,14 @@ Source: skills/360-backend-audit/SKILL.md
 ---
 name: 360-backend-audit
 description: Deep-audit backend code, write the full report to a file, and brief the user in chat with bugs, updates, and dead weight. Use before or after significant backend work, or when inheriting, refactoring, or handing off services.
-version: 2.1.0
+version: 2.2.0
 ---
 
 # 360 Backend Audit
 
 ## Purpose
 
-Run this skill on backend code: APIs, services, business logic, data access layers, integrations, background jobs, and pipelines. Identify correctness, structure, performance, and observability risks with evidence and actionable recommendations.
-
-Technology-agnostic: audit logic, structure, and data flow, not stack syntax.
-
-Prefer a file for the full deliverable and a short chat briefing; use the Delivery rules below.
+Audit APIs, services, business logic, data access, integrations and jobs for correctness, structure, performance and observability risks. Produce evidence-backed recommendations within an explicit inspection boundary.
 
 ## When to Use
 
@@ -413,11 +423,7 @@ Prefer a file for the full deliverable and a short chat briefing; use the Delive
 
 ## Core Principle
 
-Working backend code is not finished code. Audit what exists that should not, what exists twice, what is subtly wrong, what may fail under load, what cannot be diagnosed when it breaks, and what the next engineer needs to continue safely.
-
-Functionality, reliability, and accuracy are untouchable. A fast bug is still a bug.
-
-Preserve a recoverable audit using the Delivery rules below.
+Judge observed behavior against the intended contract.
 
 ## Workflow
 
@@ -435,24 +441,26 @@ Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`.
 
 Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
 
+Use observable preservation and acceptance checks. Structural validation cannot prove behavior or accuracy; evaluate realistic consent, capability, recovery, and handoff scenarios separately. Document unavailable telemetry and regressions; do not infer universal accuracy or token savings from finite tests.
+
 ### 1. Map the Audit Scope
 
 Read-only by default: do not change application code, dependencies, configuration, or observability unless implementation is explicitly requested. Writing the audit artifact is allowed. Use non-mutating inspection and authorized isolated tests; record checks that cannot safely run.
 
-- Establish what the code does: purpose, inputs, outputs, side effects
+- Establish expected behavior from requirements, public contracts, tests and current user decisions; distinguish these sources from what the implementation actually does
 - Identify callers, dependencies, state changes, and trust boundaries
-- Treat current behavior as the baseline that must survive the audit
-- If behavior is unclear, mark it as a question, not a deletion
+- Record observed inputs, outputs and side effects as evidence, not proof of correctness. Preserve intended behavior when recommending changes; a defect need not be preserved
+- If the intended contract is unclear, state competing interpretations and the next useful check
 
 ### 2. Hunt Dead Weight
 
-Find and document, with evidence only: dead code, redundant code, incomplete logic, swallowed failures, stale flags, orphaned config, unused paths.
+Inspect suspected dead code, redundancy, incomplete logic, swallowed failures, stale flags, orphaned configuration and unused paths. Before recommending deletion, check indirect callers, registration, reflection or generated entrypoints, configuration and external consumers where relevant. State the search boundary. No direct callers or an inconclusive search means uncertain use, not proven dead code.
 
 ### 3. Verify Code Accuracy
 
 Scrutinize business logic, data integrity, numeric accuracy, concurrency, trust boundaries, and failure semantics.
 
-If you cannot prove a bug exists, mark it `possible` or `uncertain` with reasoning. Never say `proven` without evidence.
+For each finding, record the triggering input/state, expected versus observed behavior, consequence, source or reproduction evidence, confidence, and inspection boundary. Use `likely` for strong indirect evidence, `possible` or `uncertain` for hypotheses, and name the next check. A local reproduction proves only that local case; production impact needs evidence of reachability and relevant conditions.
 
 ### 4. Recommend Structural Improvements
 
@@ -477,7 +485,7 @@ Proposed observability changes should be additive and non-breaking; do not imple
 
 ### 7. Record Verification and Gaps
 
-- Report results of existing tests when they can run within scope; otherwise state the limitation
+- Cover relevant requirements, likely failures and severe plausible failures within scope. Report authorized tests and their results; state uninspected paths, unavailable access and the checks needed to close gaps
 - Where coverage is thin, propose missing tests first: boundary, failure, and concurrency cases
 - Classify every recommendation as safe now, needs tests first, or needs human decision
 - Deliver recommendations as an audit; execute only separately requested implementation within its authorized scope
@@ -515,7 +523,7 @@ Local routing: Recommend planning actionable correctness or reliability fixes wi
 8. Implementation plan — grouped as New vs Updates to existing
 9. Handover — Context · Decisions · State (done / pending / blocked) · Remaining tasks (what, how, where) · Verification · Risks and how to detect them early
 
-Every finding needs evidence and an inspection boundary. Call an area clean only within verified coverage; mark uninspected areas explicitly. Implementation tasks use the Shared Plan Contract. Label all proposed changes as recommendations, not completed fixes.
+Keep the finding details from Workflow 3 inside the existing report sections. Call an area clean only within verified coverage; mark uninspected areas explicitly. A completed bounded audit does not verify proposed fixes or unavailable production behavior. Implementation tasks use the Shared Plan Contract. Label all proposed changes as recommendations, not completed fixes.
 
 ### Terminal briefing
 
@@ -551,16 +559,17 @@ Need from you
 
 The audit is complete only when every answer is yes:
 
-- Every finding is backed by evidence
-- Clean areas are stated as clean
-- Accuracy risks are verified or marked possible/uncertain
+- Every finding distinguishes expected and observed behavior, trigger, consequence, evidence or hypothesis, confidence and inspection boundary
+- Clean claims are restricted to inspected coverage; unavailable checks remain limitations
+- Deletion recommendations account for indirect, registered, configured and external use, or remain uncertain
+- Local reproductions are not overstated as production impact
 - No recommendation trades away functionality, reliability, accuracy, or precision without an explicit trade-off
 - Unification is recommended only where logic is genuinely the same
 - Library recommendations include maintenance, compatibility, and weight evidence or explicit verification gaps
 - Performance claims are measured when measurement is possible, and labeled as risks when it is not
 - The observability plan integrates without breaking behavior
 - New work and updates to existing work are grouped separately
-- The handover lets the next agent act with zero guessing
+- The handover preserves evidence, limits and the next useful checks
 - The deliverable is saved at the stated path, or honestly labeled in-session only
 - The briefing omits empty sections and uses proven/likely/possible/uncertain, never numbers
 
@@ -575,18 +584,14 @@ Source: skills/360-blueprint/SKILL.md
 ---
 name: 360-blueprint
 description: Create an executable plan from a new objective with explicit tasks, constraints, and verification. Use when a goal exists but the path is unclear, or the request is "plan this".
-version: 2.3.0
+version: 2.4.0
 ---
 
 # 360 Blueprint
 
 ## Purpose
 
-Run this skill when a plan must be created from scratch. Turn an objective into an executable plan with explicit assumptions, constraints, and risks.
-
-Prefer a file for the full deliverable and a short chat briefing; use the Delivery rules below.
-
-This skill creates plans. To review and finalize one, use `360-expert-review`.
+Turn a new objective into an executable plan with explicit assumptions, constraints, risks and acceptance checks.
 
 ## When to Use
 
@@ -597,10 +602,7 @@ This skill creates plans. To review and finalize one, use `360-expert-review`.
 
 ## Core Principle
 
-- A plan is finished when a fresh executor can act without guessing, and every task serves a real objective
-- Begin at the end. Think from first principles. Design out failure. Prefer the simplest plan that fully works
-- Ground questions in project evidence; provide recommended choices and a free-text note option before finishing; never dump trailing questions at the end of the conversation
-- Preserve a recoverable record using the Delivery rules below
+Resolve decisions that change success; make routine choices from evidence.
 
 ## Workflow
 
@@ -618,26 +620,25 @@ Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`.
 
 Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
 
+Use observable preservation and acceptance checks. Structural validation cannot prove behavior or accuracy; evaluate realistic consent, capability, recovery, and handoff scenarios separately. Document unavailable telemetry and regressions; do not infer universal accuracy or token savings from finite tests.
+
 ### 1. Ground the Objective in the Current Project
 
-- Before asking task questions, inspect the available project context: instructions, existing plans and decisions, relevant artifacts or implementation, recent changes, verification results, and any execution ledger. Establish the current stage and what is done, pending, or blocked; cite evidence and distinguish verified state from claims. If nothing exists yet, record that; if access is unavailable, state the gap and ask only for the missing context that changes the work
-- Reuse answers already supplied by the user or established by current evidence. Do not ask generic intake questions, ask the user to rediscover accessible facts, or reopen settled decisions without new conflicting evidence
-- Build a short gap list covering the goal, success measures, scope boundaries, high-level outline, constraints, dependencies, and details needed to execute or judge the plan without guessing. Resolve discoverable facts first; ask the user only about remaining decisions, contradictions, or unavailable facts
-- Use the host's available interactive question tool for every user question. Offer small, focused rounds of one to three questions; for each decision, give concrete options, put the best supported recommendation first, and briefly explain its evidence and trade-off. Always allow a free-text note or custom answer alongside the options. For missing facts, request a note and recommend what information to include; do not invent an answer or a recommendation unsupported by evidence
-- If interactive tools are unavailable, present the same numbered choices, recommendation with rationale, and explicit free-text note option in chat, then wait for the answer
-- After each answer, update the known facts and decisions, inspect newly relevant evidence, and ask the next unresolved questions. Continue until the goal, scope, outline, and required details are clear; do not stop after a fixed questionnaire or repeat answered questions. Re-enter this loop if later planning or review exposes a new gap
-- Treat a recommendation, preselected option, silence, or elapsed time as unanswered. Continue independent inspection while waiting, but do not decide dependent work or claim readiness. Preserve explicit user deferrals or delegated choices with their limits; keep unresolved blockers in `Draft`
-- Summarize the resulting understanding and record evidence, current stage, completed work, decisions, and remaining uncertainty within the existing context, assumptions, or review sections. Ask for confirmation only where the user's answers and evidence have not already settled the issue; stop questioning when a fresh executor or reviewer can proceed without material guessing
+- Inspect available instructions, plans, decisions, relevant artifacts, recent changes, verification and any execution ledger. Establish the current stage and done/pending/blocked work; cite sources and distinguish observed facts from claims. Record unavailable evidence
+- Reuse current evidence and user answers. Resolve discoverable facts by inspection; do not ask the user to rediscover them
+- Separate remaining gaps: material user decisions change the outcome, scope, acceptance criteria, significant cost or irreversible effects; reversible implementation defaults stay within established intent and conventions. Choose supported defaults, record the reason and revisit condition, and proceed. Do not present a default or inference as a fact
+- Ask only for unresolved material decisions, conflicting instructions, or inaccessible facts needed to judge success. Use the available interactive question tool in focused rounds of one to three questions, with the best supported recommendation, its trade-off, and a free-text/custom option. For missing facts, request the needed evidence without inventing it. If tools are unavailable, offer equivalent numbered choices and notes in chat
+- Unanswered required questions block dependent planning and readiness, not independent inspection. Silence, a recommendation, a preselected option or elapsed time is not an answer. Honor explicit delegation or deferral within its limits
+- After answers, update the existing context, assumptions or review sections and inspect newly relevant evidence. Stop questioning when material choices are settled; reopen only on new conflicting evidence
 
-### 2. Confirm Before Generating
+### 2. Establish Readiness
 
-- Restate the objective in the user's terms; check feasibility, what done means, and what must not happen
-- Resolve the gap list through the clarification loop before generating the plan. Do not bypass a required answer by calling it a task-shape or detail-only question
-- Do not deliver a ready plan while required answers are pending. An optional companion offer does not block delivery
-- If the user explicitly asks for a draft despite uncertainty, label it `Draft`, record open questions in the plan file, and actively prompt decisions needed to proceed
-- Never conclude with a passive list of questions or a `Need from you` section
+- Restate the intended outcome, observable success and what must not happen
+- Keep outcome-changing unanswered choices in `Draft`, with the required decision and affected tasks; do not relabel a blocker as a default
+- A complete plan with supported defaults may be `Ready for review`. An optional companion offer does not block it
+- If a draft is requested despite blockers, deliver it honestly and actively prompt the needed decisions
 
-### 3. See From Every Angle
+### 3. Examine Relevant Risks
 
 - First principles: what is known, what is assumed, what is unknown
 - Inversion: what would guarantee failure
@@ -659,26 +660,25 @@ Prefer a recoverable file when supported, using the existing path or the default
 - Every task states what, how, where, and done when
 - Mark effort, priority, and parallelization
 - Define the cut line
-- Do not invent stack choices, vendors, metrics, or architecture details. If a choice is required but unknown, write it as an open question
+- Use established stack choices and conventions. Record reversible defaults and falsifiable assumptions with supporting evidence or a pending validation method in `Validated by`; keep material unresolved choices as blockers
 - Keep names and terms consistent from start to finish
 - Make the plan self-contained for a fresh executor
 
 ### 6. Enforce Quality by Domain
 
-Apply the standards of the domain the plan touches.
+Turn quality goals into task-specific acceptance checks.
 
-When the plan produces code: maintainable, scalable, auditable, no duplication, no weak logic, no outdated practices.
-
-When the plan produces documentation: update before creating, one source of truth, clean structure, easy to find.
-
-For any other domain, define that domain's quality bar explicitly and enforce it.
+- Code: identify required outputs, boundaries, failure behavior and compatibility; add performance or scaling checks only for relevant workloads and constraints
+- Documentation: identify the intended reader action, facts and links to preserve, and how the result will be checked; update existing material when it serves that need
+- Other domains: state observable success and likely or severe plausible failure checks
+- Reuse existing structure where it fits. Require a concrete maintenance or correctness benefit before adding abstraction or consolidating superficially similar logic
 
 ### 7. Stress-Test Before Delivery
 
 - Walk the plan end to end
 - Run a premortem
 - Falsify assumptions
-- Check whether two executors could read the same step two different ways
+- Check whether different readings change success or safety; permit equivalent reversible implementations
 - Verify every objective maps to tasks and every task serves an objective
 
 ### 8. Deliver in Two Channels
@@ -823,16 +823,16 @@ The plan is ready only when every answer is yes:
 - Current project stage and completed work were inspected, or unavailable evidence was explicitly recorded
 - Existing answers were reused; follow-up rounds resolved the goal, scope, outline, and required details without treating silence or recommendations as consent
 - No blocking question or decision was skipped
-- Every question, ambiguity, and decision was actively prompted through the evidence-grounded interactive clarification loop with recommendations and a free-text note option before completing, never dumped as trailing bullets at the end of the turn
+- Material unresolved decisions were actively prompted with evidence, recommendations and a free-text option; reversible defaults have a reason and revisit condition
 - No invented technical details were presented as facts
 - Every assumption is explicit and falsifiable
 - Every task has what, how, where, done when, dependencies, skills, effort, priority, and parallel markings
 - The cut line is defined
 - Every objective maps to tasks and no orphan tasks remain
 - New work and updates to existing work are grouped separately
-- A fresh executor can act without guessing
+- A fresh executor can distinguish requirements, defaults, assumptions and unresolved blockers
 - Checkpoints and replanning triggers exist
-- The plan survived a premortem
+- The premortem covered relevant requirements, likely failures and severe plausible failures; inspection limits are stated
 - The deliverable follows the template and accurately states its location or in-session status
 - The briefing omits empty sections and uses proven/likely/possible/uncertain, never numbers
 
@@ -847,33 +847,25 @@ Source: skills/360-execute/SKILL.md
 ---
 name: 360-execute
 description: Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and brief the user in chat. Use when a plan exists and work must begin, or when resuming a partial execution.
-version: 2.1.0
+version: 2.2.0
 ---
 
 # 360 Execute
 
 ## Purpose
 
-Run this skill when a finalized plan must be executed — completely, faithfully, and verifiably. Everything on the plan gets done, QCed against its own acceptance check, and accounted for.
-
-This skill executes plans. To create one, use `360-blueprint`. To stress-test and finalize one, use `360-expert-review`. To audit the built result afterward, use `360-backend-audit`.
-
-Prefer a file for the full deliverable and a short chat briefing; use the Delivery rules below.
+Execute an authorized plan against its acceptance checks and keep a recoverable coverage ledger of results, deviations and unfinished work.
 
 ## When to Use
 
 - A plan exists and work must begin — any domain, any scale
 - Any request of the form "implement this plan", "build this", "execute this"
-- Resuming a partially executed plan — the ledger file is the source of truth
+- Resuming a partially executed plan by reconciling its ledger with current evidence
 - Not for creating plans (`360-blueprint`) or reviewing drafts (`360-expert-review`)
 
 ## Core Principle
 
-- The plan is the contract — execute what it says, not what feels close enough
-- Coverage is tracked, not trusted — a persisted ledger records every task and its verdict
-- Done is a verdict with evidence — a task is complete when its acceptance check passes
-- Deviations surface, never absorb — reality overrides the plan only through an explicit decision
-- Preserve a recoverable record using the Delivery rules below
+Current evidence establishes progress; the ledger records it.
 
 ## Workflow
 
@@ -891,6 +883,8 @@ Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`.
 
 Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
 
+Use observable preservation and acceptance checks. Structural validation cannot prove behavior or accuracy; evaluate realistic consent, capability, recovery, and handoff scenarios separately. Document unavailable telemetry and regressions; do not infer universal accuracy or token savings from finite tests.
+
 ### 1. Load the Plan Completely
 
 Never execute a plan you have not fully read.
@@ -904,37 +898,39 @@ Never automatically clear history. Use context management only when the host sup
 
 ### 2. Persist the Coverage Ledger
 
-The ledger is the spine of execution and the source of truth for progress.
+Reconcile the plan, ledger, actual artifacts or external state, and relevant verification before resuming. A ledger verdict is a recorded claim until current evidence supports it.
 
-- Write it to a file and keep it current after every task
-- Reuse the existing path if known; otherwise `plans/<short-slug>-execution.md`; create the folder if needed; ask once if ambiguous
+- Write it to a file and keep it current after each task and significant partial effect
+- Reopen stale or unsupported verified rows; record what changed and invalidate affected verification, including dependent results. Recheck only the affected acceptance conditions
+- Reuse the existing path if known; otherwise `plans/<short-slug>-execution.md`; create the folder if needed; reuse repository conventions for routine location choices
 - If the file cannot be written, use the in-session delivery fallback
 - One row per task: ID, name, priority, acceptance check, status
 - Statuses: `pending` / `in progress` / `done (verified)` / `blocked` / `dropped (approved)`
-- Nothing counts as done until the ledger says verified
-- A fresh agent must be able to open the file and continue with zero guessing
+- Mark verified only when current acceptance evidence supports it; include source revision or state identifiers when relevant
+- Record remaining uncertainty and the next check so a fresh agent can resume safely
 
 ### 3. Execute in Order
 
 - Follow phase order and task dependencies exactly; honor parallel markers
 - Load declared skills through the supported host mechanism when available. The optional `360-token-efficiency` always follows session consent; a plan listing is not approval. If another declared skill is unavailable, use the self-contained contract and available capabilities; block only tasks that actually require the missing capability
-- Verify each phase checkpoint before advancing to the next phase — a failed checkpoint stops the line
-- Do exactly what the task specifies — no silent extras, no silent shortcuts
+- Verify each phase checkpoint before advancing dependent work. A failure blocks affected descendants; continue independent authorized work where dependencies and parallel markers permit
+- Keep work within the task and change policy
+- Before a non-repeatable or external action, record intent and a recoverable operation identifier or reconciliation method. After interruption, inspect partial effects and external state before retrying. Reuse confirmed results; retry only if absence or safe repeatability is established. If state cannot be determined, block that action and identify the missing check
 
 ### 4. Verify Every Task
 
 - Run the task's "done when" check and record the evidence in the ledger
 - Done means the check passed with evidence — never "looks right", never "should work"
-- If a check cannot be executed, mark the task `blocked` with the reason — never mark it done
-- Sweep for collateral damage after each task: nothing else broke, nothing unrelated changed
+- If an implementation acceptance check cannot run, mark the task `blocked` with the missing evidence. An assessment task may finish with disclosed limits only when its own acceptance criteria permit them; an unknown check never becomes a pass
+- Check affected behavior and the diff after each task; state the inspected boundary and regressions rather than claiming everything else is safe
 
 ### 5. Handle Deviations in the Open
 
 When reality disagrees with the plan — a failed assumption, missing information, a visibly better path:
 
-- Stop that line of work; do not improvise forward
-- Follow the plan's change policy or replanning triggers
-- Surface the deviation to the user with options and a recommendation
+- Classify the departure under the plan's change policy and existing authorization
+- Resolve routine reversible implementation choices within that authority; record the reason and affected checks without asking again
+- Escalate changes to outcome, scope, acceptance criteria, significant cost, irreversible effects or authorization. Stop dependent work and present concrete options; continue independent authorized tasks
 - Never silently absorb new scope, never silently skip a task
 - A `must`-priority task is never dropped without an explicit user decision; `should`/`could` tasks follow the plan's cut line
 
@@ -1009,14 +1005,15 @@ Execution is complete only when every answer is yes:
 
 - Every task in the plan appears in the ledger file with a final status — zero unaccounted items
 - Every `done (verified)` verdict is backed by evidence from the task's own acceptance check
-- Every phase checkpoint was verified before the next phase began
-- Every deviation was surfaced and resolved through the plan's change policy or a user decision — none silently absorbed
+- Every phase checkpoint passed before its dependent work advanced; independent work respected authorization and dependency/parallel markers
+- Every deviation was recorded and resolved within existing authorization/change policy or an explicit user decision
 - No `must`-priority task was dropped or skipped without explicit user approval
 - Every objective in the plan's traceability maps to verified work
 - Regressions and collateral damage were swept for, and the results are stated
 - Declared skill availability and consent were respected; required unavailable capabilities are explicit blockers
 - Unfinished items are stated honestly — pending, blocked, or dropped, with reasons
-- The ledger file lets the next agent continue with zero guessing
+- The ledger matches current artifacts and verification; stale verdicts and partial actions were reconciled before resumption
+- The next agent can recover evidence, uncertainty and the next check; affected verification was invalidated after relevant changes
 - Delivery honors the requested format and accurately states persistence
 - The briefing omits empty sections and uses proven/likely/possible/uncertain, never numbers
 
@@ -1031,16 +1028,14 @@ Source: skills/360-expert-review/SKILL.md
 ---
 name: 360-expert-review
 description: Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage.
-version: 3.3.0
+version: 3.4.0
 ---
 
 # 360 Expert Review
 
 ## Purpose
 
-Run this skill before finalizing any important plan. Turn a draft into the strongest executable plan by exposing missing scenarios, weak assumptions, and hidden failure modes.
-
-Prefer a file for the full deliverable and a short chat briefing; use the Delivery rules below.
+Expose concrete failure cases and weak assumptions in a draft plan, then revise it in place until applicable readiness checks pass or blockers are explicit.
 
 ## When to Use
 
@@ -1051,11 +1046,7 @@ Prefer a file for the full deliverable and a short chat briefing; use the Delive
 
 ## Core Principle
 
-- Review the plan the way a senior team would: user impact, reliability, security, operations, and domain correctness
-- Attack it hard enough that only the strongest version survives
-- Finalize into the existing plan file. Do not replace tasks with a narrative essay
-- Ground questions in project evidence; provide recommended choices and a free-text note option before finishing; never dump trailing questions at the end of the conversation
-- Preserve a recoverable record using the Delivery rules below
+Try to disprove readiness with concrete failure cases.
 
 ## Workflow
 
@@ -1073,17 +1064,17 @@ Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`.
 
 Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
 
+Use observable preservation and acceptance checks. Structural validation cannot prove behavior or accuracy; evaluate realistic consent, capability, recovery, and handoff scenarios separately. Document unavailable telemetry and regressions; do not infer universal accuracy or token savings from finite tests.
+
 ### 1. Understand the Project First
 
-- Before asking task questions, inspect the available project context: instructions, existing plans and decisions, relevant artifacts or implementation, recent changes, verification results, and any execution ledger. Establish the current stage and what is done, pending, or blocked; cite evidence and distinguish verified state from claims. If nothing exists yet, record that; if access is unavailable, state the gap and ask only for the missing context that changes the work
-- Reuse answers already supplied by the user or established by current evidence. Do not ask generic intake questions, ask the user to rediscover accessible facts, or reopen settled decisions without new conflicting evidence
-- Build a short gap list covering the goal, success measures, scope boundaries, high-level outline, constraints, dependencies, and details needed to execute or judge the plan without guessing. Resolve discoverable facts first; ask the user only about remaining decisions, contradictions, or unavailable facts
-- Use the host's available interactive question tool for every user question. Offer small, focused rounds of one to three questions; for each decision, give concrete options, put the best supported recommendation first, and briefly explain its evidence and trade-off. Always allow a free-text note or custom answer alongside the options. For missing facts, request a note and recommend what information to include; do not invent an answer or a recommendation unsupported by evidence
-- If interactive tools are unavailable, present the same numbered choices, recommendation with rationale, and explicit free-text note option in chat, then wait for the answer
-- After each answer, update the known facts and decisions, inspect newly relevant evidence, and ask the next unresolved questions. Continue until the goal, scope, outline, and required details are clear; do not stop after a fixed questionnaire or repeat answered questions. Re-enter this loop if later planning or review exposes a new gap
-- Treat a recommendation, preselected option, silence, or elapsed time as unanswered. Continue independent inspection while waiting, but do not decide dependent work or claim readiness. Preserve explicit user deferrals or delegated choices with their limits; keep unresolved blockers in `Draft`
-- Summarize the resulting understanding and record evidence, current stage, completed work, decisions, and remaining uncertainty within the existing context, assumptions, or review sections. Ask for confirmation only where the user's answers and evidence have not already settled the issue; stop questioning when a fresh executor or reviewer can proceed without material guessing
-- Compare the supplied plan with the observed project stage and completed work before judging it. Surface stale assumptions, duplicated completed tasks, and conflicts with existing decisions; preserve valid task IDs and progress records
+- Inspect available instructions, plans, decisions, relevant artifacts, recent changes, verification and any execution ledger. Establish the current stage and done/pending/blocked work; cite sources and distinguish observed facts from claims. Record unavailable evidence
+- Reuse current evidence and user answers. Resolve discoverable facts by inspection; do not ask the user to rediscover them
+- Separate remaining gaps: material user decisions change the outcome, scope, acceptance criteria, significant cost or irreversible effects; reversible implementation defaults stay within established intent and conventions. Choose supported defaults, record the reason and revisit condition, and proceed. Do not present a default or inference as a fact
+- Ask only for unresolved material decisions, conflicting instructions, or inaccessible facts needed to judge success. Use the available interactive question tool in focused rounds of one to three questions, with the best supported recommendation, its trade-off, and a free-text/custom option. For missing facts, request the needed evidence without inventing it. If tools are unavailable, offer equivalent numbered choices and notes in chat
+- Unanswered required questions block dependent planning and readiness, not independent inspection. Silence, a recommendation, a preselected option or elapsed time is not an answer. Honor explicit delegation or deferral within its limits
+- After answers, update the existing context, assumptions or review sections and inspect newly relevant evidence. Stop questioning when material choices are settled; reopen only on new conflicting evidence
+- Compare the supplied plan with current artifacts before judging it. Identify stale assumptions, duplicated completed work and conflicting decisions; preserve valid task IDs and progress records
 
 ### 2. Review Through Expert Lenses
 
@@ -1099,33 +1090,30 @@ Use only the lenses this project needs:
 
 Do not role-play personas. Extract findings directly from each lens.
 
-### 3. Cover the User Completely
+### 3. Check Relevant User Outcomes
 
-- Solve the real need with the lowest-friction path that works
-- Cover empty, loading, error, interrupted, and recovery states
-- Prevent lost work, confusion, and irreversible mistakes
-- Include first-time, returning, low-skill, accessibility, and poor-connectivity users when relevant
+- Trace the real need through normal use, likely failures and severe plausible failures
+- Check empty, error, interrupted and recovery states where they affect this task
+- Include affected user groups, accessibility and connectivity constraints when relevant; state inspection limits
 
-### 4. Cover Every Scenario and Effect
+### 4. Make Findings Actionable
 
-- Map affected components, data, APIs, permissions, integrations, and existing behavior
-- Cover happy paths, edge cases, invalid input, retries, duplicates, and concurrency
-- Cover dependency failures, timeouts, partial completion, degraded performance, migrations, mixed versions, and rollback
-- Every risk needs prevention, detection, mitigation, or rollback
+- For each actionable finding, name its trigger, consequence, evidence or explicit hypothesis, and smallest correction or next check
+- Rank consequence separately from confidence. A plausible severe failure can justify investigation without being a proven defect
+- Require work only when it protects a requirement or addresses a concrete material failure; speculative improvements remain optional
+- Map only affected components, interfaces and state. Check retries, duplicates, concurrency, dependencies and rollback where those mechanisms exist
 
-### 5. Guarantee Reliability and Traceability
+### 5. Check Reliability and Traceability
 
-- Validation, error handling, idempotency, and graceful failure where relevant
-- Security, privacy, performance, and compatibility where relevant
-- The simplest design that fully works
-- Every requirement traceable to implementation, tests, monitoring, and ownership
-- Debugging path: meaningful errors, structured logs, correlation IDs, metrics, alerts, and reproduction path
+- Trace relevant requirements to implementation tasks and observable verification
+- Add validation, failure handling, security, compatibility, monitoring and ownership only where a concrete risk demands them
+- Prefer the simplest correction that protects the intended outcome; do not introduce operational machinery into an unrelated documentation task
 
-### 6. Verify Everything
+### 6. Define Proportionate Verification
 
-- Define testing proportional to risk
-- Every acceptance criterion must be observable
-- "Works correctly" is not a criterion
+- Match each acceptance check to the consequence it detects; “works correctly” is not observable
+- Distinguish a reviewed plan from a verified implementation. A planned test has not run
+- Mark irrelevant checks non-applicable with reasons. Missing evidence remains unknown; obtain it or disclose the resulting limitation/blocker
 
 ### 7. Attack the Plan
 
@@ -1139,7 +1127,7 @@ Switch to hostile critic. Ask:
 - What cannot be detected, reproduced, or reversed?
 - What can be simpler?
 
-Fix actionable findings, then recheck the affected risks. Stop when applicable acceptance checks pass and no unresolved high-severity blocker remains. If evidence or a user decision is unavailable, record a concrete blocker and stop that review line; do not loop indefinitely or claim finality. When a decision, design trade-off, or ambiguity requires user input (even for task-level shapes or non-blocking details), return to the clarification loop and resolve the required input before finalizing; do not dump questions as trailing chat bullets. Mark non-applicable checks with a reason.
+Fix actionable findings and recheck affected risks. Stop when applicable checks pass and material blockers are resolved. An unavailable check stays unknown; if it prevents judging readiness, keep the plan non-final and name the missing evidence or decision. Otherwise disclose the limit without manufacturing required work. Use the clarification loop only for material user decisions; record routine defaults. Do not loop indefinitely.
 
 ### 8. Write the Final Plan
 
@@ -1234,15 +1222,15 @@ The plan is final only when every applicable answer is yes (record a reason for 
 - Current project stage and completed work were inspected, or unavailable evidence was explicitly recorded
 - Existing answers were reused; follow-up rounds resolved the goal, scope, outline, and required details without treating silence or recommendations as consent
 - The right expert lenses were applied
-- Every important scenario and effect was mapped
-- Every risk has a countermeasure
-- Requirements are traceable to code, tests, and monitoring
-- Failures are detectable, reproducible, diagnosable, and fixable
+- Relevant requirements, likely failures and severe plausible failures were checked; inspection limits are explicit
+- Every actionable finding has a trigger, consequence, evidence or hypothesis, and smallest correction; severity and confidence are separate
+- Relevant requirements are traceable to tasks and observable verification; monitoring is included only where needed
+- Material failure cases have proportionate detection, diagnosis and recovery checks
 - The design is clear, consistent, and as simple as possible
 - Testing matches the risk
-- Release and rollback are safe
+- Release and rollback checks address the plan’s relevant failure cases
 - The plan survived hostile review
-- Every blocker, ambiguity, and decision requiring user input was actively prompted through the evidence-grounded interactive clarification loop with recommendations and a free-text note option before completing, never dumped as trailing bullets at the end of the turn
+- Material decisions were resolved through the clarification loop; defaults and unknown evidence are explicit, never silent passes
 - Task IDs were preserved or changed with a stated reason
 - New work and updates to existing work are grouped separately
 - The finalized plan preserves its original location where supported, or follows the Delivery fallback
@@ -1259,26 +1247,14 @@ Source: skills/360-faculty/SKILL.md
 ---
 name: 360-faculty
 description: Seat a living, tailored expert team on a plan or task. Use when work must fit this developer's goals, taste, mindset, and strategy, when a plan needs the right expertise chosen for its complexity, depth, and nature, or when a named faculty team must be created, called, or updated. Recommends a short list, asks only the questions that still change the work, polishes immediately, and keeps upgradable memory.
-version: 1.2.0
+version: 1.3.0
 ---
 
 # 360 Faculty
 
 ## Purpose
 
-Run this skill to **staff and tailor** work. Its job: seat named faculties who know this developer, ask only what still changes the plan, polish at once, and remember what they learned.
-
-Family position:
-
-- `360-blueprint` creates the plan — this skill does not
-- `360-faculty` attaches at any stage: before planning to set the house style, after a draft to tailor it, or ahead of review to name the lenses that review must apply
-- `360-expert-review` finalizes the plan through adversarial attack — this skill never claims finality
-- `360-execute` builds the finalized plan — this skill never marks a plan ready for it
-- `360-token-efficiency` may run underneath, as with any other skill
-
-`360-expert-review` assembles an ephemeral panel per plan and attacks it. This skill keeps a persistent team that grows with the developer and advises. One is a hostile review board; the other is a tailor's shop.
-
-Produces four artifacts: a fit assessment, a seated roster, upgradable dossiers and named teams, and a surgically polished plan — or concrete faculty guidance if no plan exists yet.
+Use advisory expert lenses to tailor work to the developer’s goals, taste, mindset and strategy. Produce a fit assessment, roster, authorized memory and polished plan or concrete guidance, according to the selected mode.
 
 ## When to Use
 
@@ -1292,18 +1268,7 @@ Produces four artifacts: a fit assessment, a seated roster, upgradable dossiers 
 
 ## Core Principle
 
-- Tailor, not template — cut for this person, this project, this request
-- Know four measures before advising: goals, taste, mindset, strategy
-- Fit is derived, not guessed — complexity sets how many seats, depth sets their urgency, nature sets which lenses
-- Every recommendation cites the plan element that demands it
-- Follow when the developer's cut is coherent and professionally sound
-- Raise when the frame is unfinished, a better cut exists, or the thought can be shaped
-- Never flatter. Never lecture. Never silently override
-- Memory upgrades; craft does not dilute
-- The roster is a floor, not a ceiling — failure modes decide seating, and a needed faculty is derived even when the roster does not name it
-- Hide the catalog; recommend a short list
-- A question is allowed only when its answer would change the plan or the house style
-- Polish after each seat — value appears before the next faculty speaks
+Expert lenses improve decisions; evidence validates them.
 
 ## Workflow
 
@@ -1321,16 +1286,18 @@ Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`.
 
 Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
 
+Use observable preservation and acceptance checks. Structural validation cannot prove behavior or accuracy; evaluate realistic consent, capability, recovery, and handoff scenarios separately. Document unavailable telemetry and regressions; do not infer universal accuracy or token savings from finite tests.
+
 ### 0. Pick the Mode
 
-Four entry points into one workflow. Choose from what the developer asked; when it is unclear, ask which one in a single question.
+Four entry points into one workflow. Choose from what the developer asked; clarify only if modes would materially differ in authorized work. In `suggest` mode, keep profile and fit notes in-session; do not edit the plan, dossiers or teams.
 
 | Mode | Trigger | Does | Never does |
 |---|---|---|---|
 | `suggest` | "who should look at this", "which experts", "help me pick" | Steps 1–4, then stops with the fit assessment, short list, and rationale | Seat, ask past fit, or touch the plan |
 | `seat` | "faculty this", "add experts", "seat a team" — the default | Steps 1–8: recommend, confirm, seat one at a time, polish after each | Batch the polish to the end |
 | `team` | "save this as X", "call the X team", "add Y to X" | Step 7: create, call, or edit a named team | Skip the drift check |
-| `quiet` | the developer replies `quiet` | Seats the confirmed set, asks blocking questions only, polishes from memory, records gaps as explicit assumptions | Ask anything two honest implementations would not diverge on |
+| `quiet` | the developer replies `quiet` | Seats the confirmed set, asks blocking questions only, polishes from current evidence, records gaps as explicit assumptions | Block on equivalent reversible implementation choices |
 
 ### 1. Load What Exists
 
@@ -1371,9 +1338,9 @@ Read three dimensions off the plan, or off the stated task when no plan exists y
 
 - **Nature** — what the work touches: user-facing, data, money, security and privacy, infrastructure, ML and agents, docs and content, org and process. Decides **which** lenses.
 - **Depth** — blast radius and reversibility: reversible-local, reversible-shared, hard to reverse, irreversible or regulated. Decides **seat urgency**.
-- **Complexity** — moving parts: task count, phase count, cross-system dependencies, unresolved assumptions, and how many tasks are `must` priority. Decides **how many** seats.
+- **Complexity** — moving parts: task count, phase count, cross-system dependencies and unresolved assumptions. Helps size the distinct expertise needed.
 
-Size the seat count from the assessment:
+Use these bands as guidance, not quotas. Each seat must add a distinct decision or failure check; combine overlapping lenses and use fewer seats when sufficient:
 
 | Complexity | Depth | Seats |
 |---|---|---|
@@ -1381,19 +1348,19 @@ Size the seat count from the assessment:
 | moderate | reversible | 2–3 |
 | moderate | hard to reverse | 3–4 |
 | high | any | 4–5 |
-| any | irreversible or regulated | 4–5, and at least one `must` seat from security, privacy, compliance, or reliability |
+| any | irreversible or regulated | Consider 4–5; include the relevant security, privacy, compliance or reliability lens when its concrete risk demands it |
 
-Five is the cap unless the developer asks for more. State the three dimensions and the resulting band before recommending, so the developer can correct the read rather than the list.
+Five is the cap unless the developer asks for more. State the dimensions and chosen band, explaining distinct value and any reduction. A single seat may cover several related checks.
 
 ### 4. Recommend a Short List
 
-Recommend the number of faculties the fit assessment sized, for this task only. Never dump the Seating Roster unless the developer asks for it.
+Recommend only faculties that add distinct value to this task. Never dump the Seating Roster unless the developer asks for it.
 
 | # | Faculty | Seat | Why now | If absent |
 |---|---|---|---|---|
-| 1 | <role> | must / should / could | <the task ID, assumption, or risk row that demands this lens> | <the disaster if they stay silent> |
+| 1 | <role> | must / should / could | <the task ID, assumption, or risk row that demands this lens> | <the concrete missed decision or failure check> |
 
-- `must` — silence creates a known failure mode
+- `must` — a concrete material failure requires this expertise
 - `should` — silence creates likely waste or rework
 - `could` — the developer may want this lens; their call
 
@@ -1421,11 +1388,11 @@ For each confirmed faculty, in the listed order:
 - New faculty on this project: at most 3 questions
 - Returning faculty: at most 1, and only if this task contradicts or extends its memory
 - Zero when memory plus the plan is enough
-- `quiet` mode: zero unless two honest implementations would diverge without the answer
+- `quiet` mode: zero unless the answer changes the intended outcome, scope, acceptance criteria, significant cost or irreversible effects
 
 A question must do exactly one job: intention, taste, or a sharper frame offered as a choice. Never ask two questions that one answer would cover.
 
-**Follow or raise.** Follow when the developer's cut matches their goals, their taste, and a professionally sound path. Raise when any of these is true:
+**Follow or raise.** Follow when the developer's cut matches their goals, their taste, and a professionally sound path. Raise only for a material decision supported by task evidence, such as:
 
 - The frame is unfinished — they asked for a feature when they need a decision
 - A better cut exists — same goal, cleaner seam, less future pain
@@ -1436,7 +1403,7 @@ Raise in their language. Put two cuts side by side — theirs and the tailor's �
 - They take the raise → polish to the tailor's cut; upgrade memory: this mind can be moved on this point
 - They keep their cut → tailor that cut; record the accepted risk; do not fight it again without new evidence. `360-expert-review` may reopen it later with evidence — that is its job, not a contradiction of this one
 
-**Polish now.** Edit only the steps, states, checks, and risks this faculty owns. Regenerate the whole plan only if the faculty proved the objective itself wrong. If no plan exists, write concrete guidance this faculty owns, then offer `360-blueprint`.
+**Polish now.** Edit only the steps, states, checks, and risks this faculty advises on. Regenerate the whole plan only if the faculty proved the objective itself wrong. If no plan exists, write concrete guidance within this faculty’s scope, then offer `360-blueprint`.
 
 Hold the plan contract while polishing. `360-execute` reads these fields directly, and prose in their place breaks execution:
 
@@ -1446,16 +1413,16 @@ Hold the plan contract while polishing. `360-execute` reads these fields directl
 
 Write findings into the plan's existing semantic sections. The blueprint uses the numbers below; other valid plans may use different headings. Preserve an existing review appendix (normally section 11), without inventing sections 12–14:
 
-- Accepted risks → section 7, countermeasure reading `Accepted by developer; owned by <faculty>`
-- Explicit assumptions → section 5, `Validated by` naming the seated faculty
+- Accepted risks → section 7: record actual acceptance, countermeasure and operational owner (a real person/team, or explicitly unassigned). A faculty is only the advisory lens, never an operational owner
+- Explicit assumptions → section 5: `Validated by` cites actual evidence and its boundary, or `Pending: <validation method>`. A seated role or its agreement cannot validate an inference
 - Open questions → Context & Constraints; decisions → Handover Summary
 - One header row so a fresh reader knows a faculty pass happened: `| Tailored by | faculty/roster.md @ <date> |`
 
-**Resolve disagreements in the open.** If two seated faculties conflict, present both cuts to the developer with what each protects. Never pick silently.
+**Resolve disagreements in the open.** Check conflicting advice against evidence and existing decisions. Resolve equivalent reversible details with a recorded reason; present material trade-offs needing user choice with what each protects.
 
 **Remember.** Update dossiers (Step 6), show the faculty block (Output Format), then move to the next seat — or stop when the developer stops or the remaining faculties would not change the plan.
 
-A faculty blocks the plan only when a missing answer would make two honest implementations diverge. Otherwise it states the assumption and continues.
+Block dependent planning only when a missing answer changes success, scope, acceptance criteria, significant cost, irreversible effects or authorization. Otherwise choose a supported reversible default, record its basis and revisit condition, and continue.
 
 ### 6. Upgrade Memory
 
@@ -1469,9 +1436,10 @@ Rules:
 
 - New answer agrees → keep, refresh
 - New answer sharpens → replace the claim; mark the old one superseded
-- New answer conflicts → ask one confirm question, then replace or split
-- Inferred never overwrites user-said
-- Unused inferred claims become disputed — never silently deleted
+- Keep provenance in Source: user statement or artifact reference, date/revision and observed boundary. Preserve the source kinds and status vocabulary above
+- Explicit current user instructions override stale preferences; supersede the old claim with the current source without asking for redundant confirmation. Ask only when current instructions materially conflict or their intended scope is unclear
+- Inferred never overwrites user-said or becomes validated through faculty agreement
+- Stale or unused means freshness is uncertain, not disputed. Note the freshness limit in Source and recheck before reuse; reserve disputed for contradictory evidence, superseded for an actual replacement
 - `faculty/developer.md` changes only when goals, taste, mindset, strategy, or a standing refusal changes
 - `faculty/<role>.md` changes after every seating of that role
 - `faculty/roster.md` records every seated role and its last seated date
@@ -1583,7 +1551,7 @@ After the session:
 - Persist: <path / in-session only; not persisted>
 
 ## Accepted risks and explicit assumptions
-- <risk or assumption> — owned by <faculty>, written to plan section <5 / 7 / 10>
+- <risk or assumption> — advisory responsibility: <faculty>; operational owner: <person/team or unassigned>; evidence or pending validation: <source/check>; written to plan section <5 / 7 / 10>
 
 ## Handover
 - Context:
@@ -1606,7 +1574,7 @@ The session is finished when every gate applicable to the selected mode passes. 
 
 - The mode was clear, and `suggest` mode stopped before seating and left the plan untouched
 - Goals, taste, mindset, and strategy were known from memory or asked in this session
-- The fit assessment stated nature, depth, and complexity, and the seat count stayed inside the band it sized
+- The fit assessment stated nature, depth and complexity; each seat adds distinct value, overlapping seats were reduced, and departures from guide bands are explained
 - Every recommendation cited the plan element that demands it, chosen by failure mode rather than habit — including rare roles and roles the roster does not name
 - A short list was shown and seating was confirmed, with no catalog dump unless the developer asked
 - Every faculty stayed inside its question caps, and no question was asked whose answer the plan, repo, or dossiers already held
@@ -1617,14 +1585,15 @@ The session is finished when every gate applicable to the selected mode passes. 
 - Every task a faculty added carries a stable ID, declared skills, `Effort` / `Priority` / `Parallel` values from the family vocabularies, and an observable `Done when`
 - Readiness reflects material edits and blockers; this skill never claimed a review occurred
 - Accepted risks, assumptions, and open questions landed in the plan's existing sections; no new numbered section was invented
-- Faculty conflicts were presented to the developer, never settled silently
-- Memory uses claim / source / status / touches; conflicts were confirmed before rewriting
+- Material faculty conflicts needing user choice were presented; routine evidence-backed resolutions were recorded
+- Memory retains claim / source / status / touches with provenance; current instructions prevail, and stale evidence is not labeled disputed without contradiction
+- Assumptions cite evidence or a pending validation method; advisory roles are distinct from operational owners
 - Any called team was drift-checked against this plan, and a missing `must` seat was raised before seating
 - House style is one shop, shared across all seated faculties
 - The hostile critic was never seated — that role belongs to `360-expert-review`
 - The handover carries context, decisions, state, remaining tasks, verification, and risks with how to detect them early
 - Delivery follows the user's format and authorization; persistence or its absence is recorded
-- A fresh agent can continue from the dossiers, teams, and roster with zero guessing
+- A fresh agent can recover decisions, provenance, uncertainty and pending checks from the authorized record
 
 An unresolved applicable gate needs a specific correction or an honest blocker. Do not seat faculties, edit plans, or write dossiers to satisfy gates excluded by the selected mode.
 
@@ -1634,7 +1603,7 @@ Source: skills/360-faculty/references/seating-roster.md
 
 # Seating Roster
 
-Optional examples. Read only when a task's risks leave a gap in expertise selection. It is a floor, not a ceiling — derive unlisted faculties when the plan's failure modes demand them. Never show it unless the developer asks.
+Optional examples. Read only when a task's risks leave a gap in expertise selection. Derive unlisted faculties when concrete failure modes demand them; combine overlapping lenses and require distinct value from every seat. These are advisory lenses, not validators of facts or operational risk owners. Never show it unless the developer asks.
 
 **Human mind**
 
@@ -1816,22 +1785,14 @@ Source: skills/360-optimize/SKILL.md
 ---
 name: 360-optimize
 description: Audit working code for zero-cost speed, weight, and reliability gains — measure first, rank drop-in upgrades and restructures, and report conservative expected effects on this system. Use when existing code must run faster, lighter, or more robustly without changing what it does.
-version: 2.1.0
+version: 2.2.0
 ---
 
 # 360 Optimize
 
 ## Purpose
 
-Run this skill on code that already works. Find gains in speed, weight, and reliability that pass a zero-cost gate: same function, same or better reliability, net-lighter system.
-
-Technology-agnostic. Audit hot paths, data movement, drop-in upgrades, and structure. Do not hunt bugs, dead weight, or observability as the job — that is `360-backend-audit`.
-
-This skill writes an audit, not a rewrite. To plan approved work, use `360-blueprint`. To build it, use `360-execute`.
-
-Reported expectations must be realistic for this system. A sold gain that this load will not see is a defect.
-
-Prefer a file for the full deliverable and a short chat briefing; use the Delivery rules below.
+Assess working code for supported speed, weight and reliability gains that preserve its intended contract. Produce an audit with conservative expectations, unresolved candidates and rejected ideas; implementation requires separate authorization.
 
 ## When to Use
 
@@ -1843,14 +1804,7 @@ Prefer a file for the full deliverable and a short chat briefing; use the Delive
 
 ## Core Principle
 
-- Current behavior is the floor. A faster wrong answer is still wrong
-- Zero-cost is a gate, not a mood. Fail a check and the idea is Rejected
-- Measure before you rank. Unmeasured stays unlabeled as proven
-- Expected gain is a conservative typical case on this code, this load, this environment — never a best case, never a vendor number
-- Local win is not end-to-end win. Do not stack overlapping gains
-- Delete waste before you swap tools. Swap tools before you reshape the system
-- Robust beats emergent. Emergent enters only behind an adapter, with rollback, and with evidence
-- Preserve a recoverable record using the Delivery rules below
+Recommend gains only as strongly as their evidence permits.
 
 ## Workflow
 
@@ -1868,18 +1822,21 @@ Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`.
 
 Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
 
+Use observable preservation and acceptance checks. Structural validation cannot prove behavior or accuracy; evaluate realistic consent, capability, recovery, and handoff scenarios separately. Document unavailable telemetry and regressions; do not infer universal accuracy or token savings from finite tests.
+
 ### 1. Lock the Contract
 
 - Map purpose, inputs, outputs, ordering, error shapes, and caller-visible side effects
-- Treat that map as the contract that must survive
-- If any behavior is allowed to change, ask once. Default is none
+- Confirm that map against requirements and caller evidence; known defects are handed off, not preserved as intended behavior
+- Honor already authorized contract changes; otherwise preserve the intended contract and ask only about material unresolved trade-offs
 - If the contract is unclear, mark questions. Do not optimize guessing
 
 ### 2. Find Time and Weight
 
 - Locate hot paths from profiles, traces, logs, complexity, or data volume
 - Name the resource: latency, CPU, memory, I/O, binary size, dependency surface
-- Record the baseline: what was measured, on which path, under which load, in which environment
+- Record baseline and candidate under comparable representative workloads, input sizes, environment and run conditions; note variability and measurement limits
+- Expose resource trade-offs: latency, CPU, memory, I/O, dependency/operational weight and money. A local speedup may move cost elsewhere
 - Cold paths stay untouched
 - If you did not measure, write `unmeasured` and keep the finding as a candidate
 
@@ -1904,9 +1861,9 @@ Admit a change only when every check is yes:
 - Weight: net dependencies, operational surface, and code complexity do not grow
 - Money: no new paid obligation unless it replaces a larger one
 - Reversal: a rollback path exists
-- Gain: measured, or explicitly `unmeasured` — never claimed proven without evidence
+- Gain: a supported improvement on a named axis from a representative comparison on this system, with uncertainty and resource trade-offs stated
 
-A failed check means Rejected, with the failed check named. Not "do it carefully".
+A failed check means Rejected, even if another axis improved. An unknown check leaves an unresolved candidate with the missing evidence and next check in Measurement/Verification; it is not admitted to Ranked gains, Upgrades or Restructures. Only all-pass items are supported recommendations. An audit can complete with no admitted gains.
 
 ### 5. Gate Upgrades and Libraries
 
@@ -1921,7 +1878,7 @@ For every candidate tool or library, record:
 
 Stdlib or an existing dependency wins when it meets the need. Do not add a dependency to look modern.
 
-An emergent or young tool is admissible only with an adapter, a rollback, and evidence it beats the incumbent on a named axis. Missing any of those: Rejected.
+For an emergent or young tool, check an adapter, rollback and evidence of improvement on a named axis. Known absence of a required safeguard fails; an uninspected safeguard remains unknown under the same gate.
 
 Never name a tool because it is popular. Name it because it passed this gate on this code.
 
@@ -1937,7 +1894,7 @@ Callers and error shapes stay identical unless the user approved a contract chan
 
 - Existing tests that cover the contract must still pass
 - Where coverage is thin on a touched path, propose contract tests first: outputs, errors, ordering, bounds, concurrency
-- Classify each admitted change: `safe now` / `needs tests first` / `needs measurement first` / `needs human decision`
+- Classify each item: `safe now` / `needs tests first` / `needs measurement first` / `needs human decision`. Items lacking gate evidence remain candidates in Measurement/Verification, regardless of a promising local result
 - When in doubt, leave it in the audit and wait. Do not rewrite production code under this skill
 
 Correctness bugs found while scanning are out of scope. Record them as `handoff to 360-backend-audit`, do not disguise them as optimizations.
@@ -1950,8 +1907,8 @@ Every admitted gain gets a conservative expected effect. This step is not option
 - Report the typical production path. Best-case is not the expectation
 - A local win stays local until you can scale it by that path's share of end-to-end cost. If the share is unknown, say `end-to-end unknown`
 - Do not add overlapping recommendations as if they stack
-- Vendor benches, blog numbers, microbenchmarks, and other projects are not evidence here
-- Unmeasured: no magnitude, no `high` rank, no `proven`
+- Vendor benches, blog numbers and other projects do not establish this system’s gain. A local microbenchmark supports only its tested path and workload; do not generalize it without representative evidence
+- Unmeasured candidates: no magnitude, rank, or `proven`; name the check needed before promotion
 - Rank `high` only when evidence shows this path dominates the named resource
 - Round the gain down and the cost of the change up (effort, overhead, risk)
 - If the sentence still sells after the evidence is removed, rewrite it
@@ -1982,7 +1939,7 @@ Local routing: Recommend `360-blueprint` to turn supported findings into scoped 
 ### Work file
 
 1. Contract — what must not change
-2. Measurement — what was profiled, load, environment, what is `unmeasured`
+2. Measurement — what was profiled, load, environment, what is `unmeasured`; unresolved candidates and missing gate evidence
 3. Ranked gains — only items that passed the Zero-Cost Gate. Each row:
 
    - Change and axis (speed / weight / reliability)
@@ -1991,18 +1948,18 @@ Local routing: Recommend `360-blueprint` to turn supported findings into scoped 
    - Expected effect — conservative typical case, scoped `local` or `end-to-end`
    - Holds when
    - Falsified when
-   - Rank: `high` / `medium` / `low` (no `high` if unmeasured)
+   - Rank: `high` / `medium` / `low` (supported gains only)
    - Effort and classification
 
 4. Upgrades — drop-in runtime, library, or tool changes that passed
 5. Restructures — shape changes that passed, with why the current shape is the cost
 6. Rejected — attractive ideas that failed the gate, with the failed check
 7. Handoff bugs — correctness or dead-weight items for `360-backend-audit`; or "None"
-8. Verification — tests to run, rollback, how to detect a silent contract break
+8. Verification — tests run/to run, rollback, how to detect a silent contract break; next checks for unresolved candidates
 9. Implementation plan — grouped as New vs Updates to existing
 10. Handover — Context · Decisions · State (done / pending / blocked) · Remaining tasks (what, how, where) · Verification · Risks and how to detect them early
 
-Implementation tasks use the Shared Plan Contract. Every finding needs evidence. Clean areas are stated as clean. No magnitude without a measurement on this system.
+Implementation tasks use the Shared Plan Contract. Keep candidates separate from supported gains using the existing Measurement/Verification sections. State inspection limits; completion of the assessment does not verify a candidate or its implementation. No magnitude without a measurement on this system.
 
 ### Terminal briefing
 
@@ -2046,19 +2003,20 @@ The audit is complete only when every answer is yes:
 - The contract is written and treated as the floor
 - Hot paths were located from evidence, or marked `unmeasured`
 - Waste was considered before upgrades, and upgrades before restructure
-- Every admitted change passed the Zero-Cost Gate
+- Every admitted change has affirmative evidence for every Zero-Cost Gate check; unknowns remain candidates and failures are Rejected
 - Every Rejected item names the check it failed
 - No recommendation weakens function, reliability, precision, or failure semantics
 - No new dependency was proposed that fails net-lighter
-- Emergent tools, if any, have adapter, rollback, and evidence — otherwise they are Rejected
+- Emergent tools meet the same pass/fail/unknown rules for adapter, rollback and improvement evidence
 - Every admitted gain has baseline, conservative expected effect, scope, Holds when, and Falsified when
-- No magnitude, `high` rank, or `proven` on an unmeasured item
+- No magnitude, rank, or `proven` on an unmeasured candidate
+- Comparisons use representative workloads and expose resource trade-offs and variability
 - No vendor, blog, or other-project number is presented as this system's gain
 - Best-case is not reported as typical; overlapping gains are not stacked
 - End-to-end claims are scaled by path share, or marked `end-to-end unknown`
 - Correctness bugs are handed off, not sold as optimizations
 - New work and updates to existing work are grouped separately
-- The handover lets the next agent act with zero guessing
+- The handover distinguishes supported gains, rejected ideas, unresolved candidates and their next checks
 - The deliverable is saved at the stated path, or honestly labeled in-session only
 - The briefing omits empty sections, uses proven/likely/possible/uncertain, never numbers, and does not hype
 

@@ -1,16 +1,14 @@
 ---
 name: 360-expert-review
 description: Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage.
-version: 3.3.0
+version: 3.4.0
 ---
 
 # 360 Expert Review
 
 ## Purpose
 
-Run this skill before finalizing any important plan. Turn a draft into the strongest executable plan by exposing missing scenarios, weak assumptions, and hidden failure modes.
-
-Prefer a file for the full deliverable and a short chat briefing; use the Delivery rules below.
+Expose concrete failure cases and weak assumptions in a draft plan, then revise it in place until applicable readiness checks pass or blockers are explicit.
 
 ## When to Use
 
@@ -21,11 +19,7 @@ Prefer a file for the full deliverable and a short chat briefing; use the Delive
 
 ## Core Principle
 
-- Review the plan the way a senior team would: user impact, reliability, security, operations, and domain correctness
-- Attack it hard enough that only the strongest version survives
-- Finalize into the existing plan file. Do not replace tasks with a narrative essay
-- Ground questions in project evidence; provide recommended choices and a free-text note option before finishing; never dump trailing questions at the end of the conversation
-- Preserve a recoverable record using the Delivery rules below
+Try to disprove readiness with concrete failure cases.
 
 ## Workflow
 
@@ -43,17 +37,17 @@ Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`.
 
 Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
 
+Use observable preservation and acceptance checks. Structural validation cannot prove behavior or accuracy; evaluate realistic consent, capability, recovery, and handoff scenarios separately. Document unavailable telemetry and regressions; do not infer universal accuracy or token savings from finite tests.
+
 ### 1. Understand the Project First
 
-- Before asking task questions, inspect the available project context: instructions, existing plans and decisions, relevant artifacts or implementation, recent changes, verification results, and any execution ledger. Establish the current stage and what is done, pending, or blocked; cite evidence and distinguish verified state from claims. If nothing exists yet, record that; if access is unavailable, state the gap and ask only for the missing context that changes the work
-- Reuse answers already supplied by the user or established by current evidence. Do not ask generic intake questions, ask the user to rediscover accessible facts, or reopen settled decisions without new conflicting evidence
-- Build a short gap list covering the goal, success measures, scope boundaries, high-level outline, constraints, dependencies, and details needed to execute or judge the plan without guessing. Resolve discoverable facts first; ask the user only about remaining decisions, contradictions, or unavailable facts
-- Use the host's available interactive question tool for every user question. Offer small, focused rounds of one to three questions; for each decision, give concrete options, put the best supported recommendation first, and briefly explain its evidence and trade-off. Always allow a free-text note or custom answer alongside the options. For missing facts, request a note and recommend what information to include; do not invent an answer or a recommendation unsupported by evidence
-- If interactive tools are unavailable, present the same numbered choices, recommendation with rationale, and explicit free-text note option in chat, then wait for the answer
-- After each answer, update the known facts and decisions, inspect newly relevant evidence, and ask the next unresolved questions. Continue until the goal, scope, outline, and required details are clear; do not stop after a fixed questionnaire or repeat answered questions. Re-enter this loop if later planning or review exposes a new gap
-- Treat a recommendation, preselected option, silence, or elapsed time as unanswered. Continue independent inspection while waiting, but do not decide dependent work or claim readiness. Preserve explicit user deferrals or delegated choices with their limits; keep unresolved blockers in `Draft`
-- Summarize the resulting understanding and record evidence, current stage, completed work, decisions, and remaining uncertainty within the existing context, assumptions, or review sections. Ask for confirmation only where the user's answers and evidence have not already settled the issue; stop questioning when a fresh executor or reviewer can proceed without material guessing
-- Compare the supplied plan with the observed project stage and completed work before judging it. Surface stale assumptions, duplicated completed tasks, and conflicts with existing decisions; preserve valid task IDs and progress records
+- Inspect available instructions, plans, decisions, relevant artifacts, recent changes, verification and any execution ledger. Establish the current stage and done/pending/blocked work; cite sources and distinguish observed facts from claims. Record unavailable evidence
+- Reuse current evidence and user answers. Resolve discoverable facts by inspection; do not ask the user to rediscover them
+- Separate remaining gaps: material user decisions change the outcome, scope, acceptance criteria, significant cost or irreversible effects; reversible implementation defaults stay within established intent and conventions. Choose supported defaults, record the reason and revisit condition, and proceed. Do not present a default or inference as a fact
+- Ask only for unresolved material decisions, conflicting instructions, or inaccessible facts needed to judge success. Use the available interactive question tool in focused rounds of one to three questions, with the best supported recommendation, its trade-off, and a free-text/custom option. For missing facts, request the needed evidence without inventing it. If tools are unavailable, offer equivalent numbered choices and notes in chat
+- Unanswered required questions block dependent planning and readiness, not independent inspection. Silence, a recommendation, a preselected option or elapsed time is not an answer. Honor explicit delegation or deferral within its limits
+- After answers, update the existing context, assumptions or review sections and inspect newly relevant evidence. Stop questioning when material choices are settled; reopen only on new conflicting evidence
+- Compare the supplied plan with current artifacts before judging it. Identify stale assumptions, duplicated completed work and conflicting decisions; preserve valid task IDs and progress records
 
 ### 2. Review Through Expert Lenses
 
@@ -69,33 +63,30 @@ Use only the lenses this project needs:
 
 Do not role-play personas. Extract findings directly from each lens.
 
-### 3. Cover the User Completely
+### 3. Check Relevant User Outcomes
 
-- Solve the real need with the lowest-friction path that works
-- Cover empty, loading, error, interrupted, and recovery states
-- Prevent lost work, confusion, and irreversible mistakes
-- Include first-time, returning, low-skill, accessibility, and poor-connectivity users when relevant
+- Trace the real need through normal use, likely failures and severe plausible failures
+- Check empty, error, interrupted and recovery states where they affect this task
+- Include affected user groups, accessibility and connectivity constraints when relevant; state inspection limits
 
-### 4. Cover Every Scenario and Effect
+### 4. Make Findings Actionable
 
-- Map affected components, data, APIs, permissions, integrations, and existing behavior
-- Cover happy paths, edge cases, invalid input, retries, duplicates, and concurrency
-- Cover dependency failures, timeouts, partial completion, degraded performance, migrations, mixed versions, and rollback
-- Every risk needs prevention, detection, mitigation, or rollback
+- For each actionable finding, name its trigger, consequence, evidence or explicit hypothesis, and smallest correction or next check
+- Rank consequence separately from confidence. A plausible severe failure can justify investigation without being a proven defect
+- Require work only when it protects a requirement or addresses a concrete material failure; speculative improvements remain optional
+- Map only affected components, interfaces and state. Check retries, duplicates, concurrency, dependencies and rollback where those mechanisms exist
 
-### 5. Guarantee Reliability and Traceability
+### 5. Check Reliability and Traceability
 
-- Validation, error handling, idempotency, and graceful failure where relevant
-- Security, privacy, performance, and compatibility where relevant
-- The simplest design that fully works
-- Every requirement traceable to implementation, tests, monitoring, and ownership
-- Debugging path: meaningful errors, structured logs, correlation IDs, metrics, alerts, and reproduction path
+- Trace relevant requirements to implementation tasks and observable verification
+- Add validation, failure handling, security, compatibility, monitoring and ownership only where a concrete risk demands them
+- Prefer the simplest correction that protects the intended outcome; do not introduce operational machinery into an unrelated documentation task
 
-### 6. Verify Everything
+### 6. Define Proportionate Verification
 
-- Define testing proportional to risk
-- Every acceptance criterion must be observable
-- "Works correctly" is not a criterion
+- Match each acceptance check to the consequence it detects; “works correctly” is not observable
+- Distinguish a reviewed plan from a verified implementation. A planned test has not run
+- Mark irrelevant checks non-applicable with reasons. Missing evidence remains unknown; obtain it or disclose the resulting limitation/blocker
 
 ### 7. Attack the Plan
 
@@ -109,7 +100,7 @@ Switch to hostile critic. Ask:
 - What cannot be detected, reproduced, or reversed?
 - What can be simpler?
 
-Fix actionable findings, then recheck the affected risks. Stop when applicable acceptance checks pass and no unresolved high-severity blocker remains. If evidence or a user decision is unavailable, record a concrete blocker and stop that review line; do not loop indefinitely or claim finality. When a decision, design trade-off, or ambiguity requires user input (even for task-level shapes or non-blocking details), return to the clarification loop and resolve the required input before finalizing; do not dump questions as trailing chat bullets. Mark non-applicable checks with a reason.
+Fix actionable findings and recheck affected risks. Stop when applicable checks pass and material blockers are resolved. An unavailable check stays unknown; if it prevents judging readiness, keep the plan non-final and name the missing evidence or decision. Otherwise disclose the limit without manufacturing required work. Use the clarification loop only for material user decisions; record routine defaults. Do not loop indefinitely.
 
 ### 8. Write the Final Plan
 
@@ -204,15 +195,15 @@ The plan is final only when every applicable answer is yes (record a reason for 
 - Current project stage and completed work were inspected, or unavailable evidence was explicitly recorded
 - Existing answers were reused; follow-up rounds resolved the goal, scope, outline, and required details without treating silence or recommendations as consent
 - The right expert lenses were applied
-- Every important scenario and effect was mapped
-- Every risk has a countermeasure
-- Requirements are traceable to code, tests, and monitoring
-- Failures are detectable, reproducible, diagnosable, and fixable
+- Relevant requirements, likely failures and severe plausible failures were checked; inspection limits are explicit
+- Every actionable finding has a trigger, consequence, evidence or hypothesis, and smallest correction; severity and confidence are separate
+- Relevant requirements are traceable to tasks and observable verification; monitoring is included only where needed
+- Material failure cases have proportionate detection, diagnosis and recovery checks
 - The design is clear, consistent, and as simple as possible
 - Testing matches the risk
-- Release and rollback are safe
+- Release and rollback checks address the plan’s relevant failure cases
 - The plan survived hostile review
-- Every blocker, ambiguity, and decision requiring user input was actively prompted through the evidence-grounded interactive clarification loop with recommendations and a free-text note option before completing, never dumped as trailing bullets at the end of the turn
+- Material decisions were resolved through the clarification loop; defaults and unknown evidence are explicit, never silent passes
 - Task IDs were preserved or changed with a stated reason
 - New work and updates to existing work are grouped separately
 - The finalized plan preserves its original location where supported, or follows the Delivery fallback

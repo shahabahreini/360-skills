@@ -48,12 +48,12 @@ Each skill works individually. Review includes its own minimum plan contract; bl
 
 | Skill | Description | Version |
 |---|---|---|
-| [`360-backend-audit`](skills/360-backend-audit) | Deep-audit backend code, write the full report to a file, and brief the user in chat with bugs, updates, and dead weight. Use before or after significant backend work, or when inheriting, refactoring, or handing off services. | 2.1.0 |
-| [`360-blueprint`](skills/360-blueprint) | Create an executable plan from a new objective with explicit tasks, constraints, and verification. Use when a goal exists but the path is unclear, or the request is "plan this". | 2.3.0 |
-| [`360-execute`](skills/360-execute) | Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and brief the user in chat. Use when a plan exists and work must begin, or when resuming a partial execution. | 2.1.0 |
-| [`360-expert-review`](skills/360-expert-review) | Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage. | 3.3.0 |
-| [`360-faculty`](skills/360-faculty) | Seat a living, tailored expert team on a plan or task. Use when work must fit this developer's goals, taste, mindset, and strategy, when a plan needs the right expertise chosen for its complexity, depth, and nature, or when a named faculty team must be created, called, or updated. Recommends a short list, asks only the questions that still change the work, polishes immediately, and keeps upgradable memory. | 1.2.0 |
-| [`360-optimize`](skills/360-optimize) | Audit working code for zero-cost speed, weight, and reliability gains — measure first, rank drop-in upgrades and restructures, and report conservative expected effects on this system. Use when existing code must run faster, lighter, or more robustly without changing what it does. | 2.1.0 |
+| [`360-backend-audit`](skills/360-backend-audit) | Deep-audit backend code, write the full report to a file, and brief the user in chat with bugs, updates, and dead weight. Use before or after significant backend work, or when inheriting, refactoring, or handing off services. | 2.2.0 |
+| [`360-blueprint`](skills/360-blueprint) | Create an executable plan from a new objective with explicit tasks, constraints, and verification. Use when a goal exists but the path is unclear, or the request is "plan this". | 2.4.0 |
+| [`360-execute`](skills/360-execute) | Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and brief the user in chat. Use when a plan exists and work must begin, or when resuming a partial execution. | 2.2.0 |
+| [`360-expert-review`](skills/360-expert-review) | Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage. | 3.4.0 |
+| [`360-faculty`](skills/360-faculty) | Seat a living, tailored expert team on a plan or task. Use when work must fit this developer's goals, taste, mindset, and strategy, when a plan needs the right expertise chosen for its complexity, depth, and nature, or when a named faculty team must be created, called, or updated. Recommends a short list, asks only the questions that still change the work, polishes immediately, and keeps upgradable memory. | 1.3.0 |
+| [`360-optimize`](skills/360-optimize) | Audit working code for zero-cost speed, weight, and reliability gains — measure first, rank drop-in upgrades and restructures, and report conservative expected effects on this system. Use when existing code must run faster, lighter, or more robustly without changing what it does. | 2.2.0 |
 | [`360-token-efficiency`](skills/360-token-efficiency) | Reduce avoidable context and tool-output overhead with capability-aware retrieval, reuse, and verified handovers. Use as an optional, session-approved companion when token cost or context growth matters, with strict preservation of task requirements by default. | 2.1.0 |
 
 ## Which Skill Do I Need?
@@ -102,13 +102,13 @@ Readiness moves from `Draft` to `Ready for review` to `Reviewed and ready to exe
 
 - **`360-blueprint`** turns a vague goal into a complete, unambiguous plan written directly to a file, briefing the user in chat with key decisions, assumptions, and risks.
 - **`360-faculty`** seats a short list of named experts fitted to this developer and to the plan's own complexity, depth, and nature, tailoring it surgically, remembering what it learns, and saving reusable teams that can be called by name later.
-- **`360-expert-review`** attacks that plan from every expert angle until only the strongest version survives, writing the finalized plan back to the file and briefing the user in chat.
+- **`360-expert-review`** tests that plan against relevant concrete failure cases, writing the finalized plan back to the file and briefing the user in chat.
 - **`360-execute`** builds it, tracking every task in a coverage ledger written to disk, verifying each against its own acceptance check with evidence, and briefing progress in chat.
 - **`360-backend-audit`** audits the resulting backend code for correctness, duplication, performance risks, and observability, writing the full report to a file and briefing findings in chat.
 - **`360-optimize`** audits working code for zero-cost speed, weight, and reliability gains, ranking drop-in upgrades and restructures with conservative expected effects written to a file and briefing highlights in chat.
 - **`360-token-efficiency`** runs alongside the active task with session consent, reducing avoidable overhead while preserving requirements and required checks.
 
-Blueprint and expert review inspect the current project stage and completed work before asking questions. They clarify remaining gaps in interactive rounds with evidence-backed recommendations and a free-text note option, continuing until goals, scope, outline, and required details are clear. When interactive tools are unavailable, they use equivalent choices and notes in chat.
+Blueprint and expert review inspect the current project stage and completed work before asking questions. They clarify remaining gaps in interactive rounds with evidence-backed recommendations and a free-text note option, resolving material decisions while recording supported reversible defaults. When interactive tools are unavailable, they use equivalent choices and notes in chat.
 
 Each skill also works standalone: ask `360-faculty` which expertise a plan needs without seating anyone, skip straight to `360-expert-review` for a plan someone else drafted, point `360-execute` at a plan someone else finalized, run `360-backend-audit` on existing code with no plan involved at all, audit working code for performance and weight with `360-optimize`, or apply `360-token-efficiency` to any task regardless of which other skills are in play.
 
@@ -126,10 +126,14 @@ All skills prefer files where supported, honor explicit output requests, and pro
 
 ## Design Principles
 
-1. **Expertise over templates**: skills simulate senior specialists, not checklists.
-2. **Coverage over speed**: every scenario, every effect, every failure mode.
-3. **Gates over suggestions**: nothing is "final" until it passes an explicit quality gate.
-4. **Simplicity over ceremony**: brief, strong instructions any agent can follow.
+Understand the intended outcome, establish the relevant facts, choose the simplest supported action, and verify the result. When evidence is insufficient, preserve uncertainty and identify the next useful check.
+
+1. **Evidence**: distinguish observed facts, supported defaults, assumptions and unknowns. Expert lenses advise; evidence validates.
+2. **Proportionate coverage**: check relevant requirements, likely failures and severe plausible failures; disclose inspection limits.
+3. **Observable gates**: an unknown check never becomes a pass. A completed assessment with limitations does not verify a proposed implementation.
+4. **Simple decisions and recovery**: resolve routine choices within authorization, ask about material departures, and reconcile current state before resuming or retrying.
+
+These rules reduce reliance on unstated judgment; they cannot guarantee flawless performance from every model. See the [logic review and scenario evidence](docs/validation/skill-logic-review.md).
 
 ## How Agent Skills Work
 
@@ -197,7 +201,7 @@ A portable, version-controlled folder that packages domain expertise and a repea
 Any agent supported by the [skills.sh](https://skills.sh) CLI, including Claude Code, Cursor, Codex, Windsurf, GitHub Copilot, OpenCode, and Gemini CLI.
 
 **Why is it called 360-skills?**
-Because the quality failures that matter most hide in the angles nobody checked. Every skill here is built to examine a problem from all sides before calling it done.
+Because the quality failures that matter most hide in the angles nobody checked. Every skill checks relevant requirements and failure cases, and states the limits of its inspection.
 
 **How do I add a new skill?**
 Read [AGENTS.md](AGENTS.md), create `skills/360-<name>/SKILL.md` following the required structure, then register it in this README's skills table.

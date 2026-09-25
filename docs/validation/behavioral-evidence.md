@@ -203,3 +203,69 @@ Acceptance review:
 
 Outcome: original contradiction resolved. Completion does not require exceeding the user's requested scope. No new defect observed in this rerun. This is a behavioral walkthrough, not an independent host benchmark.
 ````
+
+
+## 2026-09-24 logic revision evidence
+
+The implementing agent knew the scenarios and expected outcomes. Temporary fixture files were created under an isolated system temp directory; no production services or faculty memory were touched. These probes support the concrete observations below, not autonomous skill compliance. Inputs are synthetic; timings were not benchmarked.
+
+### Recovery and evidence probe
+
+Setup: artifact baseline `timeout: 1250 ms\nendpoint: /v1/jobs\n`, actual artifact `timeout: 2500 ms\nendpoint: /v1/jobs\n`. Ledger 1.1 incorrectly says done (verified) at the baseline hash. Ledger 1.2 says in progress, operation op-42, append evt-007 / 12005 cents. Local effects journal already contains exactly that one operation. This simulates interruption between effect and ledger update; it is not a real external API.
+
+Observed baseline hash: `1bc7fe26a3f3ea257271502cfd0655b4f5434cb3abaf1912cdf5bccba74f18dc`; actual hash: `515dc8df70dc157f34cb5cb88102cc39b259f0840411970a2d72a2be4abe1016`. After inspecting both, the agent reopened 1.1, reused the existing op-42 result for 1.2, and deliberately did not replay it. Python assertions checked the different hashes, exact event fields and unchanged artifact/effects bytes.
+
+Pagination inputs: page 1 contains records [1,2], total 3, next p2; first page-2 response is truncated `{"records": [`; recovered page 2 contains [3], total 3, next null. Current config is revision config@v4, retry_delay `250 ms`, max_retries 3; stale summary used config@v3. JSON parsing rejected the truncated page, and assertions checked full record count, terminal cursor and exact configuration after reopening sources.
+
+Actual probe output:
+
+```json
+{
+  "stale_task_status": "pending",
+  "reconciled_action_status": "done (verified)",
+  "effects_count": 1,
+  "effects_unchanged": true,
+  "artifact_unchanged": true,
+  "restored_record_count": 3,
+  "terminal_cursor": null,
+  "exact_config": {"revision": "config@v4", "retry_delay": "250 ms", "max_retries": 3}
+}
+```
+
+### Indirect caller and failed preservation probe
+
+Node assertions executed a handler through `registered.get(config.eventHandler)` with `config.eventHandler = 'onReceipt'`; the registered function returned `{accepted: event.id}`. This establishes indirect reachability within the fixture only. A separate preservation assertion compared ascending-order contract output for [3,1,2] with an unsafe candidate returning its input unchanged. Any speedup in scenario O3 is hypothetical supplied data, not an observed timing.
+
+Actual probe output:
+
+```json
+{
+  "indirect_handler_result": {"accepted": "evt-007"},
+  "expected_order": [1, 2, 3],
+  "candidate_order": [3, 1, 2],
+  "preservation_gate": "fail",
+  "disposition": "Rejected regardless of supplied speedup",
+  "speed_measurement": "UNMEASURED"
+}
+```
+
+### Complete fallback walkthrough output
+
+Synthetic request: assess a possible repeated-lookup cache; no caller contract, measurements or files available; return the full assessment in chat. The following is the generated walkthrough deliverable, captured here by the evaluation host. The hypothetical host did not save it. No implementation is authorized by this assessment.
+
+```text
+in-session only; not persisted
+
+1. Contract — Caller-visible outputs, errors, ordering and freshness must be preserved. Caller contract is unavailable; acceptable cache staleness is unknown.
+2. Measurement — Candidate: cache repeated lookups. No baseline/profile, representative workload or candidate measurement. Gain and preservation gates unknown; compare representative repeated/distinct key workloads and memory use after obtaining the caller contract. UNMEASURED.
+3. Ranked gains — None; no candidate passed every gate.
+4. Upgrades — None supported.
+5. Restructures — None supported.
+6. Rejected — None established; missing evidence leaves the cache unresolved rather than rejected.
+7. Handoff bugs — None established within the supplied description.
+8. Verification — Obtain caller freshness/error contract; check output, ordering, invalidation, concurrent access and failure behavior; compare baseline/candidate latency, CPU and memory under the same workload. No tests or measurements run. Rollback unverified.
+9. Implementation plan — New: none. Updates to existing: none ready to implement. Candidate investigation is the next possible direction; the missing caller contract blocks an implementation plan, not this bounded assessment.
+10. Handover — Context: static cache assessment with no files or telemetry. Decisions: preserve contract; do not implement; unresolved candidate stays outside Ranked gains. State: assessment done, candidate unresolved, implementation pending. Remaining tasks: obtain contract, then measure and test in the actual lookup path if authorized. Verification: static input review only; no measured gain or verified implementation. Risks and how to detect them early: stale answers, memory growth and changed failure behavior; use caller evidence and representative preservation checks.
+```
+
+Completion walkthrough: one parent-owned next-action prompt recommends stopping after this bounded assessment unless the user wants to supply the caller contract; allows stop and custom direction. An unanswered prompt does not change assessment completion or authorize implementation. A separate execution scenario requiring unavailable file writes remains blocked, with zero verified implementation tasks.
