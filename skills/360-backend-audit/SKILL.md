@@ -1,7 +1,7 @@
 ---
 name: 360-backend-audit
 description: Deep-audit backend code, write the full report to a file, and brief the user in chat with bugs, updates, and dead weight. Use before or after significant backend work, or when inheriting, refactoring, or handing off services.
-version: 2.2.0
+version: 2.3.0
 ---
 
 # 360 Backend Audit
@@ -36,9 +36,9 @@ Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`.
 
 ### Delivery
 
-Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
+Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat carries the Reader's Briefing and the path. These delivery rules also apply to the templates and quality gate below.
 
-Use observable preservation and acceptance checks. Structural validation cannot prove behavior or accuracy; evaluate realistic consent, capability, recovery, and handoff scenarios separately. Document unavailable telemetry and regressions; do not infer universal accuracy or token savings from finite tests.
+Judge completion by observable acceptance checks. A structural or format check does not prove behavior or accuracy; state what was not verified.
 
 ### 1. Map the Audit Scope
 
@@ -93,7 +93,7 @@ Proposed observability changes should be additive and non-breaking; do not imple
 - Reuse the existing path if known; otherwise `plans/<short-slug>-audit.md`; create the folder if needed; ask once if ambiguous
 - If the file cannot be written, use the in-session delivery fallback
 - Keep new work and updates to existing work in separate lists
-- With a saved file, print the terminal briefing and path
+- Print the Reader's Briefing in chat before asking anything. A next-action question with no briefing above it is a failed delivery. If the host sends one message, the briefing comes first in that message
 
 ### Completion: Choose the Next Action
 
@@ -122,9 +122,9 @@ Local routing: Recommend planning actionable correctness or reliability fixes wi
 
 Keep the finding details from Workflow 3 inside the existing report sections. Call an area clean only within verified coverage; mark uninspected areas explicitly. A completed bounded audit does not verify proposed fixes or unavailable production behavior. Implementation tasks use the Shared Plan Contract. Label all proposed changes as recommendations, not completed fixes.
 
-### Terminal briefing
+### Reader's Briefing
 
-Use this shape. Omit any section that would be empty. Follow the Delivery rules for file or in-session output.
+Print this in chat. Follow the Delivery rules for file or in-session output.
 
 ```text
 Backend audit — complete
@@ -146,13 +146,18 @@ Need from you
 - <decision required to proceed>
 ```
 
-- Talk to the user, not the next agent
-- A new artifact is Features to add. A change to an existing artifact, feature, or document is Updates to existing. Never mix them
-- Confidence: `proven` evidence in hand; `likely` strong reason; `possible` suspected; `uncertain` hypothesis. Never numbers. Never say proven without evidence
+Briefing rules:
+
+- Write for someone who has not read the full artifact. Define or drop any term of art
+- One line per bullet, 20 words or fewer. The whole briefing fits one screen (about 25 lines)
+- Outcomes and decisions, never mechanics: no task IDs, phases, priorities, status tables, executor notes, or skill names
+- Keep new things and changes to existing things in separate sections. Never mix them
+- Confidence uses proven (evidence in hand), likely (strong reason), possible (suspected), or uncertain (hypothesis). Never numbers; never proven without evidence
+- The second line names the full artifact's path, or says `in-session only; not persisted`
+- Omit empty sections unless this skill marks one as always present
+- A new artifact goes under `Features to add`; a change to an existing artifact, feature, or document goes under `Updates to existing`
 
 ## Quality Gate
-
-- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
 
 The audit is complete only when every answer is yes:
 
@@ -168,6 +173,8 @@ The audit is complete only when every answer is yes:
 - New work and updates to existing work are grouped separately
 - The handover preserves evidence, limits and the next useful checks
 - The deliverable is saved at the stated path, or honestly labeled in-session only
-- The briefing omits empty sections and uses proven/likely/possible/uncertain, never numbers
+- The briefing follows the briefing rules
+- The Reader's Briefing was printed in chat before any next-action question
+- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
 
 Any "no" means the audit is not finished. Fix it and review again.

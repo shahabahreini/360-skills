@@ -4,7 +4,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { generateLlmsFull } from './build-llms-full.mjs';
-import { CONSENT, PLAN_CONTRACT, HANDOVER, DELIVERY, COMPLETION, COMPLETION_GATE, READER_BRIEFING_RULE, READER_BRIEFING_GATE } from './lib/contracts.mjs';
+import { CONSENT, PLAN_CONTRACT, HANDOVER, DELIVERY, COMPLETION, COMPLETION_GATE, READER_BRIEFING_RULE, READER_BRIEFING_GATE, READER_BRIEFING_RULES } from './lib/contracts.mjs';
 import { frontmatter, markdownLinks, sections, outsideFences } from './lib/markdown.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -58,7 +58,9 @@ export function checkConsistency(root = ROOT) {
       const completionHeadings = outsideFences(text).split('\n').filter(line => line === completionHeading);
       if (completionHeadings.length !== 1) report('expected exactly one Completion block');
       const hasReaderBriefing = outsideFences(text).includes("### Reader's Briefing");
+      if (workflow.includes(DELIVERY) && !hasReaderBriefing) report('a skill that delivers an artifact needs a Reader’s Briefing output');
       if (hasReaderBriefing && !workflow.includes(READER_BRIEFING_RULE)) report('Reader’s Briefing must precede the next-action prompt');
+      if (hasReaderBriefing && !(parts[4]?.body ?? '').includes(READER_BRIEFING_RULES)) report('missing or changed shared briefing rules in the output section');
       const normalizedWorkflow = workflow.replace(`${READER_BRIEFING_RULE}\n`, '');
       const completionAt = normalizedWorkflow.indexOf(COMPLETION);
       if (completionAt < 0) report('missing or changed shared Completion block inside Workflow');
@@ -183,7 +185,7 @@ export function checkConsistency(root = ROOT) {
     for (const name of items.keys()) if (!skills.has(name)) fail(`${source}: registered non-public or nonexistent skill ${name}`);
   }
   const contributors = outsideFences(read('AGENTS.md'));
-  for (const [label, contract] of [['shared consent entry', CONSENT], ['portable Delivery rules', DELIVERY], ['shared Completion block', COMPLETION], ['Completion Quality Gate item', COMPLETION_GATE], ['Reader’s Briefing rule', READER_BRIEFING_RULE], ['Reader’s Briefing Quality Gate item', READER_BRIEFING_GATE]]) {
+  for (const [label, contract] of [['shared consent entry', CONSENT], ['portable Delivery rules', DELIVERY], ['shared Completion block', COMPLETION], ['Completion Quality Gate item', COMPLETION_GATE], ['Reader’s Briefing rule', READER_BRIEFING_RULE], ['Reader’s Briefing Quality Gate item', READER_BRIEFING_GATE], ['shared briefing rules', READER_BRIEFING_RULES]]) {
     if (!contributors.includes(contract)) fail(`AGENTS.md: ${label} missing or drifted`);
   }
   const compiled = read('llms-full.txt');

@@ -1,7 +1,7 @@
 ---
 name: 360-blueprint
 description: Create an executable plan from a new objective with explicit tasks, constraints, and verification. Use when a goal exists but the path is unclear, or the request is "plan this".
-version: 2.5.0
+version: 2.6.0
 ---
 
 # 360 Blueprint
@@ -19,9 +19,7 @@ Turn a new objective into an executable plan with explicit assumptions, constrai
 
 ## Core Principle
 
-Resolve decisions that change success; make routine choices from evidence.
-Build the smallest thing that satisfies every objective.
-Show the user the plan before asking what comes next.
+The smallest plan that meets every objective, with every material decision resolved and every routine choice made from evidence.
 
 ## Workflow
 
@@ -37,13 +35,13 @@ Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`.
 
 ### Delivery
 
-Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
+Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat carries the Reader's Briefing and the path. These delivery rules also apply to the templates and quality gate below.
 
-Use observable preservation and acceptance checks. Structural validation cannot prove behavior or accuracy; evaluate realistic consent, capability, recovery, and handoff scenarios separately. Document unavailable telemetry and regressions; do not infer universal accuracy or token savings from finite tests.
+Judge completion by observable acceptance checks. A structural or format check does not prove behavior or accuracy; state what was not verified.
 
 ### 1. Ground the Objective in the Current Project
 
-- Inspect available instructions, plans, decisions, relevant artifacts, recent changes, verification and any execution ledger. Establish the current stage and done/pending/blocked work; cite sources and distinguish observed facts from claims. Record unavailable evidence
+- Inspect available instructions, plans, decisions, developer preference records (such as `faculty/` dossiers), relevant artifacts, recent changes, verification and any execution ledger. Establish the current stage and done/pending/blocked work; cite sources and distinguish observed facts from claims. Record unavailable evidence
 - Reuse current evidence and user answers. Resolve discoverable facts by inspection; do not ask the user to rediscover them
 - Separate remaining gaps: material user decisions change the outcome, scope, acceptance criteria, significant cost or irreversible effects; reversible implementation defaults stay within established intent and conventions. Choose supported defaults, record the reason and revisit condition, and proceed. Do not present a default or inference as a fact
 - Ask only for unresolved material decisions, conflicting instructions, or inaccessible facts needed to judge success. Use the available interactive question tool in focused rounds of one to three questions, with the best supported recommendation, its trade-off, and a free-text/custom option. For missing facts, request the needed evidence without inventing it. If tools are unavailable, offer equivalent numbered choices and notes in chat
@@ -83,6 +81,8 @@ Use observable preservation and acceptance checks. Structural validation cannot 
 - Mark effort, priority, and parallelization
 - Define the cut line
 - Write each phase checkpoint as something the user can see or run
+- Fill `Skills` with the agent skills the executor should load for that task, or `None`
+- Check version-specific details (APIs, versions, commands, limits) against the project and current official documentation when tools allow; otherwise record them as assumptions with a validation method
 - Use established stack choices and conventions. Record reversible defaults and falsifiable assumptions with supporting evidence or a pending validation method in `Validated by`; keep material unresolved choices as blockers
 - Keep names and terms consistent from start to finish
 - Make the plan self-contained for a fresh executor
@@ -110,10 +110,7 @@ Turn quality goals into task-specific acceptance checks.
 - Write the full plan to a file using the work-file template
 - Reuse the existing path if known; otherwise `plans/<short-slug>.md`; create the folder if needed; ask once if the location is ambiguous
 - If the file cannot be written, use the in-session delivery fallback
-- With a saved file, print the Reader's Briefing and the path in chat. Print it before any question about next steps
-- If the plan deserves adversarial review before build, say so in plain language, with no skill names
 - Ensure required answers were resolved before ready delivery. Keep unanswered blockers in `Draft`. Never end by dumping passive questions
-
 - Print the Reader's Briefing in chat before asking anything. A next-action question with no briefing above it is a failed delivery. If the host sends one message, the briefing comes first in that message
 
 ### Completion: Choose the Next Action
@@ -245,20 +242,18 @@ Risks
 
 Briefing rules:
 
-- Write for someone who has not read the plan. Define or drop any term of art
+- Write for someone who has not read the full artifact. Define or drop any term of art
 - One line per bullet, 20 words or fewer. The whole briefing fits one screen (about 25 lines)
-- Outcomes, never tasks. No task IDs, phases, priorities, status tables, handover, or skill names
-- A new artifact goes under `What you'll get`. A change to an existing one goes under `What changes`. Never mix them
-- Every item under `What changes` shows now and after
-- `What to expect` is observable: a command that runs, a screen that shows, a number that moves. "Works correctly" is not allowed
-- Confidence uses proven, likely, possible, uncertain. Never numbers
-- Omit empty sections, except `What to expect`, which is always present
+- Outcomes and decisions, never mechanics: no task IDs, phases, priorities, status tables, executor notes, or skill names
+- Keep new things and changes to existing things in separate sections. Never mix them
+- Confidence uses proven (evidence in hand), likely (strong reason), possible (suspected), or uncertain (hypothesis). Never numbers; never proven without evidence
+- The second line names the full artifact's path, or says `in-session only; not persisted`
+- Omit empty sections unless this skill marks one as always present
+- A new artifact goes under `What you'll get`; a change to an existing one goes under `What changes`, showing now and after
+- `What to expect` is always present and observable: a command that runs, a screen that shows, a number that moves. "Works correctly" is not allowed
 - No trailing question list. Required questions use the clarification loop before delivery
 
 ## Quality Gate
-
-- The Reader's Briefing was printed in chat before any next-action question
-- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
 
 The plan is ready only when every answer is yes:
 
@@ -267,7 +262,7 @@ The plan is ready only when every answer is yes:
 - Existing answers were reused; follow-up rounds resolved the goal, scope, outline, and required details without treating silence or recommendations as consent
 - No blocking question or decision was skipped
 - Material unresolved decisions were actively prompted with evidence, recommendations and a free-text option; reversible defaults have a reason and revisit condition
-- No invented technical details were presented as facts
+- No invented technical details were presented as facts; version-specific details cite the project or a current source, or are recorded assumptions
 - Every assumption is explicit and falsifiable
 - Every task has what, how, where, done when, dependencies, skills, effort, priority, and parallel markings
 - The cut line is defined
@@ -280,6 +275,8 @@ The plan is ready only when every answer is yes:
 - The premortem covered relevant requirements, likely failures and severe plausible failures; inspection limits are stated
 - The deliverable follows the template and accurately states its location or in-session status
 - A reader with no context can say what will change and what they will see afterward
-- The briefing follows the briefing rules, omits empty sections, and uses proven/likely/possible/uncertain, never numbers
+- The briefing follows the briefing rules
+- The Reader's Briefing was printed in chat before any next-action question
+- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
 
 Any "no" means the plan is not finished. Refine and review again.

@@ -1,7 +1,7 @@
 ---
 name: 360-execute
 description: Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and brief the user in chat. Use when a plan exists and work must begin, or when resuming a partial execution.
-version: 2.2.0
+version: 2.3.0
 ---
 
 # 360 Execute
@@ -35,15 +35,16 @@ Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`.
 
 ### Delivery
 
-Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
+Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat carries the Reader's Briefing and the path. These delivery rules also apply to the templates and quality gate below.
 
-Use observable preservation and acceptance checks. Structural validation cannot prove behavior or accuracy; evaluate realistic consent, capability, recovery, and handoff scenarios separately. Document unavailable telemetry and regressions; do not infer universal accuracy or token savings from finite tests.
+Judge completion by observable acceptance checks. A structural or format check does not prove behavior or accuracy; state what was not verified.
 
 ### 1. Load the Plan Completely
 
 Never execute a plan you have not fully read.
 
 - Read the entire plan before touching anything: objective, scope, assumptions, every phase, every task, every checkpoint
+- Record the plan's readiness status and the authorization basis. Open blockers in a `Draft` plan block the tasks they affect
 - Build the full task inventory: every task ID, its priority, its dependencies, its "done when" check
 - If an acceptance check is missing, derive it from the approved objective; ask only when alternatives would change the intended outcome
 - Resolve material ambiguity before dependent work; continue independent authorized work
@@ -97,7 +98,7 @@ Before declaring completion, walk the ledger top to bottom:
 - Run the plan's overall verification; confirm all checkpoints passed
 - Sweep once more for regressions introduced across phases
 - Write the execution report into the same ledger file
-- With a saved file, print the terminal briefing and path
+- Print the Reader's Briefing in chat before asking anything. A next-action question with no briefing above it is a failed delivery. If the host sends one message, the briefing comes first in that message
 
 ### Completion: Choose the Next Action
 
@@ -122,9 +123,9 @@ The ledger file contains:
 4. Unfinished items — pending, blocked, or dropped, with reason and approval; or "None"
 5. Handover summary — Context · Decisions · State (done / pending / blocked) · Remaining tasks (what, how, where) · Verification · Risks and how to detect them early
 
-### Terminal briefing
+### Reader's Briefing
 
-Use this shape. Omit any section that would be empty. Follow the Delivery rules for file or in-session output.
+Print this in chat. Follow the Delivery rules for file or in-session output.
 
 ```text
 Execution — <n>/<m> tasks verified
@@ -146,14 +147,19 @@ Issues found
 - <bug or surprise> — <proven|likely|possible|uncertain>
 ```
 
-- Talk to the user, not the next agent
-- Done is new work shipped. Updates to existing is a change to something that already existed. Never mix them
-- Confidence: `proven` evidence in hand; `likely` strong reason; `possible` suspected; `uncertain` hypothesis. Never numbers. Never say proven without evidence
-- With file delivery, keep the briefing concise; name a missing skill when it explains a limitation
+Briefing rules:
+
+- Write for someone who has not read the full artifact. Define or drop any term of art
+- One line per bullet, 20 words or fewer. The whole briefing fits one screen (about 25 lines)
+- Outcomes and decisions, never mechanics: no task IDs, phases, priorities, status tables, executor notes, or skill names
+- Keep new things and changes to existing things in separate sections. Never mix them
+- Confidence uses proven (evidence in hand), likely (strong reason), possible (suspected), or uncertain (hypothesis). Never numbers; never proven without evidence
+- The second line names the full artifact's path, or says `in-session only; not persisted`
+- Omit empty sections unless this skill marks one as always present
+- `Done` lists new work shipped; `Updates to existing` lists changes to something that already existed
+- Describe a missing skill or tool by what it does when it explains a limitation
 
 ## Quality Gate
-
-- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
 
 Execution is complete only when every answer is yes:
 
@@ -169,6 +175,8 @@ Execution is complete only when every answer is yes:
 - The ledger matches current artifacts and verification; stale verdicts and partial actions were reconciled before resumption
 - The next agent can recover evidence, uncertainty and the next check; affected verification was invalidated after relevant changes
 - Delivery honors the requested format and accurately states persistence
-- The briefing omits empty sections and uses proven/likely/possible/uncertain, never numbers
+- The briefing follows the briefing rules
+- The Reader's Briefing was printed in chat before any next-action question
+- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
 
 Any "no" means execution is not finished. Fix it and re-run the sweep.

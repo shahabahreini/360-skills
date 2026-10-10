@@ -1,7 +1,7 @@
 ---
 name: 360-expert-review
 description: Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage.
-version: 3.5.0
+version: 3.6.0
 ---
 
 # 360 Expert Review
@@ -19,8 +19,7 @@ Expose concrete failure cases and weak assumptions in a draft plan, cut what the
 
 ## Core Principle
 
-Try to disprove readiness with concrete failure cases.
-Every fix must be the smallest that works; a review that only adds is incomplete.
+Try to disprove readiness with concrete failure cases, and fix each with the smallest change that works; a review that only adds is incomplete.
 
 ## Workflow
 
@@ -36,13 +35,13 @@ Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`.
 
 ### Delivery
 
-Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
+Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat carries the Reader's Briefing and the path. These delivery rules also apply to the templates and quality gate below.
 
-Use observable preservation and acceptance checks. Structural validation cannot prove behavior or accuracy; evaluate realistic consent, capability, recovery, and handoff scenarios separately. Document unavailable telemetry and regressions; do not infer universal accuracy or token savings from finite tests.
+Judge completion by observable acceptance checks. A structural or format check does not prove behavior or accuracy; state what was not verified.
 
 ### 1. Understand the Project First
 
-- Inspect available instructions, plans, decisions, relevant artifacts, recent changes, verification and any execution ledger. Establish the current stage and done/pending/blocked work; cite sources and distinguish observed facts from claims. Record unavailable evidence
+- Inspect available instructions, plans, decisions, developer preference records (such as `faculty/` dossiers), relevant artifacts, recent changes, verification and any execution ledger. Establish the current stage and done/pending/blocked work; cite sources and distinguish observed facts from claims. Record unavailable evidence
 - Reuse current evidence and user answers. Resolve discoverable facts by inspection; do not ask the user to rediscover them
 - Separate remaining gaps: material user decisions change the outcome, scope, acceptance criteria, significant cost or irreversible effects; reversible implementation defaults stay within established intent and conventions. Choose supported defaults, record the reason and revisit condition, and proceed. Do not present a default or inference as a fact
 - Ask only for unresolved material decisions, conflicting instructions, or inaccessible facts needed to judge success. Use the available interactive question tool in focused rounds of one to three questions, with the best supported recommendation, its trade-off, and a free-text/custom option. For missing facts, request the needed evidence without inventing it. If tools are unavailable, offer equivalent numbered choices and notes in chat
@@ -52,7 +51,7 @@ Use observable preservation and acceptance checks. Structural validation cannot 
 
 ### 2. Review Through Expert Lenses
 
-Use only the lenses this project needs:
+Choose lenses from the plan's nature, reversibility and risks. If the plan or session carries a faculty lens list, seat Cards, or a `Tailored by` row, start from those and add any lens the risks still need. Typical lenses:
 
 - Architecture: boundaries, simplicity, trade-offs
 - Engineering: correctness, edge cases, integration, performance
@@ -62,7 +61,7 @@ Use only the lenses this project needs:
 - Security and privacy: access, data exposure, abuse cases
 - Domain: business rules, terminology, real-world accuracy
 
-Do not role-play personas. Extract findings directly from each lens.
+Apply each lens as a checklist of failure modes, not a persona. Record each applied lens with its findings, or "none" and why. Respect trade-offs the user already accepted; reopen one only with new evidence.
 
 ### 3. Check Relevant User Outcomes
 
@@ -73,6 +72,7 @@ Do not role-play personas. Extract findings directly from each lens.
 ### 4. Make Findings Actionable
 
 - For each actionable finding, name its trigger, consequence, evidence or explicit hypothesis, and smallest correction or next check
+- Verify version-specific or fast-moving claims (APIs, versions, standards, advisories) against the project and current primary sources when tools allow; otherwise treat them as hypotheses with the check needed
 - Rank consequence separately from confidence. A plausible severe failure can justify investigation without being a proven defect
 - Require work only when it protects a requirement or addresses a concrete material failure; speculative improvements remain optional
 - Map only affected components, interfaces and state. Check retries, duplicates, concurrency, dependencies and rollback where those mechanisms exist
@@ -115,9 +115,7 @@ Fix actionable findings and recheck affected risks. Stop when applicable checks 
 - Put review findings, key decisions, and remaining risks in a short appendix in that same file
 - Include the executor handover in the chosen delivery format
 - If the file cannot be written, use the in-session delivery fallback
-- With a saved file, print the Reader's Briefing and the path in chat. Print it before any question about next steps
 - Ensure required answers were resolved before final delivery. Keep unanswered blockers in `Draft`. Never end by dumping passive questions
-
 - Print the Reader's Briefing in chat before asking anything. A next-action question with no briefing above it is a failed delivery. If the host sends one message, the briefing comes first in that message
 
 ### Completion: Choose the Next Action
@@ -145,12 +143,13 @@ Preserve the existing plan and fill only missing contract elements. Minimum stan
 6. Risks and countermeasures
 7. Per-task and overall verification, replanning triggers and traceability
 8. Handover: Context · Decisions · State (done / pending / blocked) · Remaining tasks (what, how, where) · Verification · Risks and how to detect them early
-9. Review appendix: findings, decisions, remaining risks, applicable checks and blockers
+9. Review appendix: lenses applied, findings, decisions, remaining risks, applicable checks and blockers
 
 Set `Reviewed and ready to execute` only when the applicable Quality Gate passes. Otherwise use `Draft` for blockers and `Ready for review` for incomplete review without blockers. Preserve user-approved trade-offs; record unresolved high-severity risks as blockers. A typical appendix (retain an existing heading when present):
 
 ```markdown
 ## 11. Review appendix
+- Lenses applied and why:
 - Findings:
 - Decisions:
 - Remaining risks:
@@ -186,7 +185,7 @@ What to expect when it's done
 - <result you can check yourself, and how>
 
 Size
-- About <n> files touched (<n> new, <n> edited). Versus the draft: <n> tasks cut, <n> added
+- About <n> files touched (<n> new, <n> edited), <n> new dependencies. Versus the draft: <n> tasks cut, <n> added
 
 Remaining risks
 - <accepted risk> — <likely|possible|uncertain>. You'd notice it by: <sign>
@@ -194,28 +193,27 @@ Remaining risks
 
 Briefing rules:
 
-- Write for someone who has not read the plan. Define or drop any term of art
+- Write for someone who has not read the full artifact. Define or drop any term of art
 - One line per bullet, 20 words or fewer. The whole briefing fits one screen (about 25 lines)
-- Outcomes, never tasks. No task IDs, phases, priorities, status tables, handover, or skill names
-- A new artifact goes under `What you'll get`. A change to an existing one goes under `What changes`. Never mix them
-- Every item under `What changes` shows now and after
-- `What to expect` is observable: a command that runs, a screen that shows, a number that moves. "Works correctly" is not allowed
-- Confidence uses proven, likely, possible, uncertain. Never numbers
-- Omit empty sections, except `What to expect`, which is always present
+- Outcomes and decisions, never mechanics: no task IDs, phases, priorities, status tables, executor notes, or skill names
+- Keep new things and changes to existing things in separate sections. Never mix them
+- Confidence uses proven (evidence in hand), likely (strong reason), possible (suspected), or uncertain (hypothesis). Never numbers; never proven without evidence
+- The second line names the full artifact's path, or says `in-session only; not persisted`
+- Omit empty sections unless this skill marks one as always present
+- A new artifact goes under `What you'll get`; a change to an existing one goes under `What changes`, showing now and after
+- `What to expect` is always present and observable: a command that runs, a screen that shows, a number that moves. "Works correctly" is not allowed
 - No trailing question list. Required questions use the clarification loop before delivery
 - Every finding pairs the problem, the fix, and the result the user will notice. A finding with no visible result says `no visible change; protects <what>`
 
 ## Quality Gate
-
-- The Reader's Briefing was printed in chat before any next-action question
-- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
 
 The plan is final only when every applicable answer is yes (record a reason for each non-applicable item):
 
 - Real user need understood and served
 - Current project stage and completed work were inspected, or unavailable evidence was explicitly recorded
 - Existing answers were reused; follow-up rounds resolved the goal, scope, outline, and required details without treating silence or recommendations as consent
-- The right expert lenses were applied
+- Lenses were chosen from the plan's risks and any faculty lens list; each applied lens has findings or a stated reason for none
+- Version-specific or fast-moving claims cite a current source or remain hypotheses with a named check
 - Relevant requirements, likely failures and severe plausible failures were checked; inspection limits are explicit
 - Every actionable finding has a trigger, consequence, evidence or hypothesis, and smallest correction; severity and confidence are separate
 - Relevant requirements are traceable to tasks and observable verification; monitoring is included only where needed
@@ -230,6 +228,8 @@ The plan is final only when every applicable answer is yes (record a reason for 
 - New work and updates to existing work are grouped separately
 - The finalized plan preserves its original location where supported, or follows the Delivery fallback
 - Each finding in the briefing states problem, fix, and the result the user will notice
-- The briefing follows the briefing rules, omits empty sections, and uses proven/likely/possible/uncertain, never numbers
+- The briefing follows the briefing rules
+- The Reader's Briefing was printed in chat before any next-action question
+- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
 
 Any unresolved "no" keeps the plan non-final. Fix actionable findings or report the blocker and the evidence or decision needed to resolve it.

@@ -1,7 +1,7 @@
 ---
 name: 360-token-efficiency
 description: Reduce avoidable context and tool-output overhead with capability-aware retrieval, reuse, and verified handovers. Use as an optional, session-approved companion when token cost or context growth matters, with strict preservation of task requirements by default.
-version: 2.1.0
+version: 2.1.1
 ---
 
 # 360 Token Efficiency
@@ -102,8 +102,6 @@ Use the six canonical handover fields above when a continuation is needed.
 
 ## Quality Gate
 
-- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
-
 Check every applicable item; record a concrete limitation if one cannot be checked:
 
 - Session approval is explicit, current, and honored after refusal or revocation
@@ -116,5 +114,6 @@ Check every applicable item; record a concrete limitation if one cannot be check
 - Any potentially lossy method had separate technique, metric, and tolerance approval
 - Delivery matches the user's request and honestly states persistence
 - Measurement claims have real evidence and include available overhead; absent telemetry is `UNMEASURED`
+- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
 
 An unresolved check is a limitation or blocker, never proof of equivalent accuracy to a run that did not happen.
