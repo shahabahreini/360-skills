@@ -4,7 +4,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { generateLlmsFull } from './build-llms-full.mjs';
-import { CONSENT, PLAN_CONTRACT, HANDOVER, DELIVERY, COMPLETION, COMPLETION_GATE } from './lib/contracts.mjs';
+import { CONSENT, PLAN_CONTRACT, HANDOVER, DELIVERY, COMPLETION, COMPLETION_GATE, READER_BRIEFING_RULE, READER_BRIEFING_GATE } from './lib/contracts.mjs';
 import { frontmatter, markdownLinks, sections, outsideFences } from './lib/markdown.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -57,15 +57,19 @@ export function checkConsistency(root = ROOT) {
       const completionHeading = '### Completion: Choose the Next Action';
       const completionHeadings = outsideFences(text).split('\n').filter(line => line === completionHeading);
       if (completionHeadings.length !== 1) report('expected exactly one Completion block');
-      const completionAt = workflow.indexOf(COMPLETION);
+      const hasReaderBriefing = outsideFences(text).includes("### Reader's Briefing");
+      if (hasReaderBriefing && !workflow.includes(READER_BRIEFING_RULE)) report('Reader’s Briefing must precede the next-action prompt');
+      const normalizedWorkflow = workflow.replace(`${READER_BRIEFING_RULE}\n\n`, '');
+      const completionAt = normalizedWorkflow.indexOf(COMPLETION);
       if (completionAt < 0) report('missing or changed shared Completion block inside Workflow');
-      const routes = [...workflow.matchAll(/^Local routing: (.+)$/gm)];
+      const routes = [...normalizedWorkflow.matchAll(/^Local routing: (.+)$/gm)];
       if (routes.length !== 1 || !routes[0][1].trim()) report('Workflow must include one nonempty local routing paragraph');
       // Canonical completion plus local guidance must end Workflow, outside fences.
-      const tail = completionAt < 0 ? '' : workflow.slice(completionAt + COMPLETION.length).trim();
+      const tail = completionAt < 0 ? '' : normalizedWorkflow.slice(completionAt + COMPLETION.length).trim();
       if (completionAt >= 0 && !/^Local routing: \S[^\n]*(?:\n(?!#|Local routing:)[^\n]+)*$/.test(tail)) report('Completion and local routing must be the final Workflow step');
       const gate = parts.find(p => p.title === 'Quality Gate')?.body ?? '';
       if (!gate.split('\n').includes(COMPLETION_GATE)) report('missing or changed Completion Quality Gate item');
+      if (hasReaderBriefing && !gate.split('\n').includes(READER_BRIEFING_GATE)) report('missing or changed Reader’s Briefing Quality Gate item');
       const output = parts[4]?.body ?? '';
       // Known family members and explicit plan producers/consumers must carry their own contract.
       const usesPlan = name !== '360-token-efficiency' && (/\bplan\b/i.test(output) || /\bplan\b/i.test(fm?.description ?? ''));
@@ -179,7 +183,7 @@ export function checkConsistency(root = ROOT) {
     for (const name of items.keys()) if (!skills.has(name)) fail(`${source}: registered non-public or nonexistent skill ${name}`);
   }
   const contributors = outsideFences(read('AGENTS.md'));
-  for (const [label, contract] of [['shared consent entry', CONSENT], ['portable Delivery rules', DELIVERY], ['shared Completion block', COMPLETION], ['Completion Quality Gate item', COMPLETION_GATE]]) {
+  for (const [label, contract] of [['shared consent entry', CONSENT], ['portable Delivery rules', DELIVERY], ['shared Completion block', COMPLETION], ['Completion Quality Gate item', COMPLETION_GATE], ['Reader’s Briefing rule', READER_BRIEFING_RULE], ['Reader’s Briefing Quality Gate item', READER_BRIEFING_GATE]]) {
     if (!contributors.includes(contract)) fail(`AGENTS.md: ${label} missing or drifted`);
   }
   const compiled = read('llms-full.txt');

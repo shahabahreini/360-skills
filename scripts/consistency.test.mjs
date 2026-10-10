@@ -6,7 +6,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { checkConsistency } from './check-consistency.mjs';
 import { generateLlmsFull } from './build-llms-full.mjs';
-import { CONSENT, PLAN_CONTRACT, HANDOVER, DELIVERY, COMPLETION, COMPLETION_GATE } from './lib/contracts.mjs';
+import { CONSENT, PLAN_CONTRACT, HANDOVER, DELIVERY, COMPLETION, COMPLETION_GATE, READER_BRIEFING_RULE, READER_BRIEFING_GATE } from './lib/contracts.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const BLUEPRINT = 'skills/360-blueprint/SKILL.md';
@@ -157,8 +157,12 @@ test('wrapped local routing remains a valid final paragraph', () => fixture(root
   edit(root, path, t => t.replace('otherwise resolve its missing evidence.', 'otherwise resolve\nits missing evidence.'));
   assert.deepEqual(checkConsistency(root).errors, []);
 }));
+rejects('Reader’s Briefing rule is required', root => edit(root, BLUEPRINT, t => t.replace(READER_BRIEFING_RULE, '')), /Reader’s Briefing must precede/);
+rejects('Reader’s Briefing gate is required', root => edit(root, BLUEPRINT, t => t.replace(READER_BRIEFING_GATE, '')), /Reader’s Briefing Quality Gate item/);
 rejects('standalone companion requires completion too', root => edit(root, TOKEN, t => t.replace(COMPLETION, '')), /shared Completion block inside Workflow/);
 rejects('companion completion gate required', root => edit(root, TOKEN, t => t.replace(COMPLETION_GATE, '')), /Completion Quality Gate item/);
 rejects('contributor Delivery verification drift', root => edit(root, 'AGENTS.md', t => t.replace('Structural validation cannot prove behavior or accuracy;', 'Structural validation proves accuracy;')), /AGENTS.md: portable Delivery/);
 rejects('contributor completion drift', root => edit(root, 'AGENTS.md', t => t.replace(COMPLETION, '')), /AGENTS.md: shared Completion block/);
 rejects('contributor completion gate drift', root => edit(root, 'AGENTS.md', t => t.replace(COMPLETION_GATE, '')), /AGENTS.md: Completion Quality Gate/);
+rejects('contributor Reader’s Briefing rule drift', root => edit(root, 'AGENTS.md', t => t.replace(READER_BRIEFING_RULE, '')), /AGENTS.md: Reader’s Briefing rule/);
+rejects('contributor Reader’s Briefing gate drift', root => edit(root, 'AGENTS.md', t => t.replace(READER_BRIEFING_GATE, '')), /AGENTS.md: Reader’s Briefing Quality Gate/);

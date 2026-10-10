@@ -96,6 +96,10 @@ Use observable preservation and acceptance checks. Structural validation cannot 
 
 Every skill, including future additions, ends its Workflow with the following completion step and local, result-dependent routing guidance. The token-efficiency companion shares its parent’s prompt; standalone use still offers a next action. Include a matching Quality Gate item. Preserve deliverable formats; this is a separate interaction.
 
+Skills with a `Reader's Briefing` output format include this rule in Workflow:
+
+- Print the Reader's Briefing in chat before asking anything. A next-action question with no briefing above it is a failed delivery. If the host sends one message, the briefing comes first in that message
+
 ### Completion: Choose the Next Action
 
 - Finish and verify the current deliverable first; make the result and its location available before asking about follow-on work. Keep artifact readiness separate from the next-action choice: an unanswered suggestion does not reopen completed work, and a blocked job is not complete
@@ -105,9 +109,13 @@ Every skill, including future additions, ends its Workflow with the following co
 - Reuse an already explicit next-step instruction instead of asking again; continue work it authorizes. Otherwise wait for the user's choice before starting follow-on work. Silence, a preselected recommendation, and elapsed time are not authorization. An explicit stop or request for no suggestions suppresses the prompt
 - When the user chooses, follow that direction and clarify only missing information needed for it. Discover and load a selected skill through the host's supported mechanism; do not assume it is installed or install it automatically. If unavailable, explain and offer an equivalent action. Carry forward artifact paths, decisions, verification, remaining risks, and session consent without restarting intake
 
-Use this exact Quality Gate item in each skill:
+Use these exact Quality Gate items in each skill:
 
 - Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
+
+For skills with a `Reader's Briefing` output format, also include:
+
+- The Reader's Briefing was printed in chat before any next-action question
 
 ## Registering a New Skill
 

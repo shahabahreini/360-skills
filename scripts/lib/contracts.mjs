@@ -27,3 +27,7 @@ export const COMPLETION = `### Completion: Choose the Next Action
 - When the user chooses, follow that direction and clarify only missing information needed for it. Discover and load a selected skill through the host's supported mechanism; do not assume it is installed or install it automatically. If unavailable, explain and offer an equivalent action. Carry forward artifact paths, decisions, verification, remaining risks, and session consent without restarting intake`;
 
 export const COMPLETION_GATE = '- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable';
+
+export const READER_BRIEFING_RULE = "- Print the Reader's Briefing in chat before asking anything. A next-action question with no briefing above it is a failed delivery. If the host sends one message, the briefing comes first in that message";
+
+export const READER_BRIEFING_GATE = "- The Reader's Briefing was printed in chat before any next-action question";
