@@ -13,9 +13,9 @@ export const HANDOVER = 'Context · Decisions · State (done / pending / blocked
 
 export const DELIVERY = `### Delivery
 
-Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it \`in-session only; not persisted\`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
+Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it \`in-session only; not persisted\`; never claim a file was saved. With a saved file, chat carries the Reader's Briefing and the path. These delivery rules also apply to the templates and quality gate below.
 
-Use observable preservation and acceptance checks. Structural validation cannot prove behavior or accuracy; evaluate realistic consent, capability, recovery, and handoff scenarios separately. Document unavailable telemetry and regressions; do not infer universal accuracy or token savings from finite tests.`;
+Judge completion by observable acceptance checks. A structural or format check does not prove behavior or accuracy; state what was not verified.`;
 
 export const COMPLETION = `### Completion: Choose the Next Action
 
@@ -31,3 +31,13 @@ export const COMPLETION_GATE = '- Completion includes the interactive next-actio
 export const READER_BRIEFING_RULE = "- Print the Reader's Briefing in chat before asking anything. A next-action question with no briefing above it is a failed delivery. If the host sends one message, the briefing comes first in that message";
 
 export const READER_BRIEFING_GATE = "- The Reader's Briefing was printed in chat before any next-action question";
+
+export const READER_BRIEFING_RULES = `Briefing rules:
+
+- Write for someone who has not read the full artifact. Define or drop any term of art
+- One line per bullet, 20 words or fewer. The whole briefing fits one screen (about 25 lines)
+- Outcomes and decisions, never mechanics: no task IDs, phases, priorities, status tables, executor notes, or skill names
+- Keep new things and changes to existing things in separate sections. Never mix them
+- Confidence uses proven (evidence in hand), likely (strong reason), possible (suspected), or uncertain (hypothesis). Never numbers; never proven without evidence
+- The second line names the full artifact's path, or says \`in-session only; not persisted\`
+- Omit empty sections unless this skill marks one as always present`;

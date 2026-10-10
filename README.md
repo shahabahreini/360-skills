@@ -48,13 +48,13 @@ Each skill works individually. Review includes its own minimum plan contract; bl
 
 | Skill | Description | Version |
 |---|---|---|
-| [`360-backend-audit`](skills/360-backend-audit) | Deep-audit backend code, write the full report to a file, and brief the user in chat with bugs, updates, and dead weight. Use before or after significant backend work, or when inheriting, refactoring, or handing off services. | 2.2.0 |
-| [`360-blueprint`](skills/360-blueprint) | Create an executable plan from a new objective with explicit tasks, constraints, and verification. Use when a goal exists but the path is unclear, or the request is "plan this". | 2.5.0 |
-| [`360-execute`](skills/360-execute) | Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and brief the user in chat. Use when a plan exists and work must begin, or when resuming a partial execution. | 2.2.0 |
-| [`360-expert-review`](skills/360-expert-review) | Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage. | 3.5.0 |
-| [`360-faculty`](skills/360-faculty) | Seat a living, tailored expert team on a plan or task. Use when work must fit this developer's goals, taste, mindset, and strategy, when a plan needs the right expertise chosen for its complexity, depth, and nature, or when a named faculty team must be created, called, or updated. Recommends a short list, defines each seat with named techniques, asks only the questions that still change the work, polishes immediately, and keeps upgradable memory. | 1.4.0 |
-| [`360-optimize`](skills/360-optimize) | Audit working code for zero-cost speed, weight, and reliability gains — measure first, rank drop-in upgrades and restructures, and report conservative expected effects on this system. Use when existing code must run faster, lighter, or more robustly without changing what it does. | 2.2.0 |
-| [`360-token-efficiency`](skills/360-token-efficiency) | Reduce avoidable context and tool-output overhead with capability-aware retrieval, reuse, and verified handovers. Use as an optional, session-approved companion when token cost or context growth matters, with strict preservation of task requirements by default. | 2.1.0 |
+| [`360-backend-audit`](skills/360-backend-audit) | Deep-audit backend code, write the full report to a file, and brief the user in chat with bugs, updates, and dead weight. Use before or after significant backend work, or when inheriting, refactoring, or handing off services. | 2.3.0 |
+| [`360-blueprint`](skills/360-blueprint) | Create an executable plan from a new objective with explicit tasks, constraints, and verification. Use when a goal exists but the path is unclear, or the request is "plan this". | 2.6.0 |
+| [`360-execute`](skills/360-execute) | Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and brief the user in chat. Use when a plan exists and work must begin, or when resuming a partial execution. | 2.3.0 |
+| [`360-expert-review`](skills/360-expert-review) | Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage. | 3.6.0 |
+| [`360-faculty`](skills/360-faculty) | Seat a short panel of specialist experts, chosen from a plan's nature, depth, and complexity, to critique and improve it from distinct angles with named methods and current best practice. Use when a plan or task needs specialist scrutiny before review, when work must fit this developer's goals and taste, or when a named expert team must be created, called, or updated. | 2.0.0 |
+| [`360-optimize`](skills/360-optimize) | Audit working code for zero-cost speed, weight, and reliability gains — measure first, rank drop-in upgrades and restructures, and report conservative expected effects on this system. Use when existing code must run faster, lighter, or more robustly without changing what it does. | 2.3.0 |
+| [`360-token-efficiency`](skills/360-token-efficiency) | Reduce avoidable context and tool-output overhead with capability-aware retrieval, reuse, and verified handovers. Use as an optional, session-approved companion when token cost or context growth matters, with strict preservation of task requirements by default. | 2.1.1 |
 
 ## Which Skill Do I Need?
 
@@ -64,21 +64,22 @@ Each skill works individually. Review includes its own minimum plan contract; bl
 | A goal exists, but no plan yet | `360-blueprint` | Not for hardening a plan that already exists (`360-expert-review`) or building one that is already final (`360-execute`) |
 | An authorized plan needs implementation or resumption | `360-execute` | Not for creating plans (`360-blueprint`) or reviewing drafts (`360-expert-review`) |
 | A draft plan needs adversarial review | `360-expert-review` | Not for drafting plans from scratch (`360-blueprint`) or executing a finalized plan (`360-execute`) |
-| Choose expertise, tailor work to this developer, or manage a named team | `360-faculty` | Not for writing the plan itself (`360-blueprint`), attacking a finished draft (`360-expert-review`), or building one (`360-execute`) |
+| A plan needs specialist angles, tailoring to this developer, or a named expert team | `360-faculty` | Not for writing the plan itself (`360-blueprint`), attacking a finished draft (`360-expert-review`), or building one (`360-execute`) |
 | Working code needs performance or weight recommendations | `360-optimize` | Not for greenfield design (`360-blueprint`), not for executing changes (`360-execute`), not for correctness or dead-weight hunts (`360-backend-audit`) |
 | Context growth or avoidable token overhead matters; optional companion | `360-token-efficiency` | Not for creating plans (`360-blueprint`), executing the task itself (`360-execute`), or optimizing application performance (`360-optimize`) |
 
 ## How the Skills Work Together
 
-On completion, each skill offers an interactive next-action recommendation based on the actual result and project stage. Choose the suggested step, stop, or write a custom direction outside the flow. Existing next-step instructions are honored without another prompt; the token-efficiency companion shares its parent’s prompt. Suggestions never authorize work by themselves.
+Every skill that delivers an artifact writes the full version for the next agent and prints a short Reader's Briefing for you: what changes, what to expect, and the risks, in plain language. On completion, each skill offers an interactive next-action recommendation based on the actual result and project stage. Choose the suggested step, stop, or write a custom direction outside the flow. Existing next-step instructions are honored without another prompt; the token-efficiency companion shares its parent’s prompt. Suggestions never authorize work by themselves.
 
 Most skills hand off to one another sequentially on the same piece of work. Two are more flexible: `360-faculty` attaches wherever expertise is needed — before planning, after a draft, or ahead of review — and `360-token-efficiency` is an optional companion active only with session approval.
 
 ```mermaid
 flowchart TD
     Objective([Objective to plan]) --> Blueprint["360-blueprint: draft the plan"]
-    Blueprint --> Faculty["360-faculty: tailor the plan to this developer"]
-    Faculty --> Review["360-expert-review: stress-test and finalize the plan"]
+    Blueprint --> Review["360-expert-review: stress-test and finalize the plan"]
+    Blueprint -.->|specialist angles needed| Faculty["360-faculty: specialist panel improves the plan"]
+    Faculty --> Review
     Review -->|concrete blocker or revision| Blueprint
     Review --> Execute["360-execute: run the finalized plan task by task"]
     Execute --> Audit["360-backend-audit: audit the resulting backend code"]
@@ -101,7 +102,7 @@ Plan producers and consumers carry the same local contract. Every task has ID, W
 Readiness moves from `Draft` to `Ready for review` to `Reviewed and ready to execute`. Material edits invalidate prior review; execution progress stays in the coverage ledger. A direct user instruction to execute a supplied plan is sufficient authorization without forcing another skill review; record that basis honestly. Handover fields are Context, Decisions, State (done / pending / blocked), Remaining tasks (what, how, where), Verification, and Risks and how to detect them early.
 
 - **`360-blueprint`** turns a vague goal into a complete, unambiguous plan written directly to a file, briefing the user in chat with key decisions, assumptions, and risks.
-- **`360-faculty`** seats a short list of named experts fitted to this developer and to the plan's own complexity, depth, and nature, tailoring it surgically, remembering what it learns, and saving reusable teams that can be called by name later.
+- **`360-faculty`** seats a short panel of specialists chosen from the plan's nature, depth, and complexity. Each seat applies named methods and checks current standards, edits the plan in place, and the session ends with a plain-language briefing. It also remembers the developer's preferences and saves reusable teams.
 - **`360-expert-review`** tests that plan against relevant concrete failure cases, writing the finalized plan back to the file and briefing the user in chat.
 - **`360-execute`** builds it, tracking every task in a coverage ledger written to disk, verifying each against its own acceptance check with evidence, and briefing progress in chat.
 - **`360-backend-audit`** audits the resulting backend code for correctness, duplication, performance risks, and observability, writing the full report to a file and briefing findings in chat.
@@ -162,7 +163,7 @@ A skill is a folder containing a `SKILL.md` file with a `name`, a `description`,
     │   └── SKILL.md           Skill definition and instructions
     ├── 360-faculty/
     │   ├── SKILL.md           Skill definition and instructions
-    │   └── references/        Optional seating roster
+    │   └── references/        Core seat cards and optional seating roster
     ├── 360-expert-review/
     │   └── SKILL.md           Skill definition and instructions
     ├── 360-execute/
@@ -176,7 +177,7 @@ A skill is a folder containing a `SKILL.md` file with a `name`, a `description`,
         └── references/        Evidence and optional techniques
 ```
 
-Supporting references: faculty has an optional [seating roster](skills/360-faculty/references/seating-roster.md); token efficiency has optional evidence and technique guidance. Runtime faculty dossiers belong beside the user's plan and are not part of this catalog.
+Supporting references: faculty has [core seat cards](skills/360-faculty/references/core-cards.md) and an optional [seating roster](skills/360-faculty/references/seating-roster.md); token efficiency has optional evidence and technique guidance. Runtime faculty dossiers belong beside the user's plan and are not part of this catalog.
 
 ## Contributing
 
@@ -204,7 +205,7 @@ Any agent supported by the [skills.sh](https://skills.sh) CLI, including Claude 
 Because the quality failures that matter most hide in the angles nobody checked. Every skill checks relevant requirements and failure cases, and states the limits of its inspection.
 
 **How do I add a new skill?**
-Read [AGENTS.md](AGENTS.md), create `skills/360-<name>/SKILL.md` following the required structure, then register it in this README's skills table.
+Read [AGENTS.md](AGENTS.md), create `skills/360-<name>/SKILL.md` following the required structure, then register it in this README's skills and routing tables and in `llms.txt`.
 
 ## License
 

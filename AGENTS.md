@@ -42,7 +42,7 @@ Every `SKILL.md` follows this section order:
 2. **When to Use**: concrete triggers for reaching for this skill
 3. **Core Principle**: the single idea the skill is built around
 4. **Workflow**: the ordered steps the agent executes
-5. **Output Format**: the exact shape of the final deliverable. May carry a domain-specific heading instead (`Plan Template`, `Final Plan Format`, `Audit Report Format`) as long as it defines that exact shape.
+5. **Output Format**: the exact shape of the final deliverable. May carry a domain-specific heading instead (`Plan Template`, `Final Plan Format`, `Audit Report Format`) as long as it defines that exact shape. Every skill that delivers an artifact also defines a `Reader's Briefing` here (see Reader's Briefing Convention).
 6. **Quality Gate**: a yes/no checklist that must fully pass before the work is considered done
 
 ## Style Rules
@@ -55,6 +55,7 @@ Every `SKILL.md` follows this section order:
 - Distinguish facts, reversible defaults, assumptions and unknowns. Ask about material decisions; resolve routine choices from evidence and existing authorization.
 - Check relevant requirements, likely failures and severe plausible failures; disclose inspection limits instead of promising exhaustive reliability.
 - An unknown check never passes. A bounded assessment can finish with disclosed limits; implementation requires its acceptance evidence.
+- Have agents check version-specific or fast-moving facts (APIs, versions, standards, advisories) against the project and current primary sources, or record them as assumptions with a check.
 
 ## Family Conventions
 
@@ -88,17 +89,31 @@ Every sibling repeats these Delivery rules inside Workflow:
 
 ### Delivery
 
-Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
+Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat carries the Reader's Briefing and the path. These delivery rules also apply to the templates and quality gate below.
 
-Use observable preservation and acceptance checks. Structural validation cannot prove behavior or accuracy; evaluate realistic consent, capability, recovery, and handoff scenarios separately. Document unavailable telemetry and regressions; do not infer universal accuracy or token savings from finite tests.
+Judge completion by observable acceptance checks. A structural or format check does not prove behavior or accuracy; state what was not verified.
+
+### Reader's Briefing Convention
+
+The full artifact serves the next agent; the Reader's Briefing serves the user. Every skill that carries the Delivery rules defines a `### Reader's Briefing` template in its output section, followed by these shared rules and then any local rules:
+
+Briefing rules:
+
+- Write for someone who has not read the full artifact. Define or drop any term of art
+- One line per bullet, 20 words or fewer. The whole briefing fits one screen (about 25 lines)
+- Outcomes and decisions, never mechanics: no task IDs, phases, priorities, status tables, executor notes, or skill names
+- Keep new things and changes to existing things in separate sections. Never mix them
+- Confidence uses proven (evidence in hand), likely (strong reason), possible (suspected), or uncertain (hypothesis). Never numbers; never proven without evidence
+- The second line names the full artifact's path, or says `in-session only; not persisted`
+- Omit empty sections unless this skill marks one as always present
+
+Each such skill includes this rule in Workflow, before the completion step:
+
+- Print the Reader's Briefing in chat before asking anything. A next-action question with no briefing above it is a failed delivery. If the host sends one message, the briefing comes first in that message
 
 ### Interactive Completion Convention
 
 Every skill, including future additions, ends its Workflow with the following completion step and local, result-dependent routing guidance. The token-efficiency companion shares its parent’s prompt; standalone use still offers a next action. Include a matching Quality Gate item. Preserve deliverable formats; this is a separate interaction.
-
-Skills with a `Reader's Briefing` output format include this rule in Workflow:
-
-- Print the Reader's Briefing in chat before asking anything. A next-action question with no briefing above it is a failed delivery. If the host sends one message, the briefing comes first in that message
 
 ### Completion: Choose the Next Action
 
@@ -113,7 +128,7 @@ Use these exact Quality Gate items in each skill:
 
 - Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
 
-For skills with a `Reader's Briefing` output format, also include:
+For skills with a Reader's Briefing, also include:
 
 - The Reader's Briefing was printed in chat before any next-action question
 
@@ -130,14 +145,14 @@ Skills under `skills/.experimental/` are not registered anywhere until promoted.
 
 ## Before You're Done
 
-Run `node scripts/build-llms-full.mjs`, `node --test scripts/*.test.mjs`, and `node scripts/check-consistency.mjs`. The checker validates public and experimental skill structure, local reference links, consent and plan contracts, routing/index registration, and compiled documentation. Experimental skills are excluded from indexes and the bundle. Fixture tests exercise both valid inputs and specific failures.
+Run `node scripts/build-llms-full.mjs`, `node --test scripts/*.test.mjs`, and `node scripts/check-consistency.mjs`. The checker validates public and experimental skill structure, local reference links, consent and plan contracts, routing/index registration, and compiled documentation. Experimental skills are excluded from indexes and the bundle. Fixture tests exercise both valid inputs and specific failures. Structural validation cannot prove behavior or accuracy: walk realistic consent, capability, recovery, and handoff scenarios separately, record unavailable telemetry and regressions, and do not infer universal accuracy or token savings from finite tests.
 
 - [ ] Folder name is kebab-case and starts with `360-`
 - [ ] Frontmatter `name` matches the folder name exactly
 - [ ] `description` is two or three sentences, action-oriented, states when to use it
 - [ ] `version` is valid semver
 - [ ] Body follows the required section order
-- [ ] Family conventions followed: priority vocabulary, handover fields, negative trigger
+- [ ] Family conventions followed: priority vocabulary, handover fields, negative trigger, Reader's Briefing
 - [ ] `README.md` index, `README.md` routing table, and `llms.txt` are all updated (unless experimental)
 - [ ] `node scripts/check-consistency.mjs` exits 0
 

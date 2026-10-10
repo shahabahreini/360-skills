@@ -1,7 +1,7 @@
 ---
 name: 360-optimize
 description: Audit working code for zero-cost speed, weight, and reliability gains — measure first, rank drop-in upgrades and restructures, and report conservative expected effects on this system. Use when existing code must run faster, lighter, or more robustly without changing what it does.
-version: 2.2.0
+version: 2.3.0
 ---
 
 # 360 Optimize
@@ -36,9 +36,9 @@ Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`.
 
 ### Delivery
 
-Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat normally carries a short briefing and its path. These delivery rules also apply to the templates and quality gate below.
+Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat carries the Reader's Briefing and the path. These delivery rules also apply to the templates and quality gate below.
 
-Use observable preservation and acceptance checks. Structural validation cannot prove behavior or accuracy; evaluate realistic consent, capability, recovery, and handoff scenarios separately. Document unavailable telemetry and regressions; do not infer universal accuracy or token savings from finite tests.
+Judge completion by observable acceptance checks. A structural or format check does not prove behavior or accuracy; state what was not verified.
 
 ### 1. Lock the Contract
 
@@ -137,7 +137,7 @@ Every admitted gain gets a conservative expected effect. This step is not option
 - If the file cannot be written, use the in-session delivery fallback
 - Rank admitted gains by conservative impact versus effort versus risk
 - Keep new work and updates to existing work in separate lists
-- With a saved file, print the terminal briefing and path
+- Print the Reader's Briefing in chat before asking anything. A next-action question with no briefing above it is a failed delivery. If the host sends one message, the briefing comes first in that message
 
 ### Completion: Choose the Next Action
 
@@ -177,9 +177,9 @@ Local routing: Recommend `360-blueprint` to turn supported findings into scoped 
 
 Implementation tasks use the Shared Plan Contract. Keep candidates separate from supported gains using the existing Measurement/Verification sections. State inspection limits; completion of the assessment does not verify a candidate or its implementation. No magnitude without a measurement on this system.
 
-### Terminal briefing
+### Reader's Briefing
 
-Use this shape. Omit any section that would be empty. Follow the Delivery rules for file or in-session output.
+Print this in chat. Follow the Delivery rules for file or in-session output.
 
 ```text
 Optimize — complete
@@ -204,15 +204,19 @@ Need from you
 - <decision required to proceed>
 ```
 
-- Talk to the user, not the next agent
-- A new artifact is Features to add only if a harness or tool must be introduced; a change to current code is Updates to existing. Never mix them
-- Confidence: `proven` evidence in hand; `likely` strong reason; `possible` suspected; `uncertain` hypothesis. Never numbers. Never say proven without evidence
+Briefing rules:
+
+- Write for someone who has not read the full artifact. Define or drop any term of art
+- One line per bullet, 20 words or fewer. The whole briefing fits one screen (about 25 lines)
+- Outcomes and decisions, never mechanics: no task IDs, phases, priorities, status tables, executor notes, or skill names
+- Keep new things and changes to existing things in separate sections. Never mix them
+- Confidence uses proven (evidence in hand), likely (strong reason), possible (suspected), or uncertain (hypothesis). Never numbers; never proven without evidence
+- The second line names the full artifact's path, or says `in-session only; not persisted`
+- Omit empty sections unless this skill marks one as always present
+- Gains, upgrades and restructures change existing code; a harness or tool the change needs is named inside the item it serves
 - Never hype. If you cannot state a conservative expected effect, the gain is not ready to brief
-- Keep the briefing concise when the audit is saved to a file
 
 ## Quality Gate
-
-- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
 
 The audit is complete only when every answer is yes:
 
@@ -234,6 +238,8 @@ The audit is complete only when every answer is yes:
 - New work and updates to existing work are grouped separately
 - The handover distinguishes supported gains, rejected ideas, unresolved candidates and their next checks
 - The deliverable is saved at the stated path, or honestly labeled in-session only
-- The briefing omits empty sections, uses proven/likely/possible/uncertain, never numbers, and does not hype
+- The briefing follows the briefing rules and does not hype
+- The Reader's Briefing was printed in chat before any next-action question
+- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
 
 Any "no" means the audit is not finished. Fix it and review again.
