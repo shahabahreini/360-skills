@@ -1,14 +1,14 @@
 ---
 name: 360-blueprint
 description: Create an executable plan from a new objective with explicit tasks, constraints, and verification. Use when a goal exists but the path is unclear, or the request is "plan this".
-version: 2.4.0
+version: 2.5.0
 ---
 
 # 360 Blueprint
 
 ## Purpose
 
-Turn a new objective into an executable plan with explicit assumptions, constraints, risks and acceptance checks.
+Turn a new objective into an executable plan with explicit assumptions, constraints, risks and acceptance checks, then show the user a short plain-language briefing of what will change and what to expect.
 
 ## When to Use
 
@@ -20,6 +20,8 @@ Turn a new objective into an executable plan with explicit assumptions, constrai
 ## Core Principle
 
 Resolve decisions that change success; make routine choices from evidence.
+Build the smallest thing that satisfies every objective.
+Show the user the plan before asking what comes next.
 
 ## Workflow
 
@@ -69,6 +71,9 @@ Use observable preservation and acceptance checks. Structural validation cannot 
 - Sequence by dependency and by risk
 - Put discovery work first when uncertainty could invalidate the plan
 - Declare what is out of scope and how scope changes are handled
+- Run the footprint test on the chosen path. For every file, dependency, layer, setting, and abstraction the plan creates, name the objective that fails without it. Cut what fails the test
+- Prefer, in order: change nothing, edit what exists, reuse what exists, add the smallest new thing
+- State the footprint in the plan: files created, files edited, dependencies added, abstractions added
 
 ### 5. Craft the Plan
 
@@ -77,6 +82,7 @@ Use observable preservation and acceptance checks. Structural validation cannot 
 - Every task states what, how, where, and done when
 - Mark effort, priority, and parallelization
 - Define the cut line
+- Write each phase checkpoint as something the user can see or run
 - Use established stack choices and conventions. Record reversible defaults and falsifiable assumptions with supporting evidence or a pending validation method in `Validated by`; keep material unresolved choices as blockers
 - Keep names and terms consistent from start to finish
 - Make the plan self-contained for a fresh executor
@@ -97,18 +103,20 @@ Turn quality goals into task-specific acceptance checks.
 - Falsify assumptions
 - Check whether different readings change success or safety; permit equivalent reversible implementations
 - Verify every objective maps to tasks and every task serves an objective
+- Reread the briefing as a stranger: can they say what changes and what they will see afterward?
 
 ### 8. Deliver in Two Channels
 
 - Write the full plan to a file using the work-file template
 - Reuse the existing path if known; otherwise `plans/<short-slug>.md`; create the folder if needed; ask once if the location is ambiguous
 - If the file cannot be written, use the in-session delivery fallback
-- With a saved file, print the terminal briefing and path
-- If the plan deserves adversarial review before build, say so in plain language — no skill names
-- Ensure required answers were resolved before ready/final delivery; keep unanswered blockers in `Draft`; never conclude by dumping passive questions at the end of the conversation
+- With a saved file, print the Reader's Briefing and the path in chat. Print it before any question about next steps
+- If the plan deserves adversarial review before build, say so in plain language, with no skill names
+- Ensure required answers were resolved before ready delivery. Keep unanswered blockers in `Draft`. Never end by dumping passive questions
 
 ### Completion: Choose the Next Action
 
+- Print the Reader's Briefing in chat before asking anything. A next-action question with no briefing above it is a failed delivery. If the host sends one message, the briefing comes first in that message
 - Finish and verify the current deliverable first; make the result and its location available before asking about follow-on work. Keep artifact readiness separate from the next-action choice: an unanswered suggestion does not reopen completed work, and a blocked job is not complete
 - Check the result, current project stage, remaining risks, and prior user instructions. Recommend the next useful action from the local routing guidance below; skip irrelevant stages and prefer stopping when no useful work remains
 - Use an available interactive question tool to offer one concise next-action choice. Put the best recommendation first, explain why it fits this result, and include a stop/pause choice. Always allow a free-text note or custom direction, including work outside the 360 flow; never force the user into a sibling skill
@@ -136,6 +144,7 @@ Local routing: Recommend `360-faculty` when tailoring or expertise would materia
 - Goal:
 - Done when:
 - Success measures:
+- Expected results: <what the user can see, run, or measure after each phase>
 - Must not happen:
 
 ## 2. Context & Constraints
@@ -155,6 +164,7 @@ Local routing: Recommend `360-faculty` when tailoring or expertise would materia
 - Explicitly out of scope:
 - Change policy:
 - Cut line: <only should/could below it>
+- Footprint: <n> files created · <n> edited · <n> dependencies · <n> abstractions. Each new item names the objective it serves
 
 ## 5. Assumptions
 | # | Assumption | Validated by |
@@ -163,7 +173,7 @@ Local routing: Recommend `360-faculty` when tailoring or expertise would materia
 
 ## 6. Phases & Tasks
 ### Phase 1: <name>
-Checkpoint:
+Checkpoint: <what the user can see or run when this phase ends>
 
 **Task 1.1 — <name>**
 - What:
@@ -202,36 +212,51 @@ Handover fields: Context · Decisions · State (done / pending / blocked) · Rem
 
 Fill every field or write `N/A` with a one-line reason.
 
-### Terminal briefing
+### Reader's Briefing
 
-Use this shape. Omit any section that would be empty. Follow the Delivery rules for file or in-session output.
+Print this in chat. Follow the Delivery rules for file or in-session output.
 
 ```text
-<what this plan is> — plan is ready
+<plain title> — plan is ready          (or: draft — open questions remain)
 Full plan: <path>
 
-Features to add
-- <new capability as an outcome>
+In one sentence
+<what will be done and why, 25 words or fewer>
 
-Updates to existing
-- <change to something that already exists>
+What you'll get
+- <new thing, as something you can see or use>
 
-Not adding
-- <left out on purpose>
+What changes in what you already have
+- <thing> — now: <current behavior>; after: <new behavior>
 
-Issues found
-- <problem or uncertainty> — <proven|likely|possible|uncertain>
+What to expect when it's done
+- <result you can check yourself, and how>
+
+Size
+- About <n> files touched (<n> new, <n> edited), <n> new dependencies. Effort: small | medium | large
+
+Left out on purpose
+- <item> — <why>
+
+Risks
+- <risk in plain words> — <proven|likely|possible|uncertain>. You'd notice it by: <sign>
 ```
 
-- First line is `plan is ready` or `draft — open questions remain`
-- Talk to the user, not the next agent. Outcomes, not tasks
-- A new artifact is Features to add. A change to an existing artifact, feature, or document is Updates to existing. Never mix them
-- Confidence: `proven` evidence in hand; `likely` strong reason; `possible` suspected; `uncertain` hypothesis. Never numbers
-- No phases, tasks, MoSCoW, status tables, handover, or skill names
-- Never append open questions, design choices, or trailing bullet lists at the end of the conversation (no `Need from you` dump). Use the clarification loop for every required question before concluding
+Briefing rules:
+
+- Write for someone who has not read the plan. Define or drop any term of art
+- One line per bullet, 20 words or fewer. The whole briefing fits one screen (about 25 lines)
+- Outcomes, never tasks. No task IDs, phases, priorities, status tables, handover, or skill names
+- A new artifact goes under `What you'll get`. A change to an existing one goes under `What changes`. Never mix them
+- Every item under `What changes` shows now and after
+- `What to expect` is observable: a command that runs, a screen that shows, a number that moves. "Works correctly" is not allowed
+- Confidence uses proven, likely, possible, uncertain. Never numbers
+- Omit empty sections, except `What to expect`, which is always present
+- No trailing question list. Required questions use the clarification loop before delivery
 
 ## Quality Gate
 
+- The Reader's Briefing was printed in chat before any next-action question
 - Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
 
 The plan is ready only when every answer is yes:
@@ -247,10 +272,13 @@ The plan is ready only when every answer is yes:
 - The cut line is defined
 - Every objective maps to tasks and no orphan tasks remain
 - New work and updates to existing work are grouped separately
+- The footprint is stated, and every new file, dependency, and abstraction names the objective it serves
+- No task adds a layer, setting, or generalization for a need that no objective names
 - A fresh executor can distinguish requirements, defaults, assumptions and unresolved blockers
-- Checkpoints and replanning triggers exist
+- Checkpoints and replanning triggers exist, and each checkpoint is something the user can see or run
 - The premortem covered relevant requirements, likely failures and severe plausible failures; inspection limits are stated
 - The deliverable follows the template and accurately states its location or in-session status
-- The briefing omits empty sections and uses proven/likely/possible/uncertain, never numbers
+- A reader with no context can say what will change and what they will see afterward
+- The briefing follows the briefing rules, omits empty sections, and uses proven/likely/possible/uncertain, never numbers
 
 Any "no" means the plan is not finished. Refine and review again.

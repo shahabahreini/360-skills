@@ -1,14 +1,14 @@
 ---
 name: 360-faculty
-description: Seat a living, tailored expert team on a plan or task. Use when work must fit this developer's goals, taste, mindset, and strategy, when a plan needs the right expertise chosen for its complexity, depth, and nature, or when a named faculty team must be created, called, or updated. Recommends a short list, asks only the questions that still change the work, polishes immediately, and keeps upgradable memory.
-version: 1.3.0
+description: Seat a living, tailored expert team on a plan or task. Use when work must fit this developer's goals, taste, mindset, and strategy, when a plan needs the right expertise chosen for its complexity, depth, and nature, or when a named faculty team must be created, called, or updated. Recommends a short list, defines each seat with named techniques, asks only the questions that still change the work, polishes immediately, and keeps upgradable memory.
+version: 1.4.0
 ---
 
 # 360 Faculty
 
 ## Purpose
 
-Use advisory expert lenses to tailor work to the developer’s goals, taste, mindset and strategy. Produce a fit assessment, roster, authorized memory and polished plan or concrete guidance, according to the selected mode.
+Use advisory expert lenses to tailor work to the developer's goals, taste, mindset and strategy. Each seat is defined by named techniques and a required output, so it can critique, recommend, and innovate inside its craft. Produce a fit assessment, roster, authorized memory and polished plan or concrete guidance, according to the selected mode.
 
 ## When to Use
 
@@ -23,6 +23,8 @@ Use advisory expert lenses to tailor work to the developer’s goals, taste, min
 ## Core Principle
 
 Expert lenses improve decisions; evidence validates them.
+A seat earns its place with named techniques and a concrete deliverable.
+Faculty work obeys the same footprint test as the plan.
 
 ## Workflow
 
@@ -110,9 +112,9 @@ Five is the cap unless the developer asks for more. State the dimensions and cho
 
 Recommend only faculties that add distinct value to this task. Never dump the Seating Roster unless the developer asks for it.
 
-| # | Faculty | Seat | Why now | If absent |
-|---|---|---|---|---|
-| 1 | <role> | must / should / could | <the task ID, assumption, or risk row that demands this lens> | <the concrete missed decision or failure check> |
+| # | Faculty | Seat | Why now | Techniques it will apply | If absent |
+|---|---|---|---|---|---|
+| 1 | <role> | must / should / could | <task ID, assumption, or risk row> | <2–3 named methods> | <the missed decision or failure> |
 
 - `must` — a concrete material failure requires this expertise
 - `should` — silence creates likely waste or rework
@@ -120,11 +122,34 @@ Recommend only faculties that add distinct value to this task. Never dump the Se
 
 `Why now` cites a real element of the plan or task. A recommendation that cannot cite one is a habit, not a fit — drop it.
 
-Choose expertise from actual failure modes and cite the relevant task or risk. Derive an unlisted role when needed. Read the optional [seating roster](references/seating-roster.md) only when expertise selection needs examples; do not load or scan the catalog by default.
+Choose expertise from actual failure modes and cite the relevant task or risk. Derive an unlisted role when needed. Read the [core cards](references/core-cards.md) for seats it covers. Read the optional [seating roster](references/seating-roster.md) only when expertise selection needs examples; do not load or scan the catalog by default.
+
+#### Define Each Seat
+
+Write a Card for every recommended seat before the developer confirms. Adapt the core card when one exists. Derive the card for any other role from the same fields.
+
+```markdown
+### Card: <role>
+Owns: <the one decision this seat decides>
+Techniques: <3–5 named methods this seat applies to this plan>
+Critique tests: <3 questions, each answerable from plan evidence>
+Excellence bar: <what the best practitioners in this craft would require here>
+Innovation move: <one improvement beyond the ask, with its footprint>
+Evidence needed: <what this seat must see before judging>
+Delivers: at least one critique, one recommendation, and one innovation, or "none" with the reason
+Stays out of: <neighbouring seats>
+```
+
+Card rules:
+
+- Techniques are established methods of the craft, not adjectives. "Thinks about security" fails. "Threat modeling, abuse-case review, secret-handling check" passes
+- Critique tests cite plan elements. A test that fits any plan is generic; rewrite it
+- A seat with fewer than three named techniques, or with no concrete deliverable, is dropped or merged
+- Show a Card to the developer in one to three lines on request. Keep the short list readable
 
 Accept these replies: `accept`, `1-3`, `drop 4 add privacy`, `only architect`, `quiet`.
 
-Do not seat until the developer confirms. If they name a faculty you did not recommend, seat it.
+Do not seat until the developer confirms. If they name a faculty you did not recommend, seat it, and write its Card first.
 
 In `suggest` mode, stop here and deliver:
 
@@ -157,7 +182,13 @@ Raise in their language. Put two cuts side by side — theirs and the tailor's �
 - They take the raise → polish to the tailor's cut; upgrade memory: this mind can be moved on this point
 - They keep their cut → tailor that cut; record the accepted risk; do not fight it again without new evidence. `360-expert-review` may reopen it later with evidence — that is its job, not a contradiction of this one
 
-**Polish now.** Edit only the steps, states, checks, and risks this faculty advises on. Regenerate the whole plan only if the faculty proved the objective itself wrong. If no plan exists, write concrete guidance within this faculty’s scope, then offer `360-blueprint`.
+**Apply the Card.** Run the seat's techniques and critique tests against the plan. Record each result as a critique, a recommendation, or an innovation.
+
+- Critique stays inside the seat's craft and aims to improve the plan. The hostile pass and the readiness verdict belong to `360-expert-review`
+- An innovation that grows the footprint (files, dependencies, abstractions) is written as `could` unless it protects a stated requirement
+- Do not add work to show value. "None, because <reason>" is a valid delivery
+
+**Polish now.** Edit only the steps, states, checks, and risks this faculty advises on. Regenerate the whole plan only if the faculty proved the objective itself wrong. If no plan exists, write concrete guidance within this faculty's scope, then offer `360-blueprint`.
 
 Hold the plan contract while polishing. `360-execute` reads these fields directly, and prose in their place breaks execution:
 
@@ -171,6 +202,7 @@ Write findings into the plan's existing semantic sections. The blueprint uses th
 - Explicit assumptions → section 5: `Validated by` cites actual evidence and its boundary, or `Pending: <validation method>`. A seated role or its agreement cannot validate an inference
 - Open questions → Context & Constraints; decisions → Handover Summary
 - One header row so a fresh reader knows a faculty pass happened: `| Tailored by | faculty/roster.md @ <date> |`
+- Update the footprint line when an edit changes it
 
 **Resolve disagreements in the open.** Check conflicting advice against evidence and existing decisions. Resolve equivalent reversible details with a recorded reason; present material trade-offs needing user choice with what each protects.
 
@@ -213,7 +245,7 @@ A team is a named lineup this developer can reuse. Teams live in `faculty/teams.
 ```
 
 - **Create** — `save this as <name>` turns the session's seated set into a team; `team create <name>: <roles>` builds one from scratch
-- **Call** — `call <name>` loads the team and skips Step 4's recommendation, going straight to seating. Dossiers and every question cap still apply
+- **Call** — `call <name>` loads the team and skips Step 4's recommendation, going straight to seating. Dossiers, Cards, and every question cap still apply
 - **Edit** — `team <name> add <role>` or `drop <role>`; record the change and its date
 
 **Drift check, always.** After loading a team, still run Step 3 against the current plan. If the fit assessment surfaces a `must` seat the team lacks, name it in one line with its plan evidence and ask before seating. A stale team must never silently under-cover a new plan — the roster is a floor for teams too.
@@ -261,8 +293,12 @@ After each faculty:
 
 Questions: <the questions asked, or "none — memory enough">
 Follow or raise: <followed / raised — tailor taken / raised — developer kept cut>
-Plan touch:
-- <section or task>: <what changed and why>
+Critiques:
+- <what is weak from this craft's view> — evidence: <plan element>
+Recommendations:
+- <section or task>: <change and why>
+Innovation:
+- <improvement> — footprint: <files / dependencies / abstractions> — priority: <should / could>
 Memory:
 - <claim> (<source>, <status>)
 Next: <next faculty> or stop
@@ -287,11 +323,11 @@ After the session:
 - Seats sized: <band> — seated: <n>
 
 ## Seated
-| Faculty | New or returning | Questions asked | Follow or raise |
-|---|---|---|---|
+| Faculty | New or returning | Techniques applied | Questions asked | Follow or raise |
+|---|---|---|---|---|
 
 ## Plan changes
-- <each surgical edit, grouped by faculty>
+- <each surgical edit, grouped by faculty, with what the user will notice>
 
 ## Teams
 - <team name>: <created / called / edited / none this session>
@@ -324,16 +360,19 @@ After the session:
 
 - Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
 
-The session is finished when every gate applicable to the selected mode passes. In `suggest` mode, finish after the fit assessment, evidence-backed short list, and rationale; seating, plan edits, dossier writes, and team management gates do not apply. State why any other gate is non-applicable.
+The session is finished when every gate applicable to the selected mode passes. In `suggest` mode, finish after the fit assessment, evidence-backed short list with Cards, and rationale; seating, plan edits, dossier writes, and team management gates do not apply. State why any other gate is non-applicable.
 
 - The mode was clear, and `suggest` mode stopped before seating and left the plan untouched
 - Goals, taste, mindset, and strategy were known from memory or asked in this session
 - The fit assessment stated nature, depth and complexity; each seat adds distinct value, overlapping seats were reduced, and departures from guide bands are explained
 - Every recommendation cited the plan element that demands it, chosen by failure mode rather than habit — including rare roles and roles the roster does not name
+- Every seat had a Card with at least three named techniques, evidence-citing critique tests, and a concrete deliverable
 - A short list was shown and seating was confirmed, with no catalog dump unless the developer asked
 - Every faculty stayed inside its question caps, and no question was asked whose answer the plan, repo, or dossiers already held
 - Every faculty followed or raised; no silent override; no flattery
 - Every raise placed two cuts side by side and waited for the developer
+- Every faculty delivered a critique, a recommendation, and an innovation, or stated why none applied
+- No innovation grew the footprint without a named requirement or a `could` priority
 - The plan or guidance was polished after each seat, never batched to the end
 - Every Plan Template field survived on every task touched: ID, Depends on, Skills, Parallel, Effort, Priority, Done when, checkpoints, change policy, replanning triggers, traceability
 - Every task a faculty added carries a stable ID, declared skills, `Effort` / `Priority` / `Parallel` values from the family vocabularies, and an observable `Done when`

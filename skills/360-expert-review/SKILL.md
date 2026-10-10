@@ -1,14 +1,14 @@
 ---
 name: 360-expert-review
 description: Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage.
-version: 3.4.0
+version: 3.5.0
 ---
 
 # 360 Expert Review
 
 ## Purpose
 
-Expose concrete failure cases and weak assumptions in a draft plan, then revise it in place until applicable readiness checks pass or blockers are explicit.
+Expose concrete failure cases and weak assumptions in a draft plan, cut what the plan does not need, then revise it in place until applicable readiness checks pass or blockers are explicit. Show the user what was found, what was fixed, and what to expect.
 
 ## When to Use
 
@@ -20,6 +20,7 @@ Expose concrete failure cases and weak assumptions in a draft plan, then revise 
 ## Core Principle
 
 Try to disprove readiness with concrete failure cases.
+Every fix must be the smallest that works; a review that only adds is incomplete.
 
 ## Workflow
 
@@ -81,10 +82,13 @@ Do not role-play personas. Extract findings directly from each lens.
 - Trace relevant requirements to implementation tasks and observable verification
 - Add validation, failure handling, security, compatibility, monitoring and ownership only where a concrete risk demands them
 - Prefer the simplest correction that protects the intended outcome; do not introduce operational machinery into an unrelated documentation task
+- Run a lean audit. For each task ask: which objective fails if this is deleted? Can existing code or structure do it? Cut or merge every task that fails both
+- Every fix that adds a file, dependency, layer, or setting cites the failure it prevents and is the smallest option that prevents it. Otherwise it stays optional
+- Report cuts next to additions, and the footprint change against the draft
 
 ### 6. Define Proportionate Verification
 
-- Match each acceptance check to the consequence it detects; “works correctly” is not observable
+- Match each acceptance check to the consequence it detects; "works correctly" is not observable
 - Distinguish a reviewed plan from a verified implementation. A planned test has not run
 - Mark irrelevant checks non-applicable with reasons. Missing evidence remains unknown; obtain it or disclose the resulting limitation/blocker
 
@@ -98,7 +102,8 @@ Switch to hostile critic. Ask:
 - What is the most damaging failure?
 - Which step could be read two different ways?
 - What cannot be detected, reproduced, or reversed?
-- What can be simpler?
+- What can be deleted, and what breaks if it is?
+- Where does the plan build for a case no objective names?
 
 Fix actionable findings and recheck affected risks. Stop when applicable checks pass and material blockers are resolved. An unavailable check stays unknown; if it prevents judging readiness, keep the plan non-final and name the missing evidence or decision. Otherwise disclose the limit without manufacturing required work. Use the clarification loop only for material user decisions; record routine defaults. Do not loop indefinitely.
 
@@ -110,11 +115,12 @@ Fix actionable findings and recheck affected risks. Stop when applicable checks 
 - Put review findings, key decisions, and remaining risks in a short appendix in that same file
 - Include the executor handover in the chosen delivery format
 - If the file cannot be written, use the in-session delivery fallback
-- With a saved file, print the terminal briefing and path
-- Ensure required answers were resolved before ready/final delivery; keep unanswered blockers in `Draft`; never conclude by dumping passive questions at the end of the conversation
+- With a saved file, print the Reader's Briefing and the path in chat. Print it before any question about next steps
+- Ensure required answers were resolved before final delivery. Keep unanswered blockers in `Draft`. Never end by dumping passive questions
 
 ### Completion: Choose the Next Action
 
+- Print the Reader's Briefing in chat before asking anything. A next-action question with no briefing above it is a failed delivery. If the host sends one message, the briefing comes first in that message
 - Finish and verify the current deliverable first; make the result and its location available before asking about follow-on work. Keep artifact readiness separate from the next-action choice: an unanswered suggestion does not reopen completed work, and a blocked job is not complete
 - Check the result, current project stage, remaining risks, and prior user instructions. Recommend the next useful action from the local routing guidance below; skip irrelevant stages and prefer stopping when no useful work remains
 - Use an available interactive question tool to offer one concise next-action choice. Put the best recommendation first, explain why it fits this result, and include a stop/pause choice. Always allow a free-text note or custom direction, including work outside the 360 flow; never force the user into a sibling skill
@@ -131,10 +137,10 @@ Local routing: Recommend `360-execute` for a finalized executable plan. For a bl
 Preserve the existing plan and fill only missing contract elements. Minimum standalone shape:
 
 1. Metadata: objective, status, version/date
-2. Objective and observable definition of done
-3. Context, constraints, scope, assumptions, open questions and decisions
+2. Objective and observable definition of done, with expected results per phase
+3. Context, constraints, scope, footprint, assumptions, open questions and decisions
 4. Strategy, alternatives, change policy and cut line
-5. Phases and tasks using the Shared Plan Contract, with checkpoints
+5. Phases and tasks using the Shared Plan Contract, with checkpoints the user can see or run
 6. Risks and countermeasures
 7. Per-task and overall verification, replanning triggers and traceability
 8. Handover: Context · Decisions · State (done / pending / blocked) · Remaining tasks (what, how, where) · Verification · Risks and how to detect them early
@@ -147,6 +153,7 @@ Set `Reviewed and ready to execute` only when the applicable Quality Gate passes
 - Findings:
 - Decisions:
 - Remaining risks:
+- Cuts made and footprint change versus the draft:
 - Applicable checks and evidence:
 - Non-applicable checks and reasons:
 - Blockers and resolution needed:
@@ -154,39 +161,52 @@ Set `Reviewed and ready to execute` only when the applicable Quality Gate passes
 
 Do not replace the task list with a narrative plan.
 
-### Terminal briefing
+### Reader's Briefing
 
-Use this shape. Omit any section that would be empty. Follow the Delivery rules for file or in-session output.
+Print this in chat. Follow the Delivery rules for file or in-session output.
 
 ```text
-<what this plan is> — plan is final
+<plain title> — plan is final          (or: not final — <specific blocker>)
 Full plan: <path>
 
-What changed
-- <material delta from the draft>
+In one sentence
+<what will be done and why, 25 words or fewer>
 
-Features to add
-- <new capability as an outcome>
+What the review found and fixed
+- <problem in plain words> — <proven|likely|possible|uncertain>. Fix: <fix>. You'll notice: <result>
 
-Updates to existing
-- <change to something that already exists>
+What you'll get
+- <new thing, as something you can see or use>
 
-Issues found
-- <hole, bug, or weak assumption> — <proven|likely|possible|uncertain>
+What changes in what you already have
+- <thing> — now: <current>; after: <new>
+
+What to expect when it's done
+- <result you can check yourself, and how>
+
+Size
+- About <n> files touched (<n> new, <n> edited). Versus the draft: <n> tasks cut, <n> added
 
 Remaining risks
-- <accepted risk> — <likely|possible|uncertain>
+- <accepted risk> — <likely|possible|uncertain>. You'd notice it by: <sign>
 ```
 
-- First line is `plan is final` or `not final — <specific blocker or remaining review>`
-- Talk to the user, not the next agent. Outcomes, not tasks
-- A new artifact is Features to add. A change to an existing artifact, feature, or document is Updates to existing. Never mix them
-- Confidence: `proven` evidence in hand; `likely` strong reason; `possible` suspected; `uncertain` hypothesis. Never numbers. Never say proven without evidence
-- No phases, tasks, skill names, or review-essay dump
-- Never append open questions, design choices, or trailing bullet lists at the end of the conversation (no `Need from you` dump). Use the clarification loop for every required question before concluding
+Briefing rules:
+
+- Write for someone who has not read the plan. Define or drop any term of art
+- One line per bullet, 20 words or fewer. The whole briefing fits one screen (about 25 lines)
+- Outcomes, never tasks. No task IDs, phases, priorities, status tables, handover, or skill names
+- A new artifact goes under `What you'll get`. A change to an existing one goes under `What changes`. Never mix them
+- Every item under `What changes` shows now and after
+- `What to expect` is observable: a command that runs, a screen that shows, a number that moves. "Works correctly" is not allowed
+- Confidence uses proven, likely, possible, uncertain. Never numbers
+- Omit empty sections, except `What to expect`, which is always present
+- No trailing question list. Required questions use the clarification loop before delivery
+- Every finding pairs the problem, the fix, and the result the user will notice. A finding with no visible result says `no visible change; protects <what>`
 
 ## Quality Gate
 
+- The Reader's Briefing was printed in chat before any next-action question
 - Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
 
 The plan is final only when every applicable answer is yes (record a reason for each non-applicable item):
@@ -200,13 +220,15 @@ The plan is final only when every applicable answer is yes (record a reason for 
 - Relevant requirements are traceable to tasks and observable verification; monitoring is included only where needed
 - Material failure cases have proportionate detection, diagnosis and recovery checks
 - The design is clear, consistent, and as simple as possible
+- The lean audit ran, cuts were reported next to additions, and no added work lacks a named failure it prevents
 - Testing matches the risk
-- Release and rollback checks address the plan’s relevant failure cases
+- Release and rollback checks address the plan's relevant failure cases
 - The plan survived hostile review
 - Material decisions were resolved through the clarification loop; defaults and unknown evidence are explicit, never silent passes
 - Task IDs were preserved or changed with a stated reason
 - New work and updates to existing work are grouped separately
 - The finalized plan preserves its original location where supported, or follows the Delivery fallback
-- The briefing omits empty sections and uses proven/likely/possible/uncertain, never numbers
+- Each finding in the briefing states problem, fix, and the result the user will notice
+- The briefing follows the briefing rules, omits empty sections, and uses proven/likely/possible/uncertain, never numbers
 
 Any unresolved "no" keeps the plan non-final. Fix actionable findings or report the blocker and the evidence or decision needed to resolve it.
