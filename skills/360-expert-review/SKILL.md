@@ -118,9 +118,10 @@ Fix actionable findings and recheck affected risks. Stop when applicable checks 
 - With a saved file, print the Reader's Briefing and the path in chat. Print it before any question about next steps
 - Ensure required answers were resolved before final delivery. Keep unanswered blockers in `Draft`. Never end by dumping passive questions
 
+- Print the Reader's Briefing in chat before asking anything. A next-action question with no briefing above it is a failed delivery. If the host sends one message, the briefing comes first in that message
+
 ### Completion: Choose the Next Action
 
-- Print the Reader's Briefing in chat before asking anything. A next-action question with no briefing above it is a failed delivery. If the host sends one message, the briefing comes first in that message
 - Finish and verify the current deliverable first; make the result and its location available before asking about follow-on work. Keep artifact readiness separate from the next-action choice: an unanswered suggestion does not reopen completed work, and a blocked job is not complete
 - Check the result, current project stage, remaining risks, and prior user instructions. Recommend the next useful action from the local routing guidance below; skip irrelevant stages and prefer stopping when no useful work remains
 - Use an available interactive question tool to offer one concise next-action choice. Put the best recommendation first, explain why it fits this result, and include a stop/pause choice. Always allow a free-text note or custom direction, including work outside the 360 flow; never force the user into a sibling skill

@@ -59,7 +59,7 @@ export function checkConsistency(root = ROOT) {
       if (completionHeadings.length !== 1) report('expected exactly one Completion block');
       const hasReaderBriefing = outsideFences(text).includes("### Reader's Briefing");
       if (hasReaderBriefing && !workflow.includes(READER_BRIEFING_RULE)) report('Reader’s Briefing must precede the next-action prompt');
-      const normalizedWorkflow = workflow.replace(`${READER_BRIEFING_RULE}\n\n`, '');
+      const normalizedWorkflow = workflow.replace(`${READER_BRIEFING_RULE}\n`, '');
       const completionAt = normalizedWorkflow.indexOf(COMPLETION);
       if (completionAt < 0) report('missing or changed shared Completion block inside Workflow');
       const routes = [...normalizedWorkflow.matchAll(/^Local routing: (.+)$/gm)];
