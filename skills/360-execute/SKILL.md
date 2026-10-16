@@ -125,7 +125,7 @@ Before declaring completion, walk the ledger top to bottom:
 - Use an available interactive question tool to offer one concise next-action choice. Put the best recommendation first, explain why it fits this result, and include a stop/pause choice. Always allow a free-text note or custom direction, including work outside the 360 flow; never force the user into a sibling skill
 - If interactive tools are unavailable, offer equivalent numbered choices with the recommendation, rationale, and explicit custom-note option in chat. This completion prompt is separate from the deliverable briefing; skill names are allowed here, and it is not a passive list of unresolved task questions
 - Reuse an already explicit next-step instruction instead of asking again; continue work it authorizes. Otherwise wait for the user's choice before starting follow-on work. Silence, a preselected recommendation, and elapsed time are not authorization. An explicit stop or request for no suggestions suppresses the prompt
-- When the user chooses, follow that direction and clarify only missing information needed for it. Discover and load a selected skill through the host's supported mechanism; do not assume it is installed or install it automatically. If unavailable, explain and offer an equivalent action. Carry forward artifact paths, decisions, verification, remaining risks, and session consent — including the delegation decision — without restarting intake
+- When the user chooses, follow that direction and clarify only missing information needed for it. Discover and load a selected skill through the host's supported mechanism; do not assume it is installed or install it automatically. If unavailable, explain and offer an equivalent action. Carry forward artifact paths, decisions, verification, remaining risks, and session consent without restarting intake
 
 Local routing: Recommend `360-backend-audit` after significant backend work, or `360-optimize` when working code has a relevant performance or weight concern. For other completed work, recommend a concrete domain-appropriate follow-up or stopping; do not invent backend work to fit the flow.
 
@@ -170,13 +170,14 @@ Briefing rules:
 
 - Write for someone who has not read the full artifact. Define or drop any term of art
 - One line per bullet, 20 words or fewer. The whole briefing fits one screen (about 25 lines)
-- Outcomes and decisions, never mechanics: no task IDs, phases, priorities, status tables, executor notes, delegation tiers, or skill names
+- Outcomes and decisions, never mechanics: no task IDs, phases, priorities, status tables, executor notes, or skill names
 - Keep new things and changes to existing things in separate sections. Never mix them
 - Confidence uses proven (evidence in hand), likely (strong reason), possible (suspected), or uncertain (hypothesis). Never numbers; never proven without evidence
 - The second line names the full artifact's path, or says `in-session only; not persisted`
 - Omit empty sections unless this skill marks one as always present
 - `Done` lists new work shipped; `Updates to existing` lists changes to something that already existed
 - Describe a missing skill or tool by what it does when it explains a limitation
+- Omit delegation tiers and subagent mechanics from the briefing
 
 ## Quality Gate
 
