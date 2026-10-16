@@ -1,14 +1,14 @@
 ---
 name: 360-execute
-description: Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and brief the user in chat. Use when a plan exists and work must begin, or when resuming a partial execution.
-version: 2.3.0
+description: Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and brief the user in chat — with optional audited delegation of routine tasks to lighter models. Use when a plan exists and work must begin, or when resuming a partial execution.
+version: 2.4.0
 ---
 
 # 360 Execute
 
 ## Purpose
 
-Execute an authorized plan against its acceptance checks and keep a recoverable coverage ledger of results, deviations and unfinished work.
+Execute an authorized plan against its acceptance checks and keep a recoverable coverage ledger of results, deviations and unfinished work. When the user approves, dispatch routine tasks to lighter-tier subagents and reserve heavier models for complex work, then review and audit every delegated result before it counts.
 
 ## When to Use
 
@@ -19,13 +19,17 @@ Execute an authorized plan against its acceptance checks and keep a recoverable 
 
 ## Core Principle
 
-Current evidence establishes progress; the ledger records it.
+Current evidence establishes progress; the ledger records it. Delegation speeds execution; it never transfers accountability.
 
 ## Workflow
 
 ### Entry: Optional Token Efficiency
 
 Reuse explicit approval or refusal for `360-token-efficiency` from this session. If unknown and not already offered, ask once whether to enable it for this session; continue the main task with the overlay inactive while unanswered. Explicit user invocation counts as approval; merely appearing in a generated plan does not. On approval, discover and load it through the host's supported skill mechanism, reusing already-loaded instructions. If unavailable, explain briefly and continue; do not install automatically. Refusal disables the overlay, not ordinary efficient habits. Revocation takes effect immediately. Keep consent in-session only; it does not authorize cross-session memory writes. The overlay never invokes itself or restarts the parent skill.
+
+### Entry: Optional Model Delegation
+
+Reuse explicit approval or refusal for model delegation from this session. If unknown and not already offered, ask once using the host's interactive question tool and state the trade-off plainly: routine tasks go to lighter, faster subagent models; complex tasks go to heavier models or stay with the current one; the executing agent reviews and audits everything a subagent returns; refusal means the same work runs with the current model — via same-tier subagents or plain sequential execution. Present refusal as a full equal choice, never as a delay. Continue without delegation while unanswered; silence and elapsed time are not approval. On approval, class models by relative tier (lighter / same / heavier) and prefer the newest model the host offers within each tier; never hardcode or assume a specific vendor or model name. If the host offers no subagent or tier mechanism, explain briefly and execute sequentially. Refusal or unavailability disables delegation only — it changes nothing else in this skill.
 
 ### Shared Plan Contract
 
@@ -62,24 +66,37 @@ Reconcile the plan, ledger, actual artifacts or external state, and relevant ver
 - One row per task: ID, name, priority, acceptance check, status
 - Statuses: `pending` / `in progress` / `done (verified)` / `blocked` / `dropped (approved)`
 - Mark verified only when current acceptance evidence supports it; include source revision or state identifiers when relevant
+- For delegated tasks, record the assigned tier alongside the verdict and the audit evidence that backed it
 - Record remaining uncertainty and the next check so a fresh agent can resume safely
 
-### 3. Execute in Order
+### 3. Assign Execution Tiers
+
+When delegation was approved, decide the executor for each task before dispatching. Without approval, every task runs with the current model.
+
+- Delegate down to a lighter tier: tasks that are self-contained, mechanical, reversible and have an observable done-when — typically effort S with fixed instructions. Send the task contract only; do not hand over full session context
+- Delegate across at the same tier: independent tasks a subagent can finish without the context you have accumulated
+- Route up to a heavier tier when available: tasks whose reasoning or verification demands exceed the current model's demonstrated capability on this plan
+- Keep with the current model: irreversible or external actions, security- and auth-sensitive work, anything depending on accumulated context, and every call the plan assigns to the user. These never leave the accountable executor
+- Classify by relative capability, not by vendor. Model lineups change; the tier rules do not
+
+### 4. Execute in Order
 
 - Follow phase order and task dependencies exactly; honor parallel markers
 - Load declared skills through the supported host mechanism when available. The optional `360-token-efficiency` always follows session consent; a plan listing is not approval. If another declared skill is unavailable, use the self-contained contract and available capabilities; block only tasks that actually require the missing capability
+- Dispatch delegated tasks within the same order; a rejected or failed delegated attempt returns the task to the current model, recorded as a deviation. Never retry silently across tiers, never forward broken output downstream
 - Verify each phase checkpoint before advancing dependent work. A failure blocks affected descendants; continue independent authorized work where dependencies and parallel markers permit
 - Keep work within the task and change policy
 - Before a non-repeatable or external action, record intent and a recoverable operation identifier or reconciliation method. After interruption, inspect partial effects and external state before retrying. Reuse confirmed results; retry only if absence or safe repeatability is established. If state cannot be determined, block that action and identify the missing check
 
-### 4. Verify Every Task
+### 5. Verify Every Task
 
 - Run the task's "done when" check and record the evidence in the ledger
 - Done means the check passed with evidence — never "looks right", never "should work"
+- Delegated output is a claim, never a result. Re-verify it against the task's own done-when check at the same standard as your own work, and audit the returned diff or artifact yourself before dependent work advances. A subagent never marks its own task verified
 - If an implementation acceptance check cannot run, mark the task `blocked` with the missing evidence. An assessment task may finish with disclosed limits only when its own acceptance criteria permit them; an unknown check never becomes a pass
 - Check affected behavior and the diff after each task; state the inspected boundary and regressions rather than claiming everything else is safe
 
-### 5. Handle Deviations in the Open
+### 6. Handle Deviations in the Open
 
 When reality disagrees with the plan — a failed assumption, missing information, a visibly better path:
 
@@ -89,12 +106,13 @@ When reality disagrees with the plan — a failed assumption, missing informatio
 - Never silently absorb new scope, never silently skip a task
 - A `must`-priority task is never dropped without an explicit user decision; `should`/`could` tasks follow the plan's cut line
 
-### 6. Sweep and Write the Report
+### 7. Sweep and Write the Report
 
 Before declaring completion, walk the ledger top to bottom:
 
 - Every task has a final status — zero unaccounted items
 - Cross-check the plan's traceability: every objective maps to verified work
+- Re-check every delegated verdict: each one carries the assigned tier and the audit evidence, and failed delegations have a recorded re-execution path
 - Run the plan's overall verification; confirm all checkpoints passed
 - Sweep once more for regressions introduced across phases
 - Write the execution report into the same ledger file
@@ -107,7 +125,7 @@ Before declaring completion, walk the ledger top to bottom:
 - Use an available interactive question tool to offer one concise next-action choice. Put the best recommendation first, explain why it fits this result, and include a stop/pause choice. Always allow a free-text note or custom direction, including work outside the 360 flow; never force the user into a sibling skill
 - If interactive tools are unavailable, offer equivalent numbered choices with the recommendation, rationale, and explicit custom-note option in chat. This completion prompt is separate from the deliverable briefing; skill names are allowed here, and it is not a passive list of unresolved task questions
 - Reuse an already explicit next-step instruction instead of asking again; continue work it authorizes. Otherwise wait for the user's choice before starting follow-on work. Silence, a preselected recommendation, and elapsed time are not authorization. An explicit stop or request for no suggestions suppresses the prompt
-- When the user chooses, follow that direction and clarify only missing information needed for it. Discover and load a selected skill through the host's supported mechanism; do not assume it is installed or install it automatically. If unavailable, explain and offer an equivalent action. Carry forward artifact paths, decisions, verification, remaining risks, and session consent without restarting intake
+- When the user chooses, follow that direction and clarify only missing information needed for it. Discover and load a selected skill through the host's supported mechanism; do not assume it is installed or install it automatically. If unavailable, explain and offer an equivalent action. Carry forward artifact paths, decisions, verification, remaining risks, and session consent — including the delegation decision — without restarting intake
 
 Local routing: Recommend `360-backend-audit` after significant backend work, or `360-optimize` when working code has a relevant performance or weight concern. For other completed work, recommend a concrete domain-appropriate follow-up or stopping; do not invent backend work to fit the flow.
 
@@ -118,10 +136,11 @@ Local routing: Recommend `360-backend-audit` after significant backend work, or 
 The ledger file contains:
 
 1. Coverage ledger — every task: ID, name, priority, final status, evidence for each `done (verified)`
-2. Deviations — what diverged, how it was resolved, who approved it; or "None"
-3. QC results — checks run, checkpoints verified, regression sweeps, outcomes
-4. Unfinished items — pending, blocked, or dropped, with reason and approval; or "None"
-5. Handover summary — Context · Decisions · State (done / pending / blocked) · Remaining tasks (what, how, where) · Verification · Risks and how to detect them early
+2. Delegation — per task: tier assigned (lighter / same / heavier / none) and audit outcome; or "None"
+3. Deviations — what diverged, how it was resolved, who approved it; or "None"
+4. QC results — checks run, checkpoints verified, regression sweeps, outcomes
+5. Unfinished items — pending, blocked, or dropped, with reason and approval; or "None"
+6. Handover summary — Context · Decisions · State (done / pending / blocked) · Remaining tasks (what, how, where) · Verification · Risks and how to detect them early
 
 ### Reader's Briefing
 
@@ -151,7 +170,7 @@ Briefing rules:
 
 - Write for someone who has not read the full artifact. Define or drop any term of art
 - One line per bullet, 20 words or fewer. The whole briefing fits one screen (about 25 lines)
-- Outcomes and decisions, never mechanics: no task IDs, phases, priorities, status tables, executor notes, or skill names
+- Outcomes and decisions, never mechanics: no task IDs, phases, priorities, status tables, executor notes, delegation tiers, or skill names
 - Keep new things and changes to existing things in separate sections. Never mix them
 - Confidence uses proven (evidence in hand), likely (strong reason), possible (suspected), or uncertain (hypothesis). Never numbers; never proven without evidence
 - The second line names the full artifact's path, or says `in-session only; not persisted`
@@ -171,6 +190,10 @@ Execution is complete only when every answer is yes:
 - Every objective in the plan's traceability maps to verified work
 - Regressions and collateral damage were swept for, and the results are stated
 - Declared skill availability and consent were respected; required unavailable capabilities are explicit blockers
+- The delegation question was asked once with its trade-off stated, the answer was honored, and refusal fell back to same-tier subagents or sequential execution
+- No irreversible, security-sensitive, or context-dependent task was delegated
+- Every delegated task was re-verified and its output audited by the executing agent against the task's own acceptance check; no subagent marked its own work verified
+- Failed delegations were recorded and re-executed with the current model before any dependent work advanced
 - Unfinished items are stated honestly — pending, blocked, or dropped, with reasons
 - The ledger matches current artifacts and verification; stale verdicts and partial actions were reconciled before resumption
 - The next agent can recover evidence, uncertainty and the next check; affected verification was invalidated after relevant changes
