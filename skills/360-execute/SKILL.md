@@ -1,7 +1,7 @@
 ---
 name: 360-execute
 description: Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and show progress as a quiet phase-and-task board before a final briefing — with optional audited delegation of routine tasks to lighter models. Use when a plan exists and work must begin, or when resuming a partial execution.
-version: 3.0.0
+version: 3.1.0
 ---
 
 # 360 Execute
@@ -105,11 +105,25 @@ When delegation was approved, decide the executor for each task before dispatchi
 In `quiet` mode, chat carries progress, not process. The ledger, logs and repository hold the detail.
 
 - Never print code, diffs, file contents, or raw command output in chat
-- No step narration. At most one line per status change, such as `✓ <task name> — verified`
-- Run commands with quiet or summary flags where available. Send long output to a log beside the ledger and read only the excerpts needed to decide
-- Show progress in the host's native task or todo list when it exists, since it updates in place. Otherwise print the Progress Board at start, at each phase checkpoint, on any `failed`, `blocked` or `needs decision`, and at the end
+- No narration. Between boards, chat carries only `<symbol> <task> — <8 words or fewer>`, once per status change. No progress summaries, no statements of intent. Delegation shows as status changes only (`◐ <task> — delegated`, `◑ <task> — auditing`)
+- Show progress in the host's native task or todo list when it exists, since it updates in place. Otherwise print the Progress Board right after the ledger is created and before the first task, at each phase checkpoint, on any `failed`, `blocked` or `needs decision`, and at the end. A board is always the last element of its message, so the bottom of the screen shows current state
 - Never hide a failure, blocker, deviation or required decision. Surface it at once, in one or two lines
-- If the host displays tool calls the skill cannot suppress, say so once at start
+
+Many hosts display tool calls and their results; you cannot hide them, but you control their shape. Make each one a short line with a one-line result:
+
+- Runner: at start, write one small runner script beside the ledger (`<slug>-run.sh`, or `.ps1` where only PowerShell exists). It runs a named command or check, appends full output to `<slug>-log.txt`, and prints one summary line such as `ok T3 35/35 tests` or `FAIL T3 2/35 — log:120`. It also rewrites the board file. Visible calls then read like `bash plans/<slug>-run.sh test T3`
+- No `cd …&&` chains or inline heredoc programs; use absolute paths or the host's working-directory option, and put multi-line logic in the runner
+- Batch independent reads and checks into one call. Give each call a short plain description of what it does
+- Create the ledger as a short skeleton, then update rows with targeted edits instead of rewriting the file
+- Read the log by line range or search, only for the excerpt a decision needs
+
+Live board file: when files are available, keep `<slug>-board.txt` beside the ledger holding the current board, overwritten whole (temp file, then rename) in the same call as each ledger update, so it adds no extra visible tool call. It is a view; the ledger stays the source of truth. Never launch windows or panes. At start, print one line naming it and a viewer the user can run in a side pane, where each redraw clears the screen:
+
+```text
+Quiet mode on. Live board: <path> — view in a side pane: while :; do clear; cat <path>; sleep 2; done
+```
+
+Offer `watch -t -n 2 cat <path>` where `watch` exists, `while(1){cls; gc <path>; sleep 2}` in PowerShell, or an editor that reloads on change. Say this once. Do not apologize for visible tool calls; point to the board instead.
 
 In `verbose` mode, the same statuses and board apply, and working detail may appear in chat.
 
@@ -173,20 +187,30 @@ The ledger file contains:
 The board shows live progress in chat. It is a progress display, separate from the Reader's Briefing; the briefing rules do not apply to it. Statuses must match the ledger at every print.
 
 ```text
-Execution — <plan title>        <n>/<m> verified · <k> in progress · <b> blocked
-Ledger: <path>
-
-Phase 1: <name>                               ✓ done
-  ✓ <task name>                               done (verified)
-Phase 2: <name>                               ◐ in progress
-  ◐ <task name>                               in progress
-  ○ <task name>                               pending
-  ⊘ <task name>                               blocked — <reason, 8 words or fewer>
-Now: <current task> — <12 words or fewer>
+╭─ <plan title> ─────────────────────────────────── quiet ─╮
+  ▕██████████░░░░░░░░▏ <n>/<m> verified · <k> active · <b> blocked
+  ! Needs you: <decision or blocker, 10 words or fewer>
+  ────────────────────────────────────────────────────────
+  ✓ Phase 1  <name>                                 4/4
+  ◐ Phase 2  <name>                                 2/5
+      ✓ <task name>
+      ◐ <task name>                                 ← now
+      ⊘ <task name> — <reason, 8 words or fewer>
+      ○ <task name>
+  ○ Phase 3  <name>                                 0/5
+  ────────────────────────────────────────────────────────
+  Now     <current task> — <12 words or fewer>
+  Recent  ✓ <task> · ✗ <task> retrying · ✓ <task>
+  Ledger  <path>   Log <path>
+╰──────────────────────────────────────────────── <hh:mm> ─╯
 ```
 
-- One line per task. A phase shows `failed`, `blocked` or `needs decision` if any of its tasks does; otherwise its least-advanced task status
-- Omit the `Now` line on the final board
+- 72 columns or fewer, so it fits a side pane. Truncate names rather than wrap
+- Expand only the active phase and any phase holding a `failed`, `blocked` or `needs decision` task; collapse the rest to one line with verified/total counts
+- A phase shows `failed`, `blocked` or `needs decision` if any of its tasks does; otherwise its least-advanced task status
+- Show `! Needs you` only when something waits on the user. `Recent` holds the last three status changes. Show `Log` only when a log exists
+- Where box characters or symbols may not render, use `+ - |`, `#` and `.` for the bar, and the text status labels
+- Omit `Now` on the final board
 
 ### Reader's Briefing
 
@@ -240,6 +264,8 @@ Execution is complete only when every answer is yes:
 - The output mode was asked once (with delegation when both were unknown), quiet applied while unanswered, and later switches were honored
 - In `quiet` mode, chat carried no code, diffs, file contents or raw command output, and every failure, blocker, deviation and required decision still surfaced at once
 - Progress Board statuses matched the ledger at every print, and the final board preceded the Reader's Briefing
+- In `quiet` mode, the first board printed before the first task, each board ended its message, and chat between boards held only one-line status changes
+- In `quiet` mode, visible tool calls were short runner or batched calls with one-line results, and the live board file (when files were available) matched the ledger with its viewer offered once
 - The delegation question was asked once with its trade-off stated, the answer was honored, and refusal fell back to same-tier subagents or sequential execution
 - No irreversible, security-sensitive, or context-dependent task was delegated
 - Every delegated task was re-verified and its output audited by the executing agent against the task's own acceptance check; no subagent marked its own work verified
