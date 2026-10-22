@@ -18,6 +18,30 @@ Google documents explicit and implicit context caching, model-dependent eligibil
 
 Changing cache settings is optional and remains subject to host permissions and task authorization. Do not change agent configuration for this overlay.
 
+## Cost mechanics across providers
+
+Checked 2026-10-21; prices and lifetimes change, so recheck before quoting numbers.
+
+- Every agent turn re-sends the whole history. Cached reads cost roughly 0.025–0.1× input; cache writes cost about 1.25–2.5× input on providers that bill them. A turn after an idle gap longer than the cache lifetime reprocesses everything. [Claude Code costs](https://code.claude.com/docs/en/costs), [Anthropic prompt caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching), [OpenAI prompt caching](https://developers.openai.com/api/docs/guides/prompt-caching), [Gemini caching](https://ai.google.dev/gemini-api/docs/caching)
+- Output costs about 3–8× input. Reasoning tokens bill as output, and on some newer models earlier reasoning stays in context and is re-read as input. [Anthropic extended thinking](https://platform.claude.com/docs/en/build-with-claude/extended-thinking), [OpenAI reasoning](https://developers.openai.com/api/docs/guides/reasoning)
+- Caches match exact prefixes. Changing tools, model, effort or thinking settings, or editing earlier messages, invalidates them
+- Agents use about 4× the tokens of chat and multi-agent systems about 15×; most coding work has little truly parallel structure. [Multi-agent research system](https://www.anthropic.com/engineering/multi-agent-research-system)
+- Deferred tool loading cut tool tokens by about 85%; batching 20 calls in code cut tokens by about 37%. [Advanced tool use](https://www.anthropic.com/engineering/advanced-tool-use)
+- Clearing old tool results cut tokens by about 84% in one internal evaluation. Treat it as potentially lossy. [Context management](https://claude.com/blog/context-management)
+
+## Measured example: display isolation versus inline work
+
+A 6-task coding plan was run headless on one host and model with identical inputs and acceptance checks. All runs passed every check. Treat this as an example, not a general result.
+
+| Setup | Runs | Cost per run | Notes |
+|---|---|---|---|
+| Single agent, inline | 4 | $0.44–0.77, mean $0.55 | Edits and commands visible |
+| Background executor plus a main thread woken per status event | 2 | $1.13–1.26 | 12 wakes, chat narration on each |
+| Same, waking only on final statuses and with one status line per wake | 3 | $0.90–0.97, mean $0.94 | Clean screen; about 1.7× inline |
+| Lighter session model told to use the detached design | 4 | $0.017–0.036 | Ignored the design and worked inline |
+
+Observed: each subagent start-up cost about 46k tokens of fixed context, and each main-thread wake re-read about 35–45k cached tokens. Wake count and cache lifetime drove most of the difference.
+
 ## Learned compression
 
 LLMLingua-2 learns token retention using distilled data and reports evaluations across selected tasks and models. Those benchmarks do not prove losslessness for arbitrary requirements or unseen tasks. Treat learned token removal as potentially lossy: obtain separate approval for the technique, a task-specific metric, and a tolerance; preserve original inputs, compare against the ordinary workflow, and restore on failure. [LLMLingua-2 research](https://arxiv.org/abs/2403.12968).

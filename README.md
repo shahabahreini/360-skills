@@ -54,7 +54,7 @@ Each skill works individually. Review includes its own minimum plan contract; bl
 | [`360-expert-review`](skills/360-expert-review) | Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage. | 3.6.0 |
 | [`360-faculty`](skills/360-faculty) | Commission a short panel of research-backed specialist experts, chosen from a plan's nature, depth, and complexity, each equipped with current methods, standards, and the tools available here to critique and improve the plan from distinct angles. Use when a plan or task needs specialist scrutiny before review, when work must fit this developer's goals and taste, or when a named expert team must be created, called, refreshed, or updated. | 3.0.0 |
 | [`360-optimize`](skills/360-optimize) | Audit working code for zero-cost speed, weight, and reliability gains — measure first, rank drop-in upgrades and restructures, and report conservative expected effects on this system. Use when existing code must run faster, lighter, or more robustly without changing what it does. | 2.3.0 |
-| [`360-token-efficiency`](skills/360-token-efficiency) | Reduce avoidable context and tool-output overhead with capability-aware retrieval, reuse, and verified handovers. Use as an optional, session-approved companion when token cost or context growth matters, with strict preservation of task requirements by default. | 2.1.1 |
+| [`360-token-efficiency`](skills/360-token-efficiency) | Reduce avoidable token cost on any agent host by probing its real capabilities and applying cache-, turn- and output-aware techniques with verified handovers. Use as an optional, session-approved companion when token cost or context growth matters, with strict preservation of task requirements by default. | 2.2.0 |
 
 ## Which Skill Do I Need?
 
@@ -107,7 +107,7 @@ Readiness moves from `Draft` to `Ready for review` to `Reviewed and ready to exe
 - **`360-execute`** builds it, tracking every task in a coverage ledger written to disk, verifying each against its own acceptance check with evidence, and showing progress as a quiet phase-and-task board instead of diffs and command output — with optional audited delegation of routine tasks to lighter models.
 - **`360-backend-audit`** audits the resulting backend code for correctness, duplication, performance risks, and observability, writing the full report to a file and briefing findings in chat.
 - **`360-optimize`** audits working code for zero-cost speed, weight, and reliability gains, ranking drop-in upgrades and restructures with conservative expected effects written to a file and briefing highlights in chat.
-- **`360-token-efficiency`** runs alongside the active task with session consent, reducing avoidable overhead while preserving requirements and required checks.
+- **`360-token-efficiency`** runs alongside the active task with session consent. It probes what the host agent (Claude Code, Codex, Gemini, Copilot, Cursor and others) actually exposes and cuts cache misses, turns and output while preserving requirements and required checks; it never overrides a parent skill's or user's explicit choices.
 
 Blueprint and expert review inspect the current project stage and completed work before asking questions. They clarify remaining gaps in interactive rounds with evidence-backed recommendations and a free-text note option, resolving material decisions while recording supported reversible defaults. When interactive tools are unavailable, they use equivalent choices and notes in chat.
 
@@ -174,10 +174,10 @@ A skill is a folder containing a `SKILL.md` file with a `name`, a `description`,
     │   └── SKILL.md           Skill definition and instructions
     └── 360-token-efficiency/
         ├── SKILL.md           Skill definition and instructions
-        └── references/        Evidence and optional techniques
+        └── references/        Evidence, techniques and host adaptation
 ```
 
-Supporting references: faculty has a [research protocol](skills/360-faculty/references/research-protocol.md), research-backed [seat profiles](skills/360-faculty/references/profiles/) grouped by domain, and an optional [seating roster](skills/360-faculty/references/seating-roster.md); token efficiency has optional evidence and technique guidance. Runtime faculty dossiers belong beside the user's plan and are not part of this catalog.
+Supporting references: faculty has a [research protocol](skills/360-faculty/references/research-protocol.md), research-backed [seat profiles](skills/360-faculty/references/profiles/) grouped by domain, and an optional [seating roster](skills/360-faculty/references/seating-roster.md); token efficiency has optional [evidence and technique guidance](skills/360-token-efficiency/references/evidence-and-techniques.md) and [host adaptation](skills/360-token-efficiency/references/host-adaptation.md) notes. Runtime faculty dossiers belong beside the user's plan and are not part of this catalog.
 
 ## Contributing
 

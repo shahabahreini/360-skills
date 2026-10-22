@@ -76,7 +76,7 @@ Each skill works individually. Review includes its own minimum plan contract; bl
 | [`360-expert-review`](skills/360-expert-review) | Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage. | 3.6.0 |
 | [`360-faculty`](skills/360-faculty) | Commission a short panel of research-backed specialist experts, chosen from a plan's nature, depth, and complexity, each equipped with current methods, standards, and the tools available here to critique and improve the plan from distinct angles. Use when a plan or task needs specialist scrutiny before review, when work must fit this developer's goals and taste, or when a named expert team must be created, called, refreshed, or updated. | 3.0.0 |
 | [`360-optimize`](skills/360-optimize) | Audit working code for zero-cost speed, weight, and reliability gains — measure first, rank drop-in upgrades and restructures, and report conservative expected effects on this system. Use when existing code must run faster, lighter, or more robustly without changing what it does. | 2.3.0 |
-| [`360-token-efficiency`](skills/360-token-efficiency) | Reduce avoidable context and tool-output overhead with capability-aware retrieval, reuse, and verified handovers. Use as an optional, session-approved companion when token cost or context growth matters, with strict preservation of task requirements by default. | 2.1.1 |
+| [`360-token-efficiency`](skills/360-token-efficiency) | Reduce avoidable token cost on any agent host by probing its real capabilities and applying cache-, turn- and output-aware techniques with verified handovers. Use as an optional, session-approved companion when token cost or context growth matters, with strict preservation of task requirements by default. | 2.2.0 |
 
 ## Which Skill Do I Need?
 
@@ -129,7 +129,7 @@ Readiness moves from `Draft` to `Ready for review` to `Reviewed and ready to exe
 - **`360-execute`** builds it, tracking every task in a coverage ledger written to disk, verifying each against its own acceptance check with evidence, and showing progress as a quiet phase-and-task board instead of diffs and command output — with optional audited delegation of routine tasks to lighter models.
 - **`360-backend-audit`** audits the resulting backend code for correctness, duplication, performance risks, and observability, writing the full report to a file and briefing findings in chat.
 - **`360-optimize`** audits working code for zero-cost speed, weight, and reliability gains, ranking drop-in upgrades and restructures with conservative expected effects written to a file and briefing highlights in chat.
-- **`360-token-efficiency`** runs alongside the active task with session consent, reducing avoidable overhead while preserving requirements and required checks.
+- **`360-token-efficiency`** runs alongside the active task with session consent. It probes what the host agent (Claude Code, Codex, Gemini, Copilot, Cursor and others) actually exposes and cuts cache misses, turns and output while preserving requirements and required checks; it never overrides a parent skill's or user's explicit choices.
 
 Blueprint and expert review inspect the current project stage and completed work before asking questions. They clarify remaining gaps in interactive rounds with evidence-backed recommendations and a free-text note option, resolving material decisions while recording supported reversible defaults. When interactive tools are unavailable, they use equivalent choices and notes in chat.
 
@@ -196,10 +196,10 @@ A skill is a folder containing a `SKILL.md` file with a `name`, a `description`,
     │   └── SKILL.md           Skill definition and instructions
     └── 360-token-efficiency/
         ├── SKILL.md           Skill definition and instructions
-        └── references/        Evidence and optional techniques
+        └── references/        Evidence, techniques and host adaptation
 ```
 
-Supporting references: faculty has a [research protocol](skills/360-faculty/references/research-protocol.md), research-backed [seat profiles](skills/360-faculty/references/profiles/) grouped by domain, and an optional [seating roster](skills/360-faculty/references/seating-roster.md); token efficiency has optional evidence and technique guidance. Runtime faculty dossiers belong beside the user's plan and are not part of this catalog.
+Supporting references: faculty has a [research protocol](skills/360-faculty/references/research-protocol.md), research-backed [seat profiles](skills/360-faculty/references/profiles/) grouped by domain, and an optional [seating roster](skills/360-faculty/references/seating-roster.md); token efficiency has optional [evidence and technique guidance](skills/360-token-efficiency/references/evidence-and-techniques.md) and [host adaptation](skills/360-token-efficiency/references/host-adaptation.md) notes. Runtime faculty dossiers belong beside the user's plan and are not part of this catalog.
 
 ## Contributing
 
@@ -942,7 +942,7 @@ Reuse explicit approval or refusal for model delegation from this session. If un
 
 ### Entry: Output Mode
 
-Reuse an explicit `quiet` or `lean` choice from this session (treat `verbose` as `lean`). If unknown and not already offered, ask once, in the same interactive round as the delegation question when both are unknown. State the trade-off: `quiet` gives the cleanest screen (todo list and short status lines only) at a higher token cost, because a background executor does the work out of view; `lean` gives the lowest token cost, with work in the main thread, so tool calls and edit diffs stay visible while chat text stays minimal. Recommend `quiet` unless the user has said cost matters more. Quiet applies while unanswered. The user may switch with `quiet` or `lean` at any time; it takes effect immediately.
+Reuse an explicit `quiet` or `lean` choice from this session (treat `verbose` as `lean`). If unknown and not already offered, ask once, in the same interactive round as the delegation question when both are unknown. State the trade-off: `quiet` gives the cleanest screen (todo list and short status lines only) at a higher token cost, because a background executor does the work out of view; `lean` gives the lowest token cost, with work in the main thread, so tool calls and edit diffs stay visible while chat text stays minimal. Recommend `quiet` unless the user has said cost matters more. Quiet applies while unanswered. The user may switch with `quiet` or `lean` at any time; it takes effect immediately. These words set this skill's output only; other skills' modes of the same name are separate.
 
 ### Shared Plan Contract
 
@@ -1039,7 +1039,7 @@ Executor (the background subagent) runs Steps 1–7 in full, with these rules:
   - `check <ID> <name>` — run a named build, test or command: `ok T3 35/35 tests` or `FAIL T3 2/35 — log:120`
   - `verify <ID>...|all` — run acceptance checks plus a change summary; record `done (verified)` with evidence on pass and `failed` on failure: `ok T3 35/35 tests · 3 files +42 -7`
   - `mark <ID> <status> [note]` — set a ledger row's status
-  - `verify` and `mark` append `@ <ID> <status> [note]` to `<slug>-events.txt` only when a row's status actually changes to a final or problem status: `done (verified)`, `failed`, `blocked`, `needs decision`, `dropped (approved)`. Re-checks that confirm an unchanged status, such as the final sweep, emit nothing. `in progress` and `verifying` emit nothing; the shell infers starts from dependencies. With more than about 12 tasks, emit one `@ <phase> done <IDs>` line at each phase checkpoint instead of per-task completions, and still emit every problem status at once
+  - `verify` and `mark` append `@ <ID> <status> [note]` to `<slug>-events.txt` only when a row's status actually changes to a final or problem status: `done (verified)`, `failed`, `blocked`, `needs decision`, `dropped (approved)`. Re-checks that confirm an unchanged status, such as the final sweep, emit nothing. `in progress` and `verifying` emit nothing; the shell infers starts from dependencies. With more than about 12 tasks, or when tasks are long enough that events would arrive further apart than the host's prompt-cache lifetime (treat an unknown lifetime as a few minutes), emit one `@ <phase> done <IDs>` line at each phase checkpoint instead of per-task completions. A wake after the cache expires reprocesses the shell's whole context, so fewer, fuller wakes cost less. Still emit every problem status at once
 - Keep ledger rows one line each, ID first, so the runner can rewrite them. After the skeleton, change the ledger, log, board and events only through the runner
 - Report status only through the runner. The executor has no todo tools, never detaches again, and never asks the user directly. It marks `needs decision`, continues independent work, and waits for the shell's message only when nothing independent remains
 - Delegate inside the executor per Step 3 where the host allows nested subagents. The audit rules of Step 5 are unchanged
@@ -3389,25 +3389,25 @@ Source: skills/360-token-efficiency/SKILL.md
 
 ---
 name: 360-token-efficiency
-description: Reduce avoidable context and tool-output overhead with capability-aware retrieval, reuse, and verified handovers. Use as an optional, session-approved companion when token cost or context growth matters, with strict preservation of task requirements by default.
-version: 2.1.1
+description: Reduce avoidable token cost on any agent host by probing its real capabilities and applying cache-, turn- and output-aware techniques with verified handovers. Use as an optional, session-approved companion when token cost or context growth matters, with strict preservation of task requirements by default.
+version: 2.2.0
 ---
 
 # 360 Token Efficiency
 
 ## Purpose
 
-Reduce avoidable overhead during the main task using capabilities the host actually exposes. Preserve task requirements and verification; strict mode forbids intentional accuracy sacrifice but cannot guarantee error-free outcomes.
+Reduce avoidable token cost during the main task on whatever agent runs it, using only capabilities the host actually exposes. Preserve task requirements and verification; strict mode forbids intentional accuracy sacrifice but cannot guarantee error-free outcomes.
 
 ## When to Use
 
-- Multi-step or tool-heavy tasks with growing context or repeated retrieval
+- Multi-step or tool-heavy tasks with growing context, repeated retrieval, or long waits
 - A user explicitly invokes this companion, or approves a sibling's session offer
 - Not for creating plans (`360-blueprint`), executing the task itself (`360-execute`), or optimizing application performance (`360-optimize`)
 
 ## Core Principle
 
-Remove redundant work, not required evidence. Judge preservation against observable acceptance checks, and claim savings only from actual measurements.
+Remove redundant work, not required evidence. Agent cost is dominated by re-sent history, output tokens and cache misses, so cut those first; judge preservation against observable acceptance checks, and claim savings only from actual measurements.
 
 ## Workflow
 
@@ -3417,33 +3417,52 @@ Explicit user invocation counts as approval for this session. Otherwise reuse th
 
 Discover and load through the host's supported skill mechanism only after approval; reuse already-loaded instructions. If unavailable, explain briefly and continue the main task without installing anything. Never invoke this skill recursively or restart the parent skill. Session consent does not authorize cross-session memory writes, configuration changes, or edits to installed skills.
 
-### 2. Assess Available Capabilities
+### 2. Coexist With the Parent Skill
 
-Make a brief internal, in-session assessment from exposed tools, instructions, and observed behavior. Unknown capabilities remain unavailable until established; do not infer them from the agent's brand.
+The overlay tunes how work is done; the parent skill and the user decide what is done.
+
+- The parent's acceptance checks, deliverable format, and the user's explicit choices win: output or display modes, delegation answers, review depth, research budgets. Apply techniques within them. If a choice is costly, state the trade-off once in one line; never override it or ask again
+- When the parent delegates by design, such as a background executor that keeps the screen clean, do not undo it. Pass the overlay's consent state in each delegated brief so the rules apply inside every agent
+- Mode words such as `quiet` or `lean` belong to the skill that defined them; never reinterpret another skill's modes
+- The parent owns questions, briefings and the completion prompt. The overlay adds no prompt, report or status line of its own unless asked
+- The overlay's no-configuration rule limits the overlay's own techniques. It does not block an action the parent separately asked the user to approve
+
+### 3. Build the Session Cost Profile
+
+Probe once, briefly and in-session, from exposed tools, commands, instructions and observed behavior. Never infer a capability from the agent's brand or model name: the same host can expose different tools per model or plan. Unknown capabilities stay unavailable until established.
 
 | Capability | Use when established | Fallback |
 |---|---|---|
-| Search and selective reads | Locate evidence, then retrieve relevant spans with source locations | Read supplied inputs; request only missing material needed for a decision |
-| Tool discovery | Discover needed tools on demand | Use the exposed tool set |
-| Code execution | Filter and aggregate large results before returning them to model context | Request bounded results or process manageable chunks |
-| Recoverable artifacts | Keep task state and evidence references in authorized files or artifacts | Keep the complete required state in-session; do not claim persistence |
-| Context management | Use supported compaction with a verified handover | Keep a state summary; never automatically clear history |
-| Caching controls | Use exposed controls when appropriate and authorized | Make no claim of cache control or savings |
-| Delegation | Delegate only when permitted and the independent work justifies coordination | Work locally |
-| Usage telemetry | Record comparable observed usage | Label savings `UNMEASURED` |
+| Search and line-range reads | Locate first, then read only needed spans with source locations | Read supplied inputs; request only material a decision needs |
+| Large-output handling | When the host saves big output to a file with a preview, search that file instead of re-running | Filter at the source and bound output |
+| Deferred tool discovery | Load tools on demand | Use the exposed set; do not add tools mid-task |
+| Code execution | Filter and aggregate large results before they reach context | Request bounded results or process chunks |
+| Prompt caching | Keep the prefix stable and work within its lifetime | Assume a short lifetime; still avoid prefix changes |
+| Subagents | Only per Step 4, with the actual model confirmed in telemetry | Work locally |
+| Native todo or plan tool | Track tasks there | A short checklist in a file, never re-pasted into chat |
+| Recoverable artifacts | Keep state and evidence references in authorized files | Keep required state in-session; do not claim persistence |
+| Context management | Compact at natural breaks with a verified handover | Keep a state summary; never automatically clear history |
+| Usage telemetry | Record comparable usage from the host's usage command or headless JSON | Label savings `UNMEASURED` |
 
-Do not modify the agent's configuration or installed skill to adapt it. Read [evidence and optional techniques](references/evidence-and-techniques.md) only when choosing caching, compression, delegation, or measurement techniques, or when the user asks for supporting evidence.
+Read [host adaptation](references/host-adaptation.md) only when a host-specific control, limit or telemetry source matters. Read [evidence and techniques](references/evidence-and-techniques.md) only when choosing caching, compression, delegation or measurement techniques, or when the user asks for evidence. Do not modify the agent's configuration or installed skills to adapt them.
 
-### 3. Retrieve and Reuse Carefully
+### 4. Apply Cost Rules in Order of Leverage
 
-- Fully read mandatory instructions and required task inputs. Progressive retrieval must not bypass them.
-- Search progressively for additional evidence. Keep source paths, ranges, IDs, versions or timestamps needed to reopen it.
-- Filter or aggregate large tool results before returning them to context when supported. Check pagination, truncation, counts, and omitted boundaries; a partial result cannot establish completeness.
-- Reuse verified facts while checking whether their sources changed. Reopen stale, conflicting, or insufficient evidence before deciding.
-- Avoid repeated explanations, whole-artifact regeneration for local edits, and redundant verification. Repeat checks after relevant changes, failures, or new uncertainty.
-- Delegation must respect host permissions; account for duplicated instructions, worker context, tool use, retries, and coordination in its cost.
+Each agent turn re-sends the whole history, cheaply when cached and at full price when not; output tokens cost several times input. Apply these in order and stop where the task's needs begin:
 
-### 4. Preserve State Through Continuation
+1. Keep the prefix stable. Do not switch model, reasoning effort, fast modes, tool sets or connected servers mid-task, and never edit earlier context; append instead. Recommend such switches to the user only at task boundaries
+2. Work within the cache lifetime. Avoid idle gaps longer than the host's cache lifetime, which is often minutes and should be treated as short when unknown. When waits are unavoidable, wake less often with more batched work: one cold resume beats several
+3. Spend output sparingly. Use targeted edits instead of whole-file rewrites; never restate inputs, echo tool output, or narrate between tool calls; keep chat to decisions and results
+4. Use fewer turns. Batch independent reads, searches and checks into one turn; prefer one script over many small calls for multi-step mechanical work
+5. Shape tool output at the source. Use filters, failure-only test output, quiet flags and counts, keeping the full output recoverable in a file or log. A filtered result is not proof of completeness: check counts, truncation and pagination
+6. Retrieve just in time. Search first, read narrow ranges, reuse what is already in context, and reread only after a change or new uncertainty
+7. Default to one agent. A subagent pays its own fixed start-up context and does not share the parent's cache. Delegate only to isolate large, noisy work behind a short summary, to run truly parallel work, or because the parent requires it. Count parent and worker usage, retries and coordination
+8. Use lighter models only for routine delegated work, only where the host honors the model choice, and verify the actual model in telemetry. Lighter models may skip long instructions, so give them short, fixed briefs and verify their output
+9. Compact rarely. Compaction is itself a full-context request and resets the cache. Compact at natural breaks with a focus hint, do not pre-empt the host's automatic threshold, and prefer a fresh session with a verified handover for unrelated work
+
+Fully read mandatory instructions and required task inputs; progressive retrieval must not bypass them. Keep source paths, ranges, IDs, versions or timestamps needed to reopen evidence. Reopen stale, conflicting or insufficient evidence before deciding.
+
+### 5. Preserve State Through Continuation
 
 Before supported compaction or handoff, verify this summary against the task, source evidence, and ledger:
 
@@ -3451,17 +3470,17 @@ Before supported compaction or handoff, verify this summary against the task, so
 
 Include constraints, exact values and units, citations and evidence references, user decisions and authorization boundaries, session consent or revocation and whether an unanswered offer was already made, unresolved uncertainty, acceptance criteria, and the next action. Preserve stable task IDs if present. Do not replace source evidence with a summary that cannot support the next decision; reopen the original when needed. Never automatically clear history. If a handover cannot retain or recover required detail, keep fuller context and disclose the continuity limit.
 
-### 5. Enforce Strict Preservation
+### 6. Enforce Strict Preservation
 
 Never weaken requirements, exact values, citations, uncertainty, acceptance criteria, or required verification to save tokens. Keep the main task's quality bar and requested output format. Prefer files when supported; honor explicit user delivery requests, and provide complete in-session output labeled `in-session only; not persisted` when files are unavailable.
 
-Potentially lossy techniques such as learned prompt compression require separate approval of the specific technique, task-specific quality metric, and tolerance before use. General session consent is insufficient. Even an approved experiment cannot silently weaken the main task's acceptance criteria; a failed comparison restores the fuller context or ordinary workflow. Missing information, conflicting evidence, or verification failure also triggers restoration and rechecking of affected decisions.
+Potentially lossy techniques such as learned prompt compression or clearing old tool results require separate approval of the specific technique, task-specific quality metric, and tolerance before use. General session consent is insufficient. Even an approved experiment cannot silently weaken the main task's acceptance criteria; a failed comparison restores the fuller context or ordinary workflow. Missing information, conflicting evidence, or verification failure also triggers restoration and rechecking of affected decisions.
 
-### 6. Measure Without Inventing Savings
+### 7. Measure Without Inventing Savings
 
-No extra report by default. Never invent token counts or an unrun baseline. Distinguish measured input/output tokens, cached tokens, cost, latency, and estimates. Caching may reduce processing cost without reducing context presented to the model.
+No extra report by default. Never invent token counts or an unrun baseline. Distinguish measured input, output, cache-read and cache-write tokens, reasoning tokens, cost, and latency from estimates. Caching reduces processing cost without reducing context presented to the model.
 
-For a comparison, use the same task inputs and acceptance criteria, record host/model settings and run conditions, and include loading, summarization, tool discovery, retries, and delegation overhead. Report quality regressions and unavailable metrics. Reserve “validated savings” for actual comparable measurements with passing task checks; a finite test set does not establish universal accuracy. Unmeasured guidance is allowed when clearly labeled. Do not persist learned rules or memory unless separately authorized.
+For a comparison, use the same task inputs and acceptance criteria, record host, model, effort and run conditions, and include loading, summarization, tool discovery, retries, and delegation overhead. Run more than once and report the spread. Report quality regressions and unavailable metrics. Reserve “validated savings” for actual comparable measurements with passing task checks; a finite test set does not establish universal accuracy. Unmeasured guidance is allowed when clearly labeled. Do not persist learned rules or memory unless separately authorized.
 
 ### Completion: Choose the Next Action
 
@@ -3480,11 +3499,11 @@ Default: complete the main task in its requested format, with no efficiency repo
 
 When requested, report:
 
-1. Capabilities used and techniques applied
-2. Context reused, omitted, or compacted, with recoverable evidence locations
+1. Host cost profile: capabilities established, unavailable, or unknown
+2. Techniques applied, and context reused, omitted, or compacted, with recoverable evidence locations
 3. Preservation checks, acceptance results, and any observed regressions
 4. Restorations or escalations and their reasons
-5. Measurements: baseline and overlay, input/output tokens, cached tokens, cost, latency, overhead; use `UNMEASURED` for unavailable metrics and label estimates
+5. Measurements: baseline and overlay, input, output, cache-read, cache-write and reasoning tokens, cost, latency, overhead, run count and spread; use `UNMEASURED` for unavailable metrics and label estimates
 6. Limitations and residual uncertainty
 
 Use the six canonical handover fields above when a continuation is needed.
@@ -3494,10 +3513,13 @@ Use the six canonical handover fields above when a continuation is needed.
 Check every applicable item; record a concrete limitation if one cannot be checked:
 
 - Session approval is explicit, current, and honored after refusal or revocation
-- Techniques use only established, permitted capabilities
+- The parent skill's acceptance checks, format and the user's explicit choices were kept; any costly choice got at most one trade-off note and was not overridden
+- The cost profile came from probing exposed capabilities, not brand or model names; unknown capabilities were treated as unavailable
+- Techniques use only established, permitted capabilities; no model, effort, tool-set or configuration change was made mid-task by the overlay
 - Required inputs, constraints, exact values, citations, uncertainty, and acceptance criteria were preserved against source evidence
-- Pagination and truncation were checked wherever completeness mattered
+- Pagination, truncation and filtered output were checked wherever completeness mattered
 - Reused evidence is sufficiently current for the decision
+- Delegation, when used, had a stated reason from Step 4, and its overhead was counted
 - The handover retains required state and recoverable evidence; no automatic history clearing occurred
 - Required task verification ran, or is explicitly unresolved; failed checks triggered restoration
 - Any potentially lossy method had separate technique, metric, and tolerance approval
@@ -3531,6 +3553,30 @@ Google documents explicit and implicit context caching, model-dependent eligibil
 
 Changing cache settings is optional and remains subject to host permissions and task authorization. Do not change agent configuration for this overlay.
 
+## Cost mechanics across providers
+
+Checked 2026-10-21; prices and lifetimes change, so recheck before quoting numbers.
+
+- Every agent turn re-sends the whole history. Cached reads cost roughly 0.025–0.1× input; cache writes cost about 1.25–2.5× input on providers that bill them. A turn after an idle gap longer than the cache lifetime reprocesses everything. [Claude Code costs](https://code.claude.com/docs/en/costs), [Anthropic prompt caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching), [OpenAI prompt caching](https://developers.openai.com/api/docs/guides/prompt-caching), [Gemini caching](https://ai.google.dev/gemini-api/docs/caching)
+- Output costs about 3–8× input. Reasoning tokens bill as output, and on some newer models earlier reasoning stays in context and is re-read as input. [Anthropic extended thinking](https://platform.claude.com/docs/en/build-with-claude/extended-thinking), [OpenAI reasoning](https://developers.openai.com/api/docs/guides/reasoning)
+- Caches match exact prefixes. Changing tools, model, effort or thinking settings, or editing earlier messages, invalidates them
+- Agents use about 4× the tokens of chat and multi-agent systems about 15×; most coding work has little truly parallel structure. [Multi-agent research system](https://www.anthropic.com/engineering/multi-agent-research-system)
+- Deferred tool loading cut tool tokens by about 85%; batching 20 calls in code cut tokens by about 37%. [Advanced tool use](https://www.anthropic.com/engineering/advanced-tool-use)
+- Clearing old tool results cut tokens by about 84% in one internal evaluation. Treat it as potentially lossy. [Context management](https://claude.com/blog/context-management)
+
+## Measured example: display isolation versus inline work
+
+A 6-task coding plan was run headless on one host and model with identical inputs and acceptance checks. All runs passed every check. Treat this as an example, not a general result.
+
+| Setup | Runs | Cost per run | Notes |
+|---|---|---|---|
+| Single agent, inline | 4 | $0.44–0.77, mean $0.55 | Edits and commands visible |
+| Background executor plus a main thread woken per status event | 2 | $1.13–1.26 | 12 wakes, chat narration on each |
+| Same, waking only on final statuses and with one status line per wake | 3 | $0.90–0.97, mean $0.94 | Clean screen; about 1.7× inline |
+| Lighter session model told to use the detached design | 4 | $0.017–0.036 | Ignored the design and worked inline |
+
+Observed: each subagent start-up cost about 46k tokens of fixed context, and each main-thread wake re-read about 35–45k cached tokens. Wake count and cache lifetime drove most of the difference.
+
 ## Learned compression
 
 LLMLingua-2 learns token retention using distilled data and reports evaluations across selected tasks and models. Those benchmarks do not prove losslessness for arbitrary requirements or unseen tasks. Treat learned token removal as potentially lossy: obtain separate approval for the technique, a task-specific metric, and a tolerance; preserve original inputs, compare against the ordinary workflow, and restore on failure. [LLMLingua-2 research](https://arxiv.org/abs/2403.12968).
@@ -3550,5 +3596,50 @@ A useful comparison records:
 - Run count and variation; no extrapolation to universal accuracy or savings
 
 A manual or scripted walkthrough can expose instruction defects. It is not a measured model benchmark. Artifact byte or word counts measure document size, not billed tokens or task-level savings.
+
+### Reference: skills/360-token-efficiency/references/host-adaptation.md
+
+Source: skills/360-token-efficiency/references/host-adaptation.md
+
+# Host adaptation
+
+Read only when a host-specific control, limit or telemetry source matters. These are known examples, checked 2026-10-21 against official docs unless marked. Hosts change quickly: confirm a control exists in the current session before relying on it, and never infer one from the product name. The same host can expose different tools per model, plan or version.
+
+## Probe checklist
+
+Answer from the exposed tool list, command list and observed results, once per session:
+
+- Search and line-range reads: is there a grep/glob tool, and does the read tool accept offsets or limits?
+- Large output: does the shell or read tool truncate, or save big output to a file with a preview?
+- Deferred tools: is there a tool-search or on-demand loading mechanism?
+- Subagents: can the agent spawn isolated workers, in the background, with a chosen model?
+- Todo or plan tool: which one, if any?
+- Context: is there manual or automatic compaction, and at what threshold?
+- Telemetry: which command or headless output reports tokens, cache use and cost?
+
+## Known host examples
+
+| Host | Skills and instructions | Context | Subagents | Todo | Output limits | Telemetry |
+|---|---|---|---|---|---|---|
+| Claude Code | SKILL.md, lazy body; CLAUDE.md | `/compact [focus]`, auto-compaction, `/rewind`, `/clear` | Isolated, model per agent, background, nesting | Task tools on some models only; otherwise TodoWrite or none | Large shell output saved to a file with a preview; read by offset and limit | `/usage`, `/context`; `-p --output-format json` with cache fields and cost |
+| Codex CLI | SKILL.md (`.agents/skills`), lazy; AGENTS.md capped (`project_doc_max_bytes`) | `/compact`, auto-compaction by token limit, `/status` | Built-in and TOML agents with model and effort; limited nesting. Model pinning reported unreliable (user reports) | `update_plan` (unconfirmed) | `tool_output_token_limit` | `/status`; `codex exec --json` usage with cached and reasoning tokens |
+| Gemini CLI / Antigravity CLI | SKILL.md via `activate_skill`, behind a consent prompt; GEMINI.md | `/compress`, auto-compression near 50%, `/chat save` and `resume` | `.gemini/agents`, separate context, model field | `write_todos` | Long tool output truncated; shell output summarization budgets | `/stats`; `-p --output-format json` stats. Antigravity CLI replaced Gemini CLI for some plans in 2026 |
+| GitHub Copilot CLI | `.github/skills`; AGENTS.md and others | Background compaction near 80%, `/compact`, `/context` | Separate context; parallel `/fleet` | `/tasks` | Large output saved to a temp file with a preview | `/context`; headless JSON fields undocumented |
+| Cursor | SKILL.md in several folders, on demand | Undocumented | Separate context and model; inheritance reported buggy | Undocumented | Undocumented | Dashboard only; headless JSON lacks usage |
+| Others (OpenCode, Cline, Aider, Amp, Windsurf) | Varies; confirm in session | Aider: `/tokens`, `/drop`, `/clear` | Confirm in session | Confirm in session | Aider: repo-map budget | Aider: `/tokens` |
+
+## Cache-breaking events
+
+Treat these as cache resets on any host unless its docs say otherwise: switching model; changing reasoning effort or thinking settings; adding or removing tools or connected servers; editing, reordering or deleting earlier messages; compaction; images added or removed; an idle gap past the cache lifetime. Typical lifetimes are 5 minutes (Anthropic default, 1 hour optional) and 30 minutes or more on newer OpenAI models. Implicit Gemini lifetimes are undocumented.
+
+## Cross-host cautions
+
+- A lighter session model may ignore a long skill and work inline. Use lighter models inside fixed, short briefs and verify the result
+- Subagent model settings are not always honored. Confirm the model that actually ran in telemetry before claiming savings
+- Hosts compact automatically at different thresholds. Do not compact manually just before the host would
+- Some hosts gate skill loading behind a consent prompt. Load the skill once and reuse it
+- Without token telemetry, label results `UNMEASURED` rather than estimating from text length
+
+Sources: [Claude Code costs](https://code.claude.com/docs/en/costs), [Claude Code prompt caching](https://code.claude.com/docs/en/prompt-caching), [Claude Code tools](https://code.claude.com/docs/en/tools-reference), [Codex subagents](https://developers.openai.com/codex/subagents), [Codex non-interactive](https://learn.chatgpt.com/docs/non-interactive-mode.md), [Gemini CLI configuration](https://geminicli.com/docs/reference/configuration), [Gemini CLI subagents](https://geminicli.com/docs/core/subagents/), [Copilot CLI context](https://docs.github.com/en/copilot/concepts/agents/copilot-cli/context-management), [Cursor headless](https://cursor.com/docs/cli/headless), [Agent Skills specification](https://agentskills.io/specification).
 
 ---
