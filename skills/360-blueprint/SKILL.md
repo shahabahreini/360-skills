@@ -1,7 +1,7 @@
 ---
 name: 360-blueprint
-description: Create an executable plan from a new objective with explicit tasks, constraints, and verification. Use when a goal exists but the path is unclear, or the request is "plan this".
-version: 2.6.0
+description: Create an executable plan from a new objective, asking questions until every requirement and default is confirmed, with explicit tasks, constraints, and verification. Use when a goal exists but the path is unclear, or the request is "plan this".
+version: 2.7.0
 ---
 
 # 360 Blueprint
@@ -19,7 +19,7 @@ Turn a new objective into an executable plan with explicit assumptions, constrai
 
 ## Core Principle
 
-The smallest plan that meets every objective, with every material decision resolved and every routine choice made from evidence.
+The smallest plan that meets every objective, planned only once every decision is answered by the user, proven by evidence, or a default the user confirmed.
 
 ## Workflow
 
@@ -39,23 +39,29 @@ Prefer a recoverable file when supported, using the existing path or the default
 
 Judge completion by observable acceptance checks. A structural or format check does not prove behavior or accuracy; state what was not verified.
 
-### 1. Ground the Objective in the Current Project
+### 1. Ground the Objective and Close Every Gap
 
 - Inspect available instructions, plans, decisions, developer preference records (such as `faculty/` dossiers), relevant artifacts, recent changes, verification and any execution ledger. Establish the current stage and done/pending/blocked work; cite sources and distinguish observed facts from claims. Record unavailable evidence
 - Reuse current evidence and user answers. Resolve discoverable facts by inspection; do not ask the user to rediscover them
-- Separate remaining gaps: material user decisions change the outcome, scope, acceptance criteria, significant cost or irreversible effects; reversible implementation defaults stay within established intent and conventions. Choose supported defaults, record the reason and revisit condition, and proceed. Do not present a default or inference as a fact
-- Ask only for unresolved material decisions, conflicting instructions, or inaccessible facts needed to judge success. Use the available interactive question tool in focused rounds of one to three questions, with the best supported recommendation, its trade-off, and a free-text/custom option. For missing facts, request the needed evidence without inventing it. If tools are unavailable, offer equivalent numbered choices and notes in chat
-- Unanswered required questions block dependent planning and readiness, not independent inspection. Silence, a recommendation, a preselected option or elapsed time is not an answer. Honor explicit delegation or deferral within its limits
-- After answers, update the existing context, assumptions or review sections and inspect newly relevant evidence. Stop questioning when material choices are settled; reopen only on new conflicting evidence
+- Track a clarity checklist: outcome and observable success; users and stakeholders; scope in and out; constraints (time, stack, budget, compatibility); acceptance and done-when; dependencies and integrations; must-not-happen and risk tolerance; preferences. Each dimension ends as answered by the user, proven by inspection (cite it), or a proposed default awaiting confirmation. Never present a default or inference as a fact
+- Ask until nothing is open. Use the available interactive question tool in rounds of one to four questions, each with the best supported recommendation first, its trade-off, and a free-text/custom option. For missing facts, request the needed evidence without inventing it. If tools are unavailable, offer equivalent numbered choices and notes in chat
+- After each round, update the checklist, inspect newly relevant evidence, and ask the next round. An answer that opens new ambiguity starts another round. Stop only when every dimension is answered, proven, or a proposed default
+- Unanswered questions block dependent planning and readiness, not independent inspection. Silence, a recommendation, a preselected option or elapsed time is not an answer. Honor explicit delegation or deferral within its limits
 
-### 2. Establish Readiness
+### 2. Confirm Understanding and Defaults
+
+- Before drafting, show one compact batch: goal, scope, out of scope, done-when, and every proposed default and assumption with its reason and revisit condition
+- Offer `accept all`, `change some`, or a free-text note through the interactive question tool. Apply changes, then confirm again only what changed
+- Explicit "you decide" delegation confirms the covered defaults. Silence does not; unconfirmed defaults keep the plan `Draft`
+
+### 3. Establish Readiness
 
 - Restate the intended outcome, observable success and what must not happen
-- Keep outcome-changing unanswered choices in `Draft`, with the required decision and affected tasks; do not relabel a blocker as a default
-- A complete plan with supported defaults may be `Ready for review`. An optional companion offer does not block it
+- Keep unanswered or unconfirmed choices in `Draft`, with the required decision and affected tasks; do not relabel a blocker as a default
+- A complete plan with confirmed defaults may be `Ready for review`. An optional companion offer does not block it
 - If a draft is requested despite blockers, deliver it honestly and actively prompt the needed decisions
 
-### 3. Examine Relevant Risks
+### 4. Examine Relevant Risks
 
 - First principles: what is known, what is assumed, what is unknown
 - Inversion: what would guarantee failure
@@ -63,7 +69,7 @@ Judge completion by observable acceptance checks. A structural or format check d
 - Stakeholders: who is affected, who decides, who executes, who can block
 - Constraints: time, people, skills, systems, dependencies, unknowns
 
-### 4. Design the Strategy
+### 5. Design the Strategy
 
 - Choose the simplest path that fully satisfies the objective
 - Sequence by dependency and by risk
@@ -73,7 +79,7 @@ Judge completion by observable acceptance checks. A structural or format check d
 - Prefer, in order: change nothing, edit what exists, reuse what exists, add the smallest new thing
 - State the footprint in the plan: files created, files edited, dependencies added, abstractions added
 
-### 5. Craft the Plan
+### 6. Craft the Plan
 
 - Structure the plan as phases and tasks
 - Separate new capabilities from changes to existing features, behavior, or documents
@@ -83,11 +89,11 @@ Judge completion by observable acceptance checks. A structural or format check d
 - Write each phase checkpoint as something the user can see or run
 - Fill `Skills` with the agent skills the executor should load for that task, or `None`
 - Check version-specific details (APIs, versions, commands, limits) against the project and current official documentation when tools allow; otherwise record them as assumptions with a validation method
-- Use established stack choices and conventions. Record reversible defaults and falsifiable assumptions with supporting evidence or a pending validation method in `Validated by`; keep material unresolved choices as blockers
+- Use established stack choices and conventions. Record confirmed defaults and falsifiable assumptions with supporting evidence or a pending validation method in `Validated by`; keep unresolved choices as blockers
 - Keep names and terms consistent from start to finish
 - Make the plan self-contained for a fresh executor
 
-### 6. Enforce Quality by Domain
+### 7. Enforce Quality by Domain
 
 Turn quality goals into task-specific acceptance checks.
 
@@ -96,7 +102,7 @@ Turn quality goals into task-specific acceptance checks.
 - Other domains: state observable success and likely or severe plausible failure checks
 - Reuse existing structure where it fits. Require a concrete maintenance or correctness benefit before adding abstraction or consolidating superficially similar logic
 
-### 7. Stress-Test Before Delivery
+### 8. Stress-Test Before Delivery
 
 - Walk the plan end to end
 - Run a premortem
@@ -105,7 +111,7 @@ Turn quality goals into task-specific acceptance checks.
 - Verify every objective maps to tasks and every task serves an objective
 - Reread the briefing as a stranger: can they say what changes and what they will see afterward?
 
-### 8. Deliver in Two Channels
+### 9. Deliver in Two Channels
 
 - Write the full plan to a file using the work-file template
 - Reuse the existing path if known; otherwise `plans/<short-slug>.md`; create the folder if needed; ask once if the location is ambiguous
@@ -259,9 +265,9 @@ The plan is ready only when every answer is yes:
 
 - The objective is clear and confirmed, or the output is explicitly marked `Draft`
 - Current project stage and completed work were inspected, or unavailable evidence was explicitly recorded
-- Existing answers were reused; follow-up rounds resolved the goal, scope, outline, and required details without treating silence or recommendations as consent
-- No blocking question or decision was skipped
-- Material unresolved decisions were actively prompted with evidence, recommendations and a free-text option; reversible defaults have a reason and revisit condition
+- Existing answers were reused; questioning rounds continued until every clarity dimension was answered, proven by inspection, or a confirmed default, without treating silence or recommendations as consent
+- No question or decision was skipped, and no round ended with an open ambiguity left untracked
+- The restatement and the batch of defaults were shown together and confirmed; each default has a reason and revisit condition
 - No invented technical details were presented as facts; version-specific details cite the project or a current source, or are recorded assumptions
 - Every assumption is explicit and falsifiable
 - Every task has what, how, where, done when, dependencies, skills, effort, priority, and parallel markings

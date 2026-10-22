@@ -1,14 +1,14 @@
 ---
 name: 360-execute
-description: Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and brief the user in chat — with optional audited delegation of routine tasks to lighter models. Use when a plan exists and work must begin, or when resuming a partial execution.
-version: 2.4.0
+description: Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and show progress as a quiet phase-and-task board before a final briefing — with optional audited delegation of routine tasks to lighter models. Use when a plan exists and work must begin, or when resuming a partial execution.
+version: 3.0.0
 ---
 
 # 360 Execute
 
 ## Purpose
 
-Execute an authorized plan against its acceptance checks and keep a recoverable coverage ledger of results, deviations and unfinished work. When the user approves, dispatch routine tasks to lighter-tier subagents and reserve heavier models for complex work, then review and audit every delegated result before it counts.
+Execute an authorized plan against its acceptance checks and keep a recoverable coverage ledger of results, deviations and unfinished work. When the user approves, dispatch routine tasks to lighter-tier subagents and reserve heavier models for complex work, then review and audit every delegated result before it counts. By default, keep chat quiet: a progress board and short status lines, not code or raw output.
 
 ## When to Use
 
@@ -30,6 +30,10 @@ Reuse explicit approval or refusal for `360-token-efficiency` from this session.
 ### Entry: Optional Model Delegation
 
 Reuse explicit approval or refusal for model delegation from this session. If unknown and not already offered, ask once using the host's interactive question tool and state the trade-off plainly: routine tasks go to lighter, faster subagent models; complex tasks go to heavier models or stay with the current one; the executing agent reviews and audits everything a subagent returns; refusal means the same work runs with the current model — via same-tier subagents or plain sequential execution. Present refusal as a full equal choice, never as a delay. Continue without delegation while unanswered; silence and elapsed time are not approval. On approval, class models by relative tier (lighter / same / heavier) and prefer the newest model the host offers within each tier; never hardcode or assume a specific vendor or model name. If the host offers no subagent or tier mechanism, explain briefly and execute sequentially. Refusal or unavailability disables delegation only — it changes nothing else in this skill.
+
+### Entry: Output Mode
+
+Reuse an explicit `quiet` or `verbose` choice from this session. If unknown and not already offered, ask once, in the same interactive round as the delegation question when both are unknown. Recommend `quiet`: chat shows only the progress board, one-line status changes, and the final result; `verbose` shows working detail such as diffs and command output. Quiet applies while unanswered. The user may switch with `quiet` or `verbose` at any time; it takes effect immediately.
 
 ### Shared Plan Contract
 
@@ -64,7 +68,15 @@ Reconcile the plan, ledger, actual artifacts or external state, and relevant ver
 - Reuse the existing path if known; otherwise `plans/<short-slug>-execution.md`; create the folder if needed; reuse repository conventions for routine location choices
 - If the file cannot be written, use the in-session delivery fallback
 - One row per task: ID, name, priority, acceptance check, status
-- Statuses: `pending` / `in progress` / `done (verified)` / `blocked` / `dropped (approved)`
+- Statuses, with optional board symbols (the text label is required):
+  - `pending` ○ — not started
+  - `in progress` ◐ — work underway
+  - `verifying` ◑ — work finished; acceptance check running
+  - `done (verified)` ✓ — check passed with recorded evidence
+  - `failed` ✗ — check failed; being fixed or retried
+  - `blocked` ⊘ — waiting on a dependency, missing evidence, or missing capability
+  - `needs decision` ? — waiting on a user decision
+  - `dropped (approved)` – — removed with explicit approval or by the cut line
 - Mark verified only when current acceptance evidence supports it; include source revision or state identifiers when relevant
 - For delegated tasks, record the assigned tier alongside the verdict and the audit evidence that backed it
 - Record remaining uncertainty and the next check so a fresh agent can resume safely
@@ -87,6 +99,19 @@ When delegation was approved, decide the executor for each task before dispatchi
 - Verify each phase checkpoint before advancing dependent work. A failure blocks affected descendants; continue independent authorized work where dependencies and parallel markers permit
 - Keep work within the task and change policy
 - Before a non-repeatable or external action, record intent and a recoverable operation identifier or reconciliation method. After interruption, inspect partial effects and external state before retrying. Reuse confirmed results; retry only if absence or safe repeatability is established. If state cannot be determined, block that action and identify the missing check
+
+### Quiet Output
+
+In `quiet` mode, chat carries progress, not process. The ledger, logs and repository hold the detail.
+
+- Never print code, diffs, file contents, or raw command output in chat
+- No step narration. At most one line per status change, such as `✓ <task name> — verified`
+- Run commands with quiet or summary flags where available. Send long output to a log beside the ledger and read only the excerpts needed to decide
+- Show progress in the host's native task or todo list when it exists, since it updates in place. Otherwise print the Progress Board at start, at each phase checkpoint, on any `failed`, `blocked` or `needs decision`, and at the end
+- Never hide a failure, blocker, deviation or required decision. Surface it at once, in one or two lines
+- If the host displays tool calls the skill cannot suppress, say so once at start
+
+In `verbose` mode, the same statuses and board apply, and working detail may appear in chat.
 
 ### 5. Verify Every Task
 
@@ -116,6 +141,7 @@ Before declaring completion, walk the ledger top to bottom:
 - Run the plan's overall verification; confirm all checkpoints passed
 - Sweep once more for regressions introduced across phases
 - Write the execution report into the same ledger file
+- Print the final Progress Board, then the Reader's Briefing as the final result
 - Print the Reader's Briefing in chat before asking anything. A next-action question with no briefing above it is a failed delivery. If the host sends one message, the briefing comes first in that message
 
 ### Completion: Choose the Next Action
@@ -141,6 +167,26 @@ The ledger file contains:
 4. QC results — checks run, checkpoints verified, regression sweeps, outcomes
 5. Unfinished items — pending, blocked, or dropped, with reason and approval; or "None"
 6. Handover summary — Context · Decisions · State (done / pending / blocked) · Remaining tasks (what, how, where) · Verification · Risks and how to detect them early
+
+### Progress Board
+
+The board shows live progress in chat. It is a progress display, separate from the Reader's Briefing; the briefing rules do not apply to it. Statuses must match the ledger at every print.
+
+```text
+Execution — <plan title>        <n>/<m> verified · <k> in progress · <b> blocked
+Ledger: <path>
+
+Phase 1: <name>                               ✓ done
+  ✓ <task name>                               done (verified)
+Phase 2: <name>                               ◐ in progress
+  ◐ <task name>                               in progress
+  ○ <task name>                               pending
+  ⊘ <task name>                               blocked — <reason, 8 words or fewer>
+Now: <current task> — <12 words or fewer>
+```
+
+- One line per task. A phase shows `failed`, `blocked` or `needs decision` if any of its tasks does; otherwise its least-advanced task status
+- Omit the `Now` line on the final board
 
 ### Reader's Briefing
 
@@ -191,6 +237,9 @@ Execution is complete only when every answer is yes:
 - Every objective in the plan's traceability maps to verified work
 - Regressions and collateral damage were swept for, and the results are stated
 - Declared skill availability and consent were respected; required unavailable capabilities are explicit blockers
+- The output mode was asked once (with delegation when both were unknown), quiet applied while unanswered, and later switches were honored
+- In `quiet` mode, chat carried no code, diffs, file contents or raw command output, and every failure, blocker, deviation and required decision still surfaced at once
+- Progress Board statuses matched the ledger at every print, and the final board preceded the Reader's Briefing
 - The delegation question was asked once with its trade-off stated, the answer was honored, and refusal fell back to same-tier subagents or sequential execution
 - No irreversible, security-sensitive, or context-dependent task was delegated
 - Every delegated task was re-verified and its output audited by the executing agent against the task's own acceptance check; no subagent marked its own work verified

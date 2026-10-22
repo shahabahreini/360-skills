@@ -49,10 +49,10 @@ Each skill works individually. Review includes its own minimum plan contract; bl
 | Skill | Description | Version |
 |---|---|---|
 | [`360-backend-audit`](skills/360-backend-audit) | Deep-audit backend code, write the full report to a file, and brief the user in chat with bugs, updates, and dead weight. Use before or after significant backend work, or when inheriting, refactoring, or handing off services. | 2.3.0 |
-| [`360-blueprint`](skills/360-blueprint) | Create an executable plan from a new objective with explicit tasks, constraints, and verification. Use when a goal exists but the path is unclear, or the request is "plan this". | 2.6.0 |
-| [`360-execute`](skills/360-execute) | Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and brief the user in chat — with optional audited delegation of routine tasks to lighter models. Use when a plan exists and work must begin, or when resuming a partial execution. | 2.4.0 |
+| [`360-blueprint`](skills/360-blueprint) | Create an executable plan from a new objective, asking questions until every requirement and default is confirmed, with explicit tasks, constraints, and verification. Use when a goal exists but the path is unclear, or the request is "plan this". | 2.7.0 |
+| [`360-execute`](skills/360-execute) | Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and show progress as a quiet phase-and-task board before a final briefing — with optional audited delegation of routine tasks to lighter models. Use when a plan exists and work must begin, or when resuming a partial execution. | 3.0.0 |
 | [`360-expert-review`](skills/360-expert-review) | Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage. | 3.6.0 |
-| [`360-faculty`](skills/360-faculty) | Seat a short panel of specialist experts, chosen from a plan's nature, depth, and complexity, to critique and improve it from distinct angles with named methods and current best practice. Use when a plan or task needs specialist scrutiny before review, when work must fit this developer's goals and taste, or when a named expert team must be created, called, or updated. | 2.0.0 |
+| [`360-faculty`](skills/360-faculty) | Commission a short panel of research-backed specialist experts, chosen from a plan's nature, depth, and complexity, each equipped with current methods, standards, and the tools available here to critique and improve the plan from distinct angles. Use when a plan or task needs specialist scrutiny before review, when work must fit this developer's goals and taste, or when a named expert team must be created, called, refreshed, or updated. | 3.0.0 |
 | [`360-optimize`](skills/360-optimize) | Audit working code for zero-cost speed, weight, and reliability gains — measure first, rank drop-in upgrades and restructures, and report conservative expected effects on this system. Use when existing code must run faster, lighter, or more robustly without changing what it does. | 2.3.0 |
 | [`360-token-efficiency`](skills/360-token-efficiency) | Reduce avoidable context and tool-output overhead with capability-aware retrieval, reuse, and verified handovers. Use as an optional, session-approved companion when token cost or context growth matters, with strict preservation of task requirements by default. | 2.1.1 |
 
@@ -101,10 +101,10 @@ Plan producers and consumers carry the same local contract. Every task has ID, W
 
 Readiness moves from `Draft` to `Ready for review` to `Reviewed and ready to execute`. Material edits invalidate prior review; execution progress stays in the coverage ledger. A direct user instruction to execute a supplied plan is sufficient authorization without forcing another skill review; record that basis honestly. Handover fields are Context, Decisions, State (done / pending / blocked), Remaining tasks (what, how, where), Verification, and Risks and how to detect them early.
 
-- **`360-blueprint`** turns a vague goal into a complete, unambiguous plan written directly to a file, briefing the user in chat with key decisions, assumptions, and risks.
-- **`360-faculty`** seats a short panel of specialists chosen from the plan's nature, depth, and complexity. Each seat applies named methods and checks current standards, edits the plan in place, and the session ends with a plain-language briefing. It also remembers the developer's preferences and saves reusable teams.
+- **`360-blueprint`** turns a vague goal into a complete, unambiguous plan written directly to a file, asking question rounds until nothing is left to assume, briefing the user in chat with key decisions, assumptions, and risks.
+- **`360-faculty`** seats a short panel of specialists chosen by mapping the plan's failure surfaces to owners. Before judging, each seat is commissioned: it researches its craft's current methods, standards and evidence at a depth set by the stakes, and is equipped with the tools this environment actually offers. Seats edit the plan in place, flag findings outside their lane to the right owner, and the session ends with a plain-language briefing. Faculty also remembers the developer's preferences, caches dated expertise per role, and saves reusable teams.
 - **`360-expert-review`** tests that plan against relevant concrete failure cases, writing the finalized plan back to the file and briefing the user in chat.
-- **`360-execute`** builds it, tracking every task in a coverage ledger written to disk, verifying each against its own acceptance check with evidence, and briefing progress in chat — with optional audited delegation of routine tasks to lighter models.
+- **`360-execute`** builds it, tracking every task in a coverage ledger written to disk, verifying each against its own acceptance check with evidence, and showing progress as a quiet phase-and-task board instead of diffs and command output — with optional audited delegation of routine tasks to lighter models.
 - **`360-backend-audit`** audits the resulting backend code for correctness, duplication, performance risks, and observability, writing the full report to a file and briefing findings in chat.
 - **`360-optimize`** audits working code for zero-cost speed, weight, and reliability gains, ranking drop-in upgrades and restructures with conservative expected effects written to a file and briefing highlights in chat.
 - **`360-token-efficiency`** runs alongside the active task with session consent, reducing avoidable overhead while preserving requirements and required checks.
@@ -163,7 +163,7 @@ A skill is a folder containing a `SKILL.md` file with a `name`, a `description`,
     │   └── SKILL.md           Skill definition and instructions
     ├── 360-faculty/
     │   ├── SKILL.md           Skill definition and instructions
-    │   └── references/        Core seat cards and optional seating roster
+    │   └── references/        Research protocol, seat profiles, optional roster
     ├── 360-expert-review/
     │   └── SKILL.md           Skill definition and instructions
     ├── 360-execute/
@@ -177,7 +177,7 @@ A skill is a folder containing a `SKILL.md` file with a `name`, a `description`,
         └── references/        Evidence and optional techniques
 ```
 
-Supporting references: faculty has [core seat cards](skills/360-faculty/references/core-cards.md) and an optional [seating roster](skills/360-faculty/references/seating-roster.md); token efficiency has optional evidence and technique guidance. Runtime faculty dossiers belong beside the user's plan and are not part of this catalog.
+Supporting references: faculty has a [research protocol](skills/360-faculty/references/research-protocol.md), research-backed [seat profiles](skills/360-faculty/references/profiles/) grouped by domain, and an optional [seating roster](skills/360-faculty/references/seating-roster.md); token efficiency has optional evidence and technique guidance. Runtime faculty dossiers belong beside the user's plan and are not part of this catalog.
 
 ## Contributing
 
