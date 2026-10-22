@@ -1,7 +1,7 @@
 ---
 name: 360-execute
 description: Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and show progress as a quiet phase-and-task board before a final briefing — with optional audited delegation of routine tasks to lighter models. Use when a plan exists and work must begin, or when resuming a partial execution.
-version: 3.1.0
+version: 3.2.0
 ---
 
 # 360 Execute
@@ -33,7 +33,7 @@ Reuse explicit approval or refusal for model delegation from this session. If un
 
 ### Entry: Output Mode
 
-Reuse an explicit `quiet` or `verbose` choice from this session. If unknown and not already offered, ask once, in the same interactive round as the delegation question when both are unknown. Recommend `quiet`: chat shows only the progress board, one-line status changes, and the final result; `verbose` shows working detail such as diffs and command output. Quiet applies while unanswered. The user may switch with `quiet` or `verbose` at any time; it takes effect immediately.
+Reuse an explicit `quiet` or `lean` choice from this session (treat `verbose` as `lean`). If unknown and not already offered, ask once, in the same interactive round as the delegation question when both are unknown. State the trade-off: `quiet` gives the cleanest screen (todo list and short status lines only) at a higher token cost, because a background executor does the work out of view; `lean` gives the lowest token cost, with work in the main thread, so tool calls and edit diffs stay visible while chat text stays minimal. Recommend `quiet` unless the user has said cost matters more. Quiet applies while unanswered. The user may switch with `quiet` or `lean` at any time; it takes effect immediately.
 
 ### Shared Plan Contract
 
@@ -90,6 +90,7 @@ When delegation was approved, decide the executor for each task before dispatchi
 - Route up to a heavier tier when available: tasks whose reasoning or verification demands exceed the current model's demonstrated capability on this plan
 - Keep with the current model: irreversible or external actions, security- and auth-sensitive work, anything depending on accumulated context, and every call the plan assigns to the user. These never leave the accountable executor
 - Classify by relative capability, not by vendor. Model lineups change; the tier rules do not
+- The quiet-mode executor (see Quiet Output) is the accountable executor running out of view, not delegation: at the current tier it needs no delegation consent. Lighter tiers belong inside the executor through approved delegation, not in the shell: in benchmarks, lighter session models ignored the detached design and worked inline
 
 ### 4. Execute in Order
 
@@ -102,30 +103,54 @@ When delegation was approved, decide the executor for each task before dispatchi
 
 ### Quiet Output
 
-In `quiet` mode, chat carries progress, not process. The ledger, logs and repository hold the detail.
+In `quiet` mode, the user's screen shows the todo list and nothing else until the result. Hosts draw every main-thread tool call, so quiet comes from where the work runs, not from restraint: one detached executor does all the work out of view, and the main thread is a thin shell that mirrors progress. The shell's context stays small, so its turns stay cheap.
 
-- Never print code, diffs, file contents, or raw command output in chat
-- No narration. Between boards, chat carries only `<symbol> <task> — <8 words or fewer>`, once per status change. No progress summaries, no statements of intent. Delegation shows as status changes only (`◐ <task> — delegated`, `◑ <task> — auditing`)
-- Show progress in the host's native task or todo list when it exists, since it updates in place. Otherwise print the Progress Board right after the ledger is created and before the first task, at each phase checkpoint, on any `failed`, `blocked` or `needs decision`, and at the end. A board is always the last element of its message, so the bottom of the screen shows current state
-- Never hide a failure, blocker, deviation or required decision. Surface it at once, in one or two lines
+Shell (main thread), where the host can run a background subagent:
 
-Many hosts display tool calls and their results; you cannot hide them, but you control their shape. Make each one a short line with a one-line result:
+1. Read the plan once and pick the slug. Create one todo item per task (`<ID> <task name>`) before anything else. The shell writes no ledger or runner and reads no source files
+2. Launch one executor in the background (`run_in_background` in Claude Code; a foreground launch blocks the shell and loses live updates) with the Executor Brief, at the current tier or the tier Step 3 sets. Use one executor for the whole plan: every subagent pays a fixed startup cost, so never spawn one per task
+3. Watch `<slug>-events.txt` with the host's event-stream tool (Monitor in Claude Code), filtered so only lines starting with `@ ` wake the shell, for example `tail -n +1 -F <path> | grep --line-buffered '^@ '`. Every wake re-reads the shell's whole context, so wakes are the shell's main cost:
+   - Mark the first ready tasks `in progress` when launching. On each event batch, in one message: mark the reported tasks, mark the tasks they unblock `in progress`, then end the turn with exactly one status line, `<symbol> <task names> — <8 words or fewer>`. Never post "waiting", "still running" or summary sentences; the todo list already shows them
+   - The watch is the only wait: start no sleeps, polls or second watches. Re-arm it only when it expires while the executor still runs, and stop it when the executor finishes
+4. On `needs decision`, or a blocker only the user can clear, ask with the interactive question tool, send the answer to the same executor (SendMessage in Claude Code), and keep watching
+5. When the executor finishes, run `<runner> verify all` once as an independent check. Then print the final board and the Reader's Briefing from the executor's reply. A mismatch reopens the task; it never passes silently
+6. Shell chat holds only the start line, one status line per event batch, and surfaced failures, blockers, deviations and decisions, one or two lines each. Never print code, diffs, file contents or raw output
 
-- Runner: at start, write one small runner script beside the ledger (`<slug>-run.sh`, or `.ps1` where only PowerShell exists). It runs a named command or check, appends full output to `<slug>-log.txt`, and prints one summary line such as `ok T3 35/35 tests` or `FAIL T3 2/35 — log:120`. It also rewrites the board file. Visible calls then read like `bash plans/<slug>-run.sh test T3`
-- No `cd …&&` chains or inline heredoc programs; use absolute paths or the host's working-directory option, and put multi-line logic in the runner
-- Batch independent reads and checks into one call. Give each call a short plain description of what it does
-- Create the ledger as a short skeleton, then update rows with targeted edits instead of rewriting the file
-- Read the log by line range or search, only for the excerpt a decision needs
-
-Live board file: when files are available, keep `<slug>-board.txt` beside the ledger holding the current board, overwritten whole (temp file, then rename) in the same call as each ledger update, so it adds no extra visible tool call. It is a view; the ledger stays the source of truth. Never launch windows or panes. At start, print one line naming it and a viewer the user can run in a side pane, where each redraw clears the screen:
+At start, print one line offering zero-token live views; never launch windows or panes:
 
 ```text
-Quiet mode on. Live board: <path> — view in a side pane: while :; do clear; cat <path>; sleep 2; done
+Quiet mode on. Todo list tracks tasks. Full board: <path> (side pane: while :; do clear; cat <path>; sleep 2; done)
 ```
 
-Offer `watch -t -n 2 cat <path>` where `watch` exists, `while(1){cls; gc <path>; sleep 2}` in PowerShell, or an editor that reloads on change. Say this once. Do not apologize for visible tool calls; point to the board instead.
+Offer `watch -t -n 2 cat <path>` where `watch` exists, or `while(1){cls; gc <path>; sleep 2}` in PowerShell. Where the host has a command status line, also offer a line that prints the board's progress row while the file exists. It refreshes locally and costs no tokens. Never replace an existing status line without explicit approval; offer to chain it instead. Where the host has a view that collapses tool calls (`/focus` in Claude Code), mention it once.
 
-In `verbose` mode, the same statuses and board apply, and working detail may appear in chat.
+Executor (the background subagent) runs Steps 1–7 in full, with these rules:
+
+- Runner: write one script beside the ledger (`<slug>-run.sh`, or `.ps1` where only PowerShell exists). Every subcommand appends full output to `<slug>-log.txt`, rewrites `<slug>-board.txt` from the ledger (temp file, then rename), and prints one line:
+  - `check <ID> <name>` — run a named build, test or command: `ok T3 35/35 tests` or `FAIL T3 2/35 — log:120`
+  - `verify <ID>...|all` — run acceptance checks plus a change summary; record `done (verified)` with evidence on pass and `failed` on failure: `ok T3 35/35 tests · 3 files +42 -7`
+  - `mark <ID> <status> [note]` — set a ledger row's status
+  - `verify` and `mark` append `@ <ID> <status> [note]` to `<slug>-events.txt` only when a row's status actually changes to a final or problem status: `done (verified)`, `failed`, `blocked`, `needs decision`, `dropped (approved)`. Re-checks that confirm an unchanged status, such as the final sweep, emit nothing. `in progress` and `verifying` emit nothing; the shell infers starts from dependencies. With more than about 12 tasks, emit one `@ <phase> done <IDs>` line at each phase checkpoint instead of per-task completions, and still emit every problem status at once
+- Keep ledger rows one line each, ID first, so the runner can rewrite them. After the skeleton, change the ledger, log, board and events only through the runner
+- Report status only through the runner. The executor has no todo tools, never detaches again, and never asks the user directly. It marks `needs decision`, continues independent work, and waits for the shell's message only when nothing independent remains
+- Delegate inside the executor per Step 3 where the host allows nested subagents. The audit rules of Step 5 are unchanged
+- Final reply: the final Progress Board and the Reader's Briefing only, no code
+
+Without background subagents, the shell and the executor are one thread. Use the runner and update the todo list on every status change. Write no chat text between tool calls. Batch independent calls. Use no `cd …&&` chains or inline heredoc programs. Keep edits targeted, since diffs will show. Without a todo tool, print the Progress Board at start, at each checkpoint, on any problem, and at the end, always as the last element of its message.
+
+### Lean Output
+
+In `lean` mode, spend the fewest tokens that still meet every acceptance check. Work runs in the main thread, so tool calls and diffs show; chat text and avoidable context do not.
+
+- No subagents for display. Delegate only under Step 3 with approval, and only when it saves cost or time
+- Use the runner from Quiet Output for every build, test and check, so only one summary line enters context. Read the log by line range or search, only for the excerpt a decision needs
+- After the ledger skeleton, update ledger rows and the board through the runner `mark` and `verify`, never by rewriting files
+- Read only the files and ranges a task needs, batch independent reads and checks in one message, and never re-read a file just edited
+- Make existing-file changes with targeted edits; write whole files only when creating them
+- Update the todo list in the same message as the next action, never in a turn of its own. Without a todo tool, print the Progress Board only at phase checkpoints, on problems, and at the end
+- No chat text between tool calls except surfaced failures, blockers, deviations and decisions, one or two lines each. Put intent in the tool call's description. Never print code, diffs, file contents or raw output in chat
+- Do not repeat checks already passed with unchanged inputs. The final sweep runs `verify all` once
+
 
 ### 5. Verify Every Task
 
@@ -182,12 +207,27 @@ The ledger file contains:
 5. Unfinished items — pending, blocked, or dropped, with reason and approval; or "None"
 6. Handover summary — Context · Decisions · State (done / pending / blocked) · Remaining tasks (what, how, where) · Verification · Risks and how to detect them early
 
-### Progress Board
+### Executor Brief
 
-The board shows live progress in chat. It is a progress display, separate from the Reader's Briefing; the briefing rules do not apply to it. Statuses must match the ledger at every print.
+The shell sends this to the detached executor. Keep the wording fixed so hosts can cache it.
 
 ```text
-╭─ <plan title> ─────────────────────────────────── quiet ─╮
+You are the detached executor for <plan path>. Run 360-execute Steps 1–7 out of the user's view.
+Load the 360-execute skill through the host's mechanism, or read <skill path>, and follow its executor rules:
+never detach again, never ask the user directly, use no todo tools, never print code in replies.
+Session choices: output quiet; delegation <approved|refused>; token efficiency <approved|refused>.
+Paths: ledger <slug>-execution.md, runner <slug>-run.sh, log <slug>-log.txt, board <slug>-board.txt, events <slug>-events.txt, all in <dir>.
+Report every status change only through the runner, which appends "@ <ID> <status> [note]" to the events file.
+If a decision is needed, mark it, continue independent work, then stop and wait for a message.
+Final reply: the final Progress Board and the Reader's Briefing only.
+```
+
+### Progress Board
+
+The board shows live progress in the board file, and in chat only when the host has no todo list; otherwise chat gets only the final board. It is a progress display, separate from the Reader's Briefing; the briefing rules do not apply to it. Statuses must match the ledger at every print.
+
+```text
+╭─ <plan title> ─────────────────────────────────── <mode> ─╮
   ▕██████████░░░░░░░░▏ <n>/<m> verified · <k> active · <b> blocked
   ! Needs you: <decision or blocker, 10 words or fewer>
   ────────────────────────────────────────────────────────
@@ -264,8 +304,11 @@ Execution is complete only when every answer is yes:
 - The output mode was asked once (with delegation when both were unknown), quiet applied while unanswered, and later switches were honored
 - In `quiet` mode, chat carried no code, diffs, file contents or raw command output, and every failure, blocker, deviation and required decision still surfaced at once
 - Progress Board statuses matched the ledger at every print, and the final board preceded the Reader's Briefing
-- In `quiet` mode, the first board printed before the first task, each board ended its message, and chat between boards held only one-line status changes
-- In `quiet` mode, visible tool calls were short runner or batched calls with one-line results, and the live board file (when files were available) matched the ledger with its viewer offered once
+- In `quiet` mode with background subagents, one detached executor did all the work; the shell created the todo list first, updated it only from runner events, ran one independent `verify all`, and printed nothing between tool calls except surfaced problems
+- In `quiet` mode, the ledger (after its skeleton), log, board and events changed only through the runner, and no subagent marked its own task verified
+- Without background subagents, the single thread followed the inline fallback: todo list or board cadence, no chat text between tool calls, batched calls
+- In `lean` mode, checks ran through the runner, ledger updates went through `mark`/`verify`, reads and checks were batched, no passed check was repeated without changed inputs, and chat held no text between tool calls beyond surfaced problems
+- The zero-token board viewer was offered once, and no existing status line was replaced without explicit approval
 - The delegation question was asked once with its trade-off stated, the answer was honored, and refusal fell back to same-tier subagents or sequential execution
 - No irreversible, security-sensitive, or context-dependent task was delegated
 - Every delegated task was re-verified and its output audited by the executing agent against the task's own acceptance check; no subagent marked its own work verified
