@@ -1,20 +1,21 @@
 ---
 name: 360-optimize
-description: Audit working code for zero-cost speed, weight, and reliability gains — measure first, rank drop-in upgrades and restructures, and report conservative expected effects on this system. Use when existing code must run faster, lighter, or more robustly without changing what it does.
-version: 2.3.0
+description: Audit working code and its whole toolchain — build, test, lint, CI, and runtime libraries — for zero-cost speed, weight, and reliability gains, verifying every claim against the pinned versions and measuring before ranking. Use when existing code must run faster, lighter, or more robustly without changing what it does, or when a list of proposed tooling or library upgrades needs a verdict.
+version: 3.0.0
 ---
 
 # 360 Optimize
 
 ## Purpose
 
-Assess working code for supported speed, weight and reliability gains that preserve its intended contract. Produce an audit with conservative expectations, unresolved candidates and rejected ideas; implementation requires separate authorization.
+Assess working code and the tools, libraries and methods around it for supported speed, weight and reliability gains that preserve its intended contract. Produce an audit with conservative expectations, unresolved candidates and rejected ideas; implementation requires separate authorization.
 
 ## When to Use
 
 - Working code feels slow, heavy, or fragile under load, and behavior must stay the same
 - A stack, library, or runtime may have a drop-in successor that is lighter or more robust
 - A restructure might cut copies, I/O, or serialized work on a hot path
+- A supplied audit or recommendation list needs a verified verdict per item
 - Before or after `360-backend-audit` when the remaining question is performance and weight, not correctness
 - Not for greenfield design (`360-blueprint`), not for executing changes (`360-execute`), not for correctness or dead-weight hunts (`360-backend-audit`)
 
@@ -47,7 +48,22 @@ Judge completion by observable acceptance checks. A structural or format check d
 - Honor already authorized contract changes; otherwise preserve the intended contract and ask only about material unresolved trade-offs
 - If the contract is unclear, mark questions. Do not optimize guessing
 
-### 2. Find Time and Weight
+### 2. Inventory the Stack
+
+Build one inventory table before hunting. Sources: manifests, lockfiles and toolchain pins; build and compile profiles; CI workflows; test, lint, format and typecheck configs; git hooks and scripts; runtime libraries by role (serialization, hashing, compression, codecs, database, concurrency, collections); I/O and persistence methods on hot paths.
+
+Each row: role · tool or library · resolved version · effective configuration · what it costs or wins here · suspect or not.
+
+- Record the effective state, not the declared one: feature unification and transitive enablement, defaults of the pinned toolchain or library version, runtime detection, config overrides
+- Note what already exists transitively; reuse it before adding anything
+- Note duplicate versions of one package and what each pulls in
+- Note what CI actually runs, not what the scripts offer
+- Resolve with the ecosystem's own tools, for example `cargo tree -e features -i <crate>`, `cargo tree -d`, `pnpm why`, `npm ls`, `pipdeptree`, `go mod graph`
+- State layers left out of scope
+
+Read [suspect patterns](references/suspect-patterns.md) once the inventory exists, and sweep each layer with it. It lists suspects to confirm, never prescriptions.
+
+### 3. Find Time and Weight
 
 - Locate hot paths from profiles, traces, logs, complexity, or data volume
 - Name the resource: latency, CPU, memory, I/O, binary size, dependency surface
@@ -55,8 +71,10 @@ Judge completion by observable acceptance checks. A structural or format check d
 - Expose resource trade-offs: latency, CPU, memory, I/O, dependency/operational weight and money. A local speedup may move cost elsewhere
 - Cold paths stay untouched
 - If you did not measure, write `unmeasured` and keep the finding as a candidate
+- When nothing measures the path, add a minimal harness: timing tests beside the code, skipped by default, or the ecosystem's bench tool. Same workload before and after; repeat runs and report spread
+- Decompose a path into its parts before choosing a target. Declare each gate threshold before measuring; a change that misses it is dropped
 
-### 3. Hunt Waste First
+### 4. Hunt Waste First
 
 Attack in this order. Stop at the first level that removes the cost.
 
@@ -68,7 +86,31 @@ Attack in this order. Stop at the first level that removes the cost.
 
 Do not micro-tune a cold path. Do not strip checks, reduce precision, or weaken failure handling to go faster.
 
-### 4. Apply the Zero-Cost Gate
+### 5. Verify Before You Claim
+
+Apply to every candidate, ours or supplied. A failed check rejects or rewrites the claim; an unchecked one stays a candidate.
+
+1. Exists: the flag, feature or API exists in the pinned version. Read that version's manifest or source (a local package cache counts) or its versioned docs
+2. Not already done: the pinned toolchain or library does not already do it by default or by runtime detection
+3. Not already active: no feature unification, transitive dependency or config override already enables it
+4. Located: the cited file and line match the code. A wrong location demotes the claim until re-verified
+5. Ceiling: measure the target's share of the path. The best possible speedup is 1 / (1 − share); reject when that ceiling is below the declared threshold
+6. Contract-bound: changes to persisted, shared or parity-bound behavior (stored digests, cache keys, file layouts, wire formats, model preprocessing) fail the Function check unless the user approved a contract change
+7. Concurrency fits: added parallelism is bounded, respects existing pools and schedulers, keeps result order, and keeps progress and cancellation semantics
+8. Durability fits the data: authoritative data keeps its atomicity and fsyncs; a disposable cache may drop fsyncs only if it validates what it reads and regenerates on failure
+9. Tests really run: the tests a claim relies on run in CI; otherwise say so and make running them part of the change
+
+When the user supplies recommendations, give each exactly one verdict with evidence:
+
+- `Accept` — passes every check
+- `Modify → <better form>` — the goal is valid, the method is not; name the better form
+- `Reject (<failed check>)`
+- `Defer (<missing evidence or decision>)`
+- `Already done (<evidence>)`
+
+Also scan for what the list missed; the inventory and suspect patterns are the sweep.
+
+### 6. Apply the Zero-Cost Gate
 
 Admit a change only when every check is yes:
 
@@ -81,7 +123,7 @@ Admit a change only when every check is yes:
 
 A failed check means Rejected, even if another axis improved. An unknown check leaves an unresolved candidate with the missing evidence and next check in Measurement/Verification; it is not admitted to Ranked gains, Upgrades or Restructures. Only all-pass items are supported recommendations. An audit can complete with no admitted gains.
 
-### 5. Gate Upgrades and Libraries
+### 7. Gate Upgrades and Libraries
 
 Prefer, in order: delete the work; use the language and current stack; a compatible version of an existing dependency; a maintained drop-in with the same contract and less weight; a new library only when it removes more than it adds.
 
@@ -98,7 +140,7 @@ For an emergent or young tool, check an adapter, rollback and evidence of improv
 
 Never name a tool because it is popular. Name it because it passed this gate on this code.
 
-### 6. Restructure Only When Shape Is the Cost
+### 8. Restructure Only When Shape Is the Cost
 
 Restructure when the current shape forces extra I/O, extra copies, or serialized work on a hot path.
 
@@ -106,7 +148,7 @@ Forbidden as "optimization": layering fashion, package renaming, architecture th
 
 Callers and error shapes stay identical unless the user approved a contract change.
 
-### 7. Prove No Cost
+### 9. Prove No Cost
 
 - Existing tests that cover the contract must still pass
 - Where coverage is thin on a touched path, propose contract tests first: outputs, errors, ordering, bounds, concurrency
@@ -115,7 +157,7 @@ Callers and error shapes stay identical unless the user approved a contract chan
 
 Correctness bugs found while scanning are out of scope. Record them as `handoff to 360-backend-audit`, do not disguise them as optimizations.
 
-### 8. Bound the Expectation
+### 10. Bound the Expectation
 
 Every admitted gain gets a conservative expected effect. This step is not optional.
 
@@ -130,7 +172,7 @@ Every admitted gain gets a conservative expected effect. This step is not option
 - If the sentence still sells after the evidence is removed, rewrite it
 - State `Holds when` and `Falsified when` for every expected effect
 
-### 9. Write the Audit
+### 11. Write the Audit
 
 - Write the full audit to a file using the work-file template
 - Reuse the existing path if known; otherwise `plans/<short-slug>-optimize.md`; create the folder if needed; ask once if ambiguous
@@ -154,9 +196,11 @@ Local routing: Recommend `360-blueprint` to turn supported findings into scoped 
 
 ### Work file
 
-1. Contract — what must not change
-2. Measurement — what was profiled, load, environment, what is `unmeasured`; unresolved candidates and missing gate evidence
-3. Ranked gains — only items that passed the Zero-Cost Gate. Each row:
+1. Contract — what must not change, including persisted, shared and parity-bound behavior
+2. Stack inventory — the table from Inventory the Stack, with effective state and suspects; layers out of scope
+3. Measurement — what was profiled, load, environment, harness, thresholds declared up front, what is `unmeasured`; unresolved candidates and missing gate evidence
+4. Recommendation verdicts — only when a list was supplied: each item, its verdict, the evidence, and the better form for `Modify`
+5. Ranked gains — only items that passed the Zero-Cost Gate. Each row:
 
    - Change and axis (speed / weight / reliability)
    - Evidence (this system)
@@ -167,13 +211,13 @@ Local routing: Recommend `360-blueprint` to turn supported findings into scoped 
    - Rank: `high` / `medium` / `low` (supported gains only)
    - Effort and classification
 
-4. Upgrades — drop-in runtime, library, or tool changes that passed
-5. Restructures — shape changes that passed, with why the current shape is the cost
-6. Rejected — attractive ideas that failed the gate, with the failed check
-7. Handoff bugs — correctness or dead-weight items for `360-backend-audit`; or "None"
-8. Verification — tests run/to run, rollback, how to detect a silent contract break; next checks for unresolved candidates
-9. Implementation plan — grouped as New vs Updates to existing
-10. Handover — Context · Decisions · State (done / pending / blocked) · Remaining tasks (what, how, where) · Verification · Risks and how to detect them early
+6. Upgrades — drop-in runtime, library, or tool changes that passed
+7. Restructures — shape changes that passed, with why the current shape is the cost
+8. Rejected — attractive ideas that failed the gate, with the failed check
+9. Handoff bugs — correctness or dead-weight items for `360-backend-audit`; or "None"
+10. Verification — tests run/to run, rollback, how to detect a silent contract break; next checks for unresolved candidates
+11. Implementation plan — grouped as New vs Updates to existing
+12. Handover — Context · Decisions · State (done / pending / blocked) · Remaining tasks (what, how, where) · Verification · Risks and how to detect them early
 
 Implementation tasks use the Shared Plan Contract. Keep candidates separate from supported gains using the existing Measurement/Verification sections. State inspection limits; completion of the assessment does not verify a candidate or its implementation. No magnitude without a measurement on this system.
 
@@ -184,6 +228,10 @@ Print this in chat. Follow the Delivery rules for file or in-session output.
 ```text
 Optimize — complete
 Full audit: <path>
+
+Verdicts (only when a list was supplied)
+- <n> accepted, <n> modified, <n> rejected, <n> deferred, <n> already done
+- <notable reject or modification, and why>
 
 Gains
 - <change, axis, local|end-to-end> — <proven|likely|possible|uncertain>
@@ -221,6 +269,12 @@ Briefing rules:
 The audit is complete only when every answer is yes:
 
 - The contract is written and treated as the floor
+- The stack inventory covers build, test, lint and format, typecheck, CI, runtime libraries and hot-path I/O, or names the layers left out
+- Effective state (pinned version, defaults, unification, transitive presence) was resolved for every candidate
+- Every recommended flag, feature or API was confirmed to exist in the pinned version
+- Every targeted speedup has a measured share and ceiling, or is marked `unmeasured`
+- Persisted, shared and parity-bound behavior was identified before any change was admitted
+- Every supplied recommendation has exactly one verdict with evidence
 - Hot paths were located from evidence, or marked `unmeasured`
 - Waste was considered before upgrades, and upgrades before restructure
 - Every admitted change has affirmative evidence for every Zero-Cost Gate check; unknowns remain candidates and failures are Rejected
