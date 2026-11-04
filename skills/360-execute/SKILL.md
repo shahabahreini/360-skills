@@ -42,7 +42,7 @@ Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`.
 
 ### Delivery
 
-Write the deliverable to a recoverable file when the host supports it, at the existing path or the default below. Honor explicit user output requests. Without files, deliver the same complete structure in chat labeled `in-session only; not persisted`, and never claim a file was saved. With a saved file, chat carries the Reader's Briefing and the path.
+Write the deliverable to a recoverable file when the host supports it, at the existing path or the default below. Honor explicit user output requests. Without files, deliver the same complete structure in chat labeled `in-session only; not persisted`, and never claim a file was saved. With a saved file, chat carries the Reader's Briefing and the path. In a non-interactive run where no one can answer, do not wait: record each open question, apply only reversible defaults, mark readiness honestly, and deliver.
 
 Judge completion by observable acceptance checks. A structural or format check does not prove behavior or accuracy; state what was not verified.
 
@@ -69,12 +69,12 @@ Hosts display every main-thread tool call, so a quiet screen needs the work out 
 5. When the executor finishes, the shell runs the plan's overall verification once as an independent check. A mismatch reopens the affected task
 6. The executor's final reply holds only the final Progress Board and the Reader's Briefing; the shell prints both
 
-Without background subagents or notifications, say in one line that quiet is unavailable on this host and continue in `lean`.
+Without background subagents, notifications or file writes, say in one line that quiet is unavailable on this host and continue in `lean`.
 
 ### 1. Load the Plan Completely
 
 - Read the entire plan before touching anything: objective, scope, assumptions, every phase, task and checkpoint
-- Record the plan's readiness status and the authorization basis. Open blockers in a `Draft` plan block the tasks they affect
+- Record the plan's readiness status (a plan without one counts as unreviewed) and the authorization basis. Open blockers in a `Draft` plan block the tasks they affect
 - Build the full task inventory: every task ID, its priority, its dependencies and its done-when check
 - If an acceptance check is missing, derive it from the approved objective; ask only when alternatives would change the intended outcome
 - Resolve material ambiguity before dependent work; continue independent authorized work
@@ -84,7 +84,7 @@ Never clear history automatically. Before host compaction or a handoff, write th
 ### 2. Persist the Coverage Ledger
 
 - Write the ledger to a file and keep it current after each task and each significant partial effect. Reuse the existing path if known; otherwise use `plans/<short-slug>-execution.md`, creating the folder if needed. If the file cannot be written, use the Delivery fallback
-- One row per task: ID, name, priority, acceptance check, status, evidence. Delegated tasks also record the tier and the audit result
+- One row per task: ID, name, priority, acceptance check, status, evidence. Delegated tasks also record the tier, the model that actually ran when the host reports it, and the audit result
 - Statuses (the text label is required; the symbol is optional):
   - `pending` ○: not started
   - `in progress` ◐: work underway
@@ -154,7 +154,7 @@ Before declaring completion, walk the ledger top to bottom:
 - Deliver and verify the current result first, with its location. An unanswered suggestion never reopens finished work, and a blocked job is not complete
 - Recommend one next action from the local routing below, based on the result, project stage, open risks and prior instructions. Skip stages that do not apply; recommend stopping when no useful work remains
 - Ask with the host's interactive question tool, or with numbered choices in chat when there is none: the recommendation first with its reason, a stop option, and a free-text option for any direction, inside or outside the 360 skills. This prompt is separate from the briefing and is not a list of open task questions
-- An explicit next-step instruction answers this prompt, and an explicit stop or request for no suggestions suppresses it. Otherwise wait for the user's choice. Silence, a preselected recommendation, and elapsed time are not authorization. On a choice, clarify only what is missing, load a selected skill through the host's mechanism without installing it (offer an equivalent if it is unavailable), and carry forward paths, decisions, verification, risks and session consent
+- An explicit next-step instruction answers this prompt, and an explicit stop or request for no suggestions suppresses it. Otherwise wait for the user's choice; in a non-interactive run, state the recommendation and stop. Silence, a preselected recommendation, and elapsed time are not authorization. On a choice, clarify only what is missing, load a selected skill through the host's mechanism without installing it (offer an equivalent if it is unavailable), and carry forward paths, decisions, verification, risks and session consent
 
 Local routing: Recommend `360-backend-audit` after significant backend work, or `360-optimize` when working code has a relevant performance or weight concern. For other completed work, recommend a concrete domain-appropriate follow-up or stopping; do not invent backend work to fit the flow.
 

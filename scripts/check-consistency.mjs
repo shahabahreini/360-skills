@@ -47,6 +47,8 @@ export function checkConsistency(root = ROOT) {
       const expected = ['Purpose', 'When to Use', 'Core Principle', 'Workflow'];
       if (parts.length !== 6 || expected.some((heading, i) => parts[i]?.title !== heading) || parts[5]?.title !== 'Quality Gate' || !/(?:Format|Template)$/.test(parts[4]?.title ?? '')) report('expected Purpose, When to Use, Core Principle, Workflow, output Format/Template, Quality Gate in order');
       for (const part of parts) if (!part.body) report(`empty section "${part.title}"`);
+      const purpose = parts.find(p => p.title === 'Purpose')?.body ?? '';
+      if ((purpose.match(/[^.!?]+[.!?](?=\s|$)/g) ?? []).length > 2) report('Purpose must be one or two sentences');
       const when = parts.find(p => p.title === 'When to Use')?.body ?? '';
       const negative = when.split('\n').filter(l => l.trim()).at(-1) ?? '';
       const neighbors = [...negative.matchAll(/`(360-[^`]+)`/g)].map(m => m[1]);
@@ -71,6 +73,11 @@ export function checkConsistency(root = ROOT) {
       if (completionAt >= 0 && !/^Local routing: \S[^\n]*(?:\n(?!#|Local routing:)[^\n]+)*$/.test(tail)) report('Completion and local routing must be the final Workflow step');
       const gate = parts.find(p => p.title === 'Quality Gate')?.body ?? '';
       if (!gate.split('\n').includes(COMPLETION_GATE)) report('missing or changed Completion Quality Gate item');
+      const gateItems = gate.split('\n').filter(line => line.startsWith('- '));
+      if (!gateItems.length) report('Quality Gate must be a checklist of "- " items');
+      for (const [i, item] of gateItems.entries()) if (gateItems.indexOf(item) !== i) report(`duplicate Quality Gate item "${item.slice(2, 50)}"`);
+      const briefing = text.match(/### Reader's Briefing\n[\s\S]*?```text\n[^\n]*\n([^\n]*)\n/);
+      if (hasReaderBriefing && !(briefing && briefing[1].includes('<path>'))) report('Reader’s Briefing template must name the artifact <path> on its second line');
       if (hasReaderBriefing && !gate.split('\n').includes(READER_BRIEFING_GATE)) report('missing or changed Reader’s Briefing Quality Gate item');
       const output = parts[4]?.body ?? '';
       // Known family members and explicit plan producers/consumers must carry their own contract.
