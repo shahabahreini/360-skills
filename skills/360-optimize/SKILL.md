@@ -1,7 +1,7 @@
 ---
 name: 360-optimize
 description: Audit working code and its whole toolchain — build, test, lint, CI, and runtime libraries — for zero-cost speed, weight, and reliability gains, verifying every claim against the pinned versions and measuring before ranking. Use when existing code must run faster, lighter, or more robustly without changing what it does, or when a list of proposed tooling or library upgrades needs a verdict.
-version: 3.1.0
+version: 3.1.1
 ---
 
 # 360 Optimize
@@ -267,22 +267,15 @@ The audit is complete only when every answer is yes:
 
 - The contract is written and treated as the floor
 - The stack inventory covers build, test, lint and format, typecheck, CI, runtime libraries and hot-path I/O, or names the layers left out
-- Effective state (pinned version, defaults, unification, transitive presence) was resolved for every candidate
-- Every recommended flag, feature or API was confirmed to exist in the pinned version
+- Every candidate's effective state (pinned version, defaults, unification, transitive presence) was resolved, and every recommended flag, feature or API exists in the pinned version
 - Hot paths and every targeted speedup's share and ceiling come from evidence or are marked `unmeasured`; unmeasured candidates carry no magnitude, rank or `proven`
 - Persisted, shared and parity-bound behavior was identified before any change was admitted
 - Every supplied recommendation has exactly one verdict with evidence
 - Waste was considered before upgrades, and upgrades before restructure
-- Every admitted change has affirmative evidence for every Zero-Cost Gate check; unknowns remain candidates and failures are Rejected
-- Every Rejected item names the check it failed
-- No recommendation weakens function, reliability, precision, or failure semantics
-- No new dependency was proposed that fails net-lighter
-- Emergent tools meet the same pass/fail/unknown rules for adapter, rollback and improvement evidence
+- Every admitted change has affirmative evidence for every Zero-Cost Gate check; unknowns remain candidates, and every Rejected item names the check it failed
+- No recommendation weakens function, reliability, precision or failure semantics, and no proposed dependency or emergent tool fails the net-lighter, adapter, rollback or evidence rules
 - Every admitted gain has baseline, conservative expected effect, scope, Holds when, and Falsified when
-- Comparisons use representative workloads and expose resource trade-offs and variability
-- No vendor, blog, or other-project number is presented as this system's gain
-- Best-case is not reported as typical; overlapping gains are not stacked
-- End-to-end claims are scaled by path share, or marked `end-to-end unknown`
+- Gains come from representative comparisons on this system with trade-offs and variability, never from vendor or blog numbers; best-case is not reported as typical, overlapping gains are not stacked, and end-to-end claims are scaled by path share or marked `end-to-end unknown`
 - Correctness bugs are handed off, not sold as optimizations
 - New work and updates to existing work are grouped separately
 - The handover distinguishes supported gains, rejected ideas, unresolved candidates and their next checks

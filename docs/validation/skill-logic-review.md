@@ -79,3 +79,51 @@ Execute walkthroughs against the revised text, applied manually by the implement
 One conflict was found and fixed during the walkthrough: the Lean rules told the executor to update the todo list, which the Executor Brief forbids. The todo list now belongs to the main thread only.
 
 Result: entrypoints total 21,014 words (from 23,157). Execute fell from 4,787 to 3,366 words; the 3,000-word target was not met because the shared blocks it must carry account for about 600 words. Structural checks and these walkthroughs do not establish model compliance or token savings; those remain UNMEASURED.
+
+## 2026-11-04 second pass: handoffs, conflicts, validator, fallbacks, routing and a trial
+
+Baseline: `db5533a`, 100/100 tests. Token figures below are chars/4 estimates, not the Claude tokenizer (its encoding file was blocked by the network policy).
+
+### Static analyses
+
+| ID | Analysis | Finding | Disposition |
+|---|---|---|---|
+| S1 | Handoff map | Review read a "faculty lens list" and "seat Cards" that faculty never produces | Review now reads faculty review angles and faculty blocks |
+| S2 | Handoff map | Audit and optimize implementation plans carry no readiness status; execute required one | A plan without a status counts as unreviewed |
+| S3 | Rule conflicts | Token efficiency requires confirming the model that ran; execute delegation never recorded it | Ledger records the model that actually ran when the host reports it |
+| S4 | Rule conflicts | Faculty writes dossiers after every seat but named no single authorization point | Authorization is asked once, in the seating confirmation |
+| S5 | Validator coverage | Purpose length, duplicate gate items and the briefing path line were not enforced; faculty's Purpose had three sentences | Three checks with fixtures; faculty Purpose fixed |
+| S6 | Fallbacks | With no one to answer, Completion and question rounds waited indefinitely | Shared Delivery and Completion: record open questions, apply only reversible defaults, deliver, stop |
+| S7 | Fallbacks | Quiet mode needs file writes for its events file | Quiet falls back to lean without file writes |
+
+### Faculty 4.0.0
+
+Seats extend the shipped profile with 10 plan-specific fields instead of rewriting 17; the per-seat block is 7 lines instead of 13; one source serves several seats; the cross-cutting profile (about 5,000 tokens) loads only when a cross-cutting seat is needed; the gate checks results instead of restating steps. Entrypoint: 5,142 to 4,767 words. The 4,000-word target was not met without cutting working rules.
+
+### Routing test
+
+Thirty prompts (26 with an expected skill, 4 with none), descriptions only. Sonnet: 30/30. Haiku: 30/30. No description changed. The most frequent runner-up confusions were faculty against expert review and backend audit against optimize. Limit: the prompts were written by the agent that edited the descriptions, so they may be easier than real requests.
+
+### Behavioral trial
+
+One agent per chain ran blueprint, expert review and execute on a fixture Node project (add `maxLength` to `slugify`, fix repeated dashes), with scripted user answers. This deviates from the planned one agent per skill because a single session is the realistic case.
+
+| Check | Chain B (lighter model) |
+|---|---|
+| Plan tasks carry every contract field and valid vocabulary | pass (5 tasks) |
+| Review set `Reviewed and ready to execute` and wrote the appendix | pass |
+| Every task has a final ledger status with evidence | pass |
+| Project tests and objective probe | pass (11/11; dashes, `maxLength`, existing caller) |
+| Briefing before every next-action question; path on line two | pass (3 skills) |
+| Token-efficiency offer asked once; execute choices in one round | pass |
+| Ledger handover section | fail: missing |
+| Review briefing bullet length | fail: 3 finding bullets over 20 words |
+| Review briefing size matches plan footprint | fail: briefing said 1 new file, plan said 0 |
+
+Fixes: execute Step 7 now names every Work file section including the handover; review finding bullets may use up to 30 words, since the template carries problem, fix and result; blueprint and review briefings must match the plan's footprint line. These were rechecked against the text, not by a full re-run.
+
+Chain A (current model) stopped during blueprint when a safety check halted the agent while it wrote the plan. Its partial transcript shows one question round with the token-efficiency offer asked once, then the defaults batch. The run was not repeated. Quiet mode was not trialed (it needs nested background agents). Token usage per chain was not reported by the host and is UNMEASURED.
+
+### Result
+
+103/103 tests and consistency pass. Estimated load: all entrypoints 33,856 to 33,577 tokens; faculty 8,190 to 7,575; blueprint, review and execute chain 13,870 to 14,114, because the headless-run rule adds about 40 tokens per skill. The main remaining weight is in the blueprint, review and optimize Quality Gates (about 550 to 610 tokens each).

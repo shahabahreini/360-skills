@@ -1,7 +1,7 @@
 ---
 name: 360-blueprint
 description: Create an executable plan from a new objective, asking questions until every requirement and default is confirmed, with explicit tasks, constraints, and verification. Use when a goal exists but the path is unclear, or the request is "plan this".
-version: 2.8.0
+version: 2.8.1
 ---
 
 # 360 Blueprint
@@ -256,6 +256,7 @@ Briefing rules:
 - A new artifact goes under `What you'll get`; a change to an existing one goes under `What changes`, showing now and after
 - `What to expect` is always present and observable: a command that runs, a screen that shows, a number that moves. "Works correctly" is not allowed
 - No trailing question list. Required questions use the clarification loop before delivery
+- `Size` matches the plan's footprint line
 
 ## Quality Gate
 

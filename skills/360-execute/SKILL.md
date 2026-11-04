@@ -1,7 +1,7 @@
 ---
 name: 360-execute
 description: Execute a finalized plan task by task with a persisted coverage ledger, verifying every item against its own acceptance check and keeping chat to short status lines and a final briefing. Optionally delegate routine tasks to lighter models under audit, or run the work in one background executor for a quiet screen. Use when a plan exists and work must begin, or when resuming a partial execution.
-version: 4.0.0
+version: 4.0.1
 ---
 
 # 360 Execute
@@ -145,7 +145,7 @@ Before declaring completion, walk the ledger top to bottom:
 - Every delegated verdict carries its tier and audit evidence; failed delegations show how they were re-executed
 - Run the plan's overall verification and confirm all checkpoints passed; in quiet mode, the shell's independent run is this check
 - Sweep once for regressions introduced across phases
-- Write the execution report into the ledger file and handle the disposable files
+- Write the execution report into the ledger file with every Work file section, including the six-field handover, and handle the disposable files
 - Print the final Progress Board, then the Reader's Briefing as the final result
 - Print the Reader's Briefing in chat before any next-action question; when the host sends one message, the briefing comes first
 

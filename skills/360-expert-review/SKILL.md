@@ -1,7 +1,7 @@
 ---
 name: 360-expert-review
 description: Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage.
-version: 3.7.0
+version: 3.7.1
 ---
 
 # 360 Expert Review
@@ -199,7 +199,8 @@ Briefing rules:
 - A new artifact goes under `What you'll get`; a change to an existing one goes under `What changes`, showing now and after
 - `What to expect` is always present and observable: a command that runs, a screen that shows, a number that moves. "Works correctly" is not allowed
 - No trailing question list. Required questions use the clarification loop before delivery
-- Every finding pairs the problem, the fix, and the result the user will notice. A finding with no visible result says `no visible change; protects <what>`
+- Every finding pairs the problem, the fix, and the result the user will notice, and may use up to 30 words to fit them. A finding with no visible result says `no visible change; protects <what>`
+- `Size` matches the plan's footprint line
 
 ## Quality Gate
 
