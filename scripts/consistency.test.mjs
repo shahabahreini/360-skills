@@ -170,5 +170,6 @@ rejects('contributor Reader’s Briefing rule drift', root => edit(root, 'AGENTS
 rejects('contributor Reader’s Briefing gate drift', root => edit(root, 'AGENTS.md', t => t.replace(READER_BRIEFING_GATE, '')), /AGENTS.md: Reader’s Briefing Quality Gate/);
 rejects('shared briefing rules are required', root => edit(root, BLUEPRINT, t => t.replace(READER_BRIEFING_RULES, 'Briefing rules:\n\n- Be brief')), /shared briefing rules/);
 rejects('changed briefing confidence vocabulary', root => edit(root, 'skills/360-execute/SKILL.md', t => t.replace('or uncertain (hypothesis). Never numbers', 'or uncertain (hypothesis). Percentages allowed')), /shared briefing rules/);
+rejects('host-specific tool name in entrypoint', root => edit(root, BLUEPRINT, t => t.replace('### 1. Ground the Objective', 'Use SendMessage to reach workers.\n\n### 1. Ground the Objective')), /host-specific name/);
 rejects('delivering skill needs a Reader’s Briefing', root => edit(root, 'skills/360-optimize/SKILL.md', t => t.replace("### Reader's Briefing", '### Summary')), /needs a Reader’s Briefing/);
 rejects('contributor briefing rules drift', root => edit(root, 'AGENTS.md', t => t.replace(READER_BRIEFING_RULES, '')), /AGENTS.md: shared briefing rules/);

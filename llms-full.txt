@@ -70,19 +70,19 @@ Each skill works individually. Review includes its own minimum plan contract; bl
 
 | Skill | Description | Version |
 |---|---|---|
-| [`360-backend-audit`](skills/360-backend-audit) | Deep-audit backend code, write the full report to a file, and brief the user in chat with bugs, updates, and dead weight. Use before or after significant backend work, or when inheriting, refactoring, or handing off services. | 2.3.0 |
-| [`360-blueprint`](skills/360-blueprint) | Create an executable plan from a new objective, asking questions until every requirement and default is confirmed, with explicit tasks, constraints, and verification. Use when a goal exists but the path is unclear, or the request is "plan this". | 2.7.0 |
-| [`360-execute`](skills/360-execute) | Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and show progress as a quiet phase-and-task board before a final briefing — with optional audited delegation of routine tasks to lighter models. Use when a plan exists and work must begin, or when resuming a partial execution. | 3.2.0 |
-| [`360-expert-review`](skills/360-expert-review) | Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage. | 3.6.0 |
-| [`360-faculty`](skills/360-faculty) | Commission a short panel of research-backed specialist experts, chosen from a plan's nature, depth, and complexity, each equipped with current methods, standards, and the tools available here to critique and improve the plan from distinct angles. Use when a plan or task needs specialist scrutiny before review, when work must fit this developer's goals and taste, or when a named expert team must be created, called, refreshed, or updated. | 3.0.0 |
-| [`360-optimize`](skills/360-optimize) | Audit working code and its whole toolchain — build, test, lint, CI, and runtime libraries — for zero-cost speed, weight, and reliability gains, verifying every claim against the pinned versions and measuring before ranking. Use when existing code must run faster, lighter, or more robustly without changing what it does, or when a list of proposed tooling or library upgrades needs a verdict. | 3.0.0 |
-| [`360-token-efficiency`](skills/360-token-efficiency) | Reduce avoidable token cost on any agent host by probing its real capabilities and applying cache-, turn- and output-aware techniques with verified handovers. Use as an optional, session-approved companion when token cost or context growth matters, with strict preservation of task requirements by default. | 2.2.0 |
+| [`360-backend-audit`](skills/360-backend-audit) | Deep-audit backend code, write the full report to a file, and brief the user in chat with bugs, updates, and dead weight. Use before or after significant backend work, or when inheriting, refactoring, or handing off services. | 2.4.0 |
+| [`360-blueprint`](skills/360-blueprint) | Create an executable plan from a new objective, asking questions until every requirement and default is confirmed, with explicit tasks, constraints, and verification. Use when a goal exists but the path is unclear, or the request is "plan this". | 2.8.0 |
+| [`360-execute`](skills/360-execute) | Execute a finalized plan task by task with a persisted coverage ledger, verifying every item against its own acceptance check and keeping chat to short status lines and a final briefing. Optionally delegate routine tasks to lighter models under audit, or run the work in one background executor for a quiet screen. Use when a plan exists and work must begin, or when resuming a partial execution. | 4.0.0 |
+| [`360-expert-review`](skills/360-expert-review) | Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage. | 3.7.0 |
+| [`360-faculty`](skills/360-faculty) | Commission a short panel of research-backed specialist experts, chosen from a plan's nature, depth, and complexity, each equipped with current methods, standards, and the tools available here to critique and improve the plan from distinct angles. Use when a plan or task needs specialist scrutiny before review, when work must fit this developer's goals and taste, or when a named expert team must be created, called, refreshed, or updated. | 3.0.1 |
+| [`360-optimize`](skills/360-optimize) | Audit working code and its whole toolchain — build, test, lint, CI, and runtime libraries — for zero-cost speed, weight, and reliability gains, verifying every claim against the pinned versions and measuring before ranking. Use when existing code must run faster, lighter, or more robustly without changing what it does, or when a list of proposed tooling or library upgrades needs a verdict. | 3.1.0 |
+| [`360-token-efficiency`](skills/360-token-efficiency) | Reduce avoidable token cost on any agent host by probing its real capabilities and applying cache-, turn- and output-aware techniques with verified handovers. Use as an optional, session-approved companion when token cost or context growth matters, with strict preservation of task requirements by default. | 2.2.1 |
 
 ## Which Skill Do I Need?
 
 | Your situation | Load | Not for |
 |---|---|---|
-| Backend correctness, dead weight, structure, or observability needs auditing | `360-backend-audit` | Not for planning work that does not exist yet (`360-blueprint`) or executing a plan (`360-execute`) |
+| Backend correctness, dead weight, structure, or observability needs auditing | `360-backend-audit` | Not for planning work that does not exist yet (`360-blueprint`), executing a plan (`360-execute`), or measured performance and toolchain tuning (`360-optimize`) |
 | A goal exists, but no plan yet | `360-blueprint` | Not for hardening a plan that already exists (`360-expert-review`) or building one that is already final (`360-execute`) |
 | An authorized plan needs implementation or resumption | `360-execute` | Not for creating plans (`360-blueprint`) or reviewing drafts (`360-expert-review`) |
 | A draft plan needs adversarial review | `360-expert-review` | Not for drafting plans from scratch (`360-blueprint`) or executing a finalized plan (`360-execute`) |
@@ -126,7 +126,7 @@ Readiness moves from `Draft` to `Ready for review` to `Reviewed and ready to exe
 - **`360-blueprint`** turns a vague goal into a complete, unambiguous plan written directly to a file, asking question rounds until nothing is left to assume, briefing the user in chat with key decisions, assumptions, and risks.
 - **`360-faculty`** seats a short panel of specialists chosen by mapping the plan's failure surfaces to owners. Before judging, each seat is commissioned: it researches its craft's current methods, standards and evidence at a depth set by the stakes, and is equipped with the tools this environment actually offers. Seats edit the plan in place, flag findings outside their lane to the right owner, and the session ends with a plain-language briefing. Faculty also remembers the developer's preferences, caches dated expertise per role, and saves reusable teams.
 - **`360-expert-review`** tests that plan against relevant concrete failure cases, writing the finalized plan back to the file and briefing the user in chat.
-- **`360-execute`** builds it, tracking every task in a coverage ledger written to disk, verifying each against its own acceptance check with evidence, and showing progress as a quiet phase-and-task board instead of diffs and command output — with optional audited delegation of routine tasks to lighter models.
+- **`360-execute`** builds it, tracking every task in a coverage ledger written to disk and verifying each against its own acceptance check with evidence. The default `lean` mode keeps chat to short status lines at the lowest token cost; `quiet` moves the work into one background executor for a clean screen. Delegating routine tasks to lighter models is optional and always audited.
 - **`360-backend-audit`** audits the resulting backend code for correctness, duplication, performance risks, and observability, writing the full report to a file and briefing findings in chat.
 - **`360-optimize`** inventories the whole stack (build, test, lint, CI, runtime libraries and hot-path I/O), verifies each candidate against the pinned versions, gives supplied recommendation lists a verdict per item, and ranks zero-cost speed, weight, and reliability gains with conservative expected effects written to a file and briefing highlights in chat.
 - **`360-token-efficiency`** runs alongside the active task with session consent. It probes what the host agent (Claude Code, Codex, Gemini, Copilot, Cursor and others) actually exposes and cuts cache misses, turns and output while preserving requirements and required checks; it never overrides a parent skill's or user's explicit choices.
@@ -295,6 +295,22 @@ Every `SKILL.md` follows this section order:
 - Check relevant requirements, likely failures and severe plausible failures; disclose inspection limits instead of promising exhaustive reliability.
 - An unknown check never passes. A bounded assessment can finish with disclosed limits; implementation requires its acceptance evidence.
 - Have agents check version-specific or fast-moving facts (APIs, versions, standards, advisories) against the project and current primary sources, or record them as assumptions with a check.
+- Name capabilities, not host products or tool names, in `SKILL.md` ("the host's background-subagent mechanism", not a specific tool). Host-specific notes belong in a dated reference file. The validator rejects known host tool names in entrypoints.
+- Do not tie a rule to current model behavior, prices or benchmark anecdotes. State the rule and its reason so a more capable model can apply it to cases the text does not list.
+
+### Writing for agents
+
+- Lead each step with the action. Give the reason in a clause when the rule is not self-evident; a rule with a reason generalizes, a bare prohibition gets over-applied.
+- Prefer a positive instruction to a list of prohibitions. Keep `never` for actions that are unsafe or irreversible.
+- Use one term per concept across the skill (one name for each status, mode, file and role), and define it where it first appears.
+- Put a rule in the one step where it applies. Quality Gate items check observable results; they do not restate the workflow.
+- Ask the user only what evidence cannot settle, in one round where possible, with a recommendation and its trade-off first.
+
+### Writing for users
+
+- Briefings, status lines and questions use plain words, short sentences and concrete results ("tests pass: 35/35"), not process narration.
+- State confidence with the shared vocabulary (proven, likely, possible, uncertain). Do not inflate or hedge beyond the evidence.
+- A question names the decision, the recommended answer and what each choice changes. It stands on its own without the earlier conversation.
 
 ## Family Conventions
 
@@ -304,7 +320,7 @@ Skills install individually. Repeat the following contract locally in every skil
 
 Preserve stable task IDs and existing user decisions. Every task carries: ID, What, How, Where, Depends on, Skills (list or `None`), Parallel, Effort, Priority, Done when (observable). Use `Priority: must | should | could`, `Effort: S | M | L`, and `Parallel: yes | no`. Only `should` and `could` sit below the cut line. Preserve phase checkpoints, change policy, replanning triggers, and objective-to-task traceability.
 
-Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep it `Draft`; a complete unreviewed plan is `Ready for review`; a passed review sets `Reviewed and ready to execute`. Material edits after review return it to `Ready for review` (or `Draft` if blocked). Execution progress belongs in the ledger, not the readiness status. An explicit user instruction to execute a supplied plan authorizes execution without a mandatory sibling review; record that basis without claiming a review occurred.
+Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep a plan `Draft`; a complete unreviewed plan is `Ready for review`; only a passed review sets `Reviewed and ready to execute`, and material edits after it return the plan to `Ready for review` (or `Draft` if blocked). Execution progress lives in the ledger, not in this status. An explicit user instruction to execute a supplied plan authorizes execution without a sibling review; record that basis and never claim a review occurred.
 
 Every skill that produces a handover uses these six fields:
 
@@ -318,7 +334,7 @@ Every sibling skill, including future additions, starts its Workflow with this i
 
 ### Entry: Optional Token Efficiency
 
-Reuse explicit approval or refusal for `360-token-efficiency` from this session. If unknown and not already offered, ask once whether to enable it for this session; continue the main task with the overlay inactive while unanswered. Explicit user invocation counts as approval; merely appearing in a generated plan does not. On approval, discover and load it through the host's supported skill mechanism, reusing already-loaded instructions. If unavailable, explain briefly and continue; do not install automatically. Refusal disables the overlay, not ordinary efficient habits. Revocation takes effect immediately. Keep consent in-session only; it does not authorize cross-session memory writes. The overlay never invokes itself or restarts the parent skill.
+Reuse this session's approval or refusal of `360-token-efficiency`. If unknown and not yet offered, ask once, in the same question round as any other entry question, and keep the overlay off until answered. Explicit user invocation is approval; a plan that lists the skill is not. On approval, load it through the host's skill mechanism, reusing instructions already loaded; if unavailable, say so briefly and continue without installing it. Refusal turns the overlay off, not ordinary efficient work. Revocation takes effect immediately. Consent lasts this session only and never authorizes cross-session memory writes.
 
 Consent is a session decision, not a prerequisite for the main task. Keep unknown/offered, approved, refused, and revoked state in-session across skill handoffs. An unanswered offer is not approval and must not be repeated on each handoff. A new session starts unknown. Do not persist consent in faculty dossiers or other cross-session memory.
 
@@ -328,7 +344,7 @@ Every sibling repeats these Delivery rules inside Workflow:
 
 ### Delivery
 
-Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat carries the Reader's Briefing and the path. These delivery rules also apply to the templates and quality gate below.
+Write the deliverable to a recoverable file when the host supports it, at the existing path or the default below. Honor explicit user output requests. Without files, deliver the same complete structure in chat labeled `in-session only; not persisted`, and never claim a file was saved. With a saved file, chat carries the Reader's Briefing and the path.
 
 Judge completion by observable acceptance checks. A structural or format check does not prove behavior or accuracy; state what was not verified.
 
@@ -338,17 +354,17 @@ The full artifact serves the next agent; the Reader's Briefing serves the user. 
 
 Briefing rules:
 
-- Write for someone who has not read the full artifact. Define or drop any term of art
-- One line per bullet, 20 words or fewer. The whole briefing fits one screen (about 25 lines)
-- Outcomes and decisions, never mechanics: no task IDs, phases, priorities, status tables, executor notes, or skill names
-- Keep new things and changes to existing things in separate sections. Never mix them
-- Confidence uses proven (evidence in hand), likely (strong reason), possible (suspected), or uncertain (hypothesis). Never numbers; never proven without evidence
+- Write for a reader who has not seen the full artifact; define or drop any term of art
+- One line per bullet, 20 words or fewer; the whole briefing fits one screen (about 25 lines)
+- Outcomes and decisions, not mechanics: no task IDs, phases, priorities, status tables, executor notes or skill names
+- Keep new things and changes to existing things in separate sections
+- Confidence is proven (evidence in hand), likely (strong reason), possible (suspected), or uncertain (hypothesis). Never numbers; never proven without evidence
 - The second line names the full artifact's path, or says `in-session only; not persisted`
 - Omit empty sections unless this skill marks one as always present
 
 Each such skill includes this rule in Workflow, before the completion step:
 
-- Print the Reader's Briefing in chat before asking anything. A next-action question with no briefing above it is a failed delivery. If the host sends one message, the briefing comes first in that message
+- Print the Reader's Briefing in chat before any next-action question; when the host sends one message, the briefing comes first
 
 ### Interactive Completion Convention
 
@@ -356,16 +372,14 @@ Every skill, including future additions, ends its Workflow with the following co
 
 ### Completion: Choose the Next Action
 
-- Finish and verify the current deliverable first; make the result and its location available before asking about follow-on work. Keep artifact readiness separate from the next-action choice: an unanswered suggestion does not reopen completed work, and a blocked job is not complete
-- Check the result, current project stage, remaining risks, and prior user instructions. Recommend the next useful action from the local routing guidance below; skip irrelevant stages and prefer stopping when no useful work remains
-- Use an available interactive question tool to offer one concise next-action choice. Put the best recommendation first, explain why it fits this result, and include a stop/pause choice. Always allow a free-text note or custom direction, including work outside the 360 flow; never force the user into a sibling skill
-- If interactive tools are unavailable, offer equivalent numbered choices with the recommendation, rationale, and explicit custom-note option in chat. This completion prompt is separate from the deliverable briefing; skill names are allowed here, and it is not a passive list of unresolved task questions
-- Reuse an already explicit next-step instruction instead of asking again; continue work it authorizes. Otherwise wait for the user's choice before starting follow-on work. Silence, a preselected recommendation, and elapsed time are not authorization. An explicit stop or request for no suggestions suppresses the prompt
-- When the user chooses, follow that direction and clarify only missing information needed for it. Discover and load a selected skill through the host's supported mechanism; do not assume it is installed or install it automatically. If unavailable, explain and offer an equivalent action. Carry forward artifact paths, decisions, verification, remaining risks, and session consent without restarting intake
+- Deliver and verify the current result first, with its location. An unanswered suggestion never reopens finished work, and a blocked job is not complete
+- Recommend one next action from the local routing below, based on the result, project stage, open risks and prior instructions. Skip stages that do not apply; recommend stopping when no useful work remains
+- Ask with the host's interactive question tool, or with numbered choices in chat when there is none: the recommendation first with its reason, a stop option, and a free-text option for any direction, inside or outside the 360 skills. This prompt is separate from the briefing and is not a list of open task questions
+- An explicit next-step instruction answers this prompt, and an explicit stop or request for no suggestions suppresses it. Otherwise wait for the user's choice. Silence, a preselected recommendation, and elapsed time are not authorization. On a choice, clarify only what is missing, load a selected skill through the host's mechanism without installing it (offer an equivalent if it is unavailable), and carry forward paths, decisions, verification, risks and session consent
 
 Use these exact Quality Gate items in each skill:
 
-- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
+- Completion offered one recommended next action with stop and free-text options, or followed an explicit instruction or the parent skill's prompt; an unanswered suggestion does not block the finished deliverable
 
 For skills with a Reader's Briefing, also include:
 
@@ -428,7 +442,7 @@ Source: skills/360-backend-audit/SKILL.md
 ---
 name: 360-backend-audit
 description: Deep-audit backend code, write the full report to a file, and brief the user in chat with bugs, updates, and dead weight. Use before or after significant backend work, or when inheriting, refactoring, or handing off services.
-version: 2.3.0
+version: 2.4.0
 ---
 
 # 360 Backend Audit
@@ -443,7 +457,7 @@ Audit APIs, services, business logic, data access, integrations and jobs for cor
 - When inheriting, refactoring, or modernizing services or data layers
 - When code feels heavy, fragile, slow, or hard to debug
 - Before handing code to another engineer or AI agent
-- Not for planning work that does not exist yet (`360-blueprint`) or executing a plan (`360-execute`)
+- Not for planning work that does not exist yet (`360-blueprint`), executing a plan (`360-execute`), or measured performance and toolchain tuning (`360-optimize`)
 
 ## Core Principle
 
@@ -453,17 +467,17 @@ Judge observed behavior against the intended contract.
 
 ### Entry: Optional Token Efficiency
 
-Reuse explicit approval or refusal for `360-token-efficiency` from this session. If unknown and not already offered, ask once whether to enable it for this session; continue the main task with the overlay inactive while unanswered. Explicit user invocation counts as approval; merely appearing in a generated plan does not. On approval, discover and load it through the host's supported skill mechanism, reusing already-loaded instructions. If unavailable, explain briefly and continue; do not install automatically. Refusal disables the overlay, not ordinary efficient habits. Revocation takes effect immediately. Keep consent in-session only; it does not authorize cross-session memory writes. The overlay never invokes itself or restarts the parent skill.
+Reuse this session's approval or refusal of `360-token-efficiency`. If unknown and not yet offered, ask once, in the same question round as any other entry question, and keep the overlay off until answered. Explicit user invocation is approval; a plan that lists the skill is not. On approval, load it through the host's skill mechanism, reusing instructions already loaded; if unavailable, say so briefly and continue without installing it. Refusal turns the overlay off, not ordinary efficient work. Revocation takes effect immediately. Consent lasts this session only and never authorizes cross-session memory writes.
 
 ### Shared Plan Contract
 
 Preserve stable task IDs and existing user decisions. Every task carries: ID, What, How, Where, Depends on, Skills (list or `None`), Parallel, Effort, Priority, Done when (observable). Use `Priority: must | should | could`, `Effort: S | M | L`, and `Parallel: yes | no`. Only `should` and `could` sit below the cut line. Preserve phase checkpoints, change policy, replanning triggers, and objective-to-task traceability.
 
-Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep it `Draft`; a complete unreviewed plan is `Ready for review`; a passed review sets `Reviewed and ready to execute`. Material edits after review return it to `Ready for review` (or `Draft` if blocked). Execution progress belongs in the ledger, not the readiness status. An explicit user instruction to execute a supplied plan authorizes execution without a mandatory sibling review; record that basis without claiming a review occurred.
+Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep a plan `Draft`; a complete unreviewed plan is `Ready for review`; only a passed review sets `Reviewed and ready to execute`, and material edits after it return the plan to `Ready for review` (or `Draft` if blocked). Execution progress lives in the ledger, not in this status. An explicit user instruction to execute a supplied plan authorizes execution without a sibling review; record that basis and never claim a review occurred.
 
 ### Delivery
 
-Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat carries the Reader's Briefing and the path. These delivery rules also apply to the templates and quality gate below.
+Write the deliverable to a recoverable file when the host supports it, at the existing path or the default below. Honor explicit user output requests. Without files, deliver the same complete structure in chat labeled `in-session only; not persisted`, and never claim a file was saved. With a saved file, chat carries the Reader's Briefing and the path.
 
 Judge completion by observable acceptance checks. A structural or format check does not prove behavior or accuracy; state what was not verified.
 
@@ -490,7 +504,7 @@ For each finding, record the triggering input/state, expected versus observed be
 
 - Recommend unifying duplicated business logic only when it is truly the same
 - Recommend replacing reinvented wheels with mature, maintained, lighter alternatives when justified
-- Assess separation of transport, domain logic, and data access cleanly
+- Assess whether transport, domain logic and data access are cleanly separated
 - Avoid premature abstraction
 
 ### 5. Assess Performance Honestly
@@ -520,16 +534,14 @@ Proposed observability changes should be additive and non-breaking; do not imple
 - Reuse the existing path if known; otherwise `plans/<short-slug>-audit.md`; create the folder if needed; ask once if ambiguous
 - If the file cannot be written, use the in-session delivery fallback
 - Keep new work and updates to existing work in separate lists
-- Print the Reader's Briefing in chat before asking anything. A next-action question with no briefing above it is a failed delivery. If the host sends one message, the briefing comes first in that message
+- Print the Reader's Briefing in chat before any next-action question; when the host sends one message, the briefing comes first
 
 ### Completion: Choose the Next Action
 
-- Finish and verify the current deliverable first; make the result and its location available before asking about follow-on work. Keep artifact readiness separate from the next-action choice: an unanswered suggestion does not reopen completed work, and a blocked job is not complete
-- Check the result, current project stage, remaining risks, and prior user instructions. Recommend the next useful action from the local routing guidance below; skip irrelevant stages and prefer stopping when no useful work remains
-- Use an available interactive question tool to offer one concise next-action choice. Put the best recommendation first, explain why it fits this result, and include a stop/pause choice. Always allow a free-text note or custom direction, including work outside the 360 flow; never force the user into a sibling skill
-- If interactive tools are unavailable, offer equivalent numbered choices with the recommendation, rationale, and explicit custom-note option in chat. This completion prompt is separate from the deliverable briefing; skill names are allowed here, and it is not a passive list of unresolved task questions
-- Reuse an already explicit next-step instruction instead of asking again; continue work it authorizes. Otherwise wait for the user's choice before starting follow-on work. Silence, a preselected recommendation, and elapsed time are not authorization. An explicit stop or request for no suggestions suppresses the prompt
-- When the user chooses, follow that direction and clarify only missing information needed for it. Discover and load a selected skill through the host's supported mechanism; do not assume it is installed or install it automatically. If unavailable, explain and offer an equivalent action. Carry forward artifact paths, decisions, verification, remaining risks, and session consent without restarting intake
+- Deliver and verify the current result first, with its location. An unanswered suggestion never reopens finished work, and a blocked job is not complete
+- Recommend one next action from the local routing below, based on the result, project stage, open risks and prior instructions. Skip stages that do not apply; recommend stopping when no useful work remains
+- Ask with the host's interactive question tool, or with numbered choices in chat when there is none: the recommendation first with its reason, a stop option, and a free-text option for any direction, inside or outside the 360 skills. This prompt is separate from the briefing and is not a list of open task questions
+- An explicit next-step instruction answers this prompt, and an explicit stop or request for no suggestions suppresses it. Otherwise wait for the user's choice. Silence, a preselected recommendation, and elapsed time are not authorization. On a choice, clarify only what is missing, load a selected skill through the host's mechanism without installing it (offer an equivalent if it is unavailable), and carry forward paths, decisions, verification, risks and session consent
 
 Local routing: Recommend planning actionable correctness or reliability fixes with `360-blueprint`, or `360-execute` when a suitable authorized plan already exists. Recommend `360-optimize` when optimization is the remaining need; stop when there is no justified follow-up.
 
@@ -575,11 +587,11 @@ Need from you
 
 Briefing rules:
 
-- Write for someone who has not read the full artifact. Define or drop any term of art
-- One line per bullet, 20 words or fewer. The whole briefing fits one screen (about 25 lines)
-- Outcomes and decisions, never mechanics: no task IDs, phases, priorities, status tables, executor notes, or skill names
-- Keep new things and changes to existing things in separate sections. Never mix them
-- Confidence uses proven (evidence in hand), likely (strong reason), possible (suspected), or uncertain (hypothesis). Never numbers; never proven without evidence
+- Write for a reader who has not seen the full artifact; define or drop any term of art
+- One line per bullet, 20 words or fewer; the whole briefing fits one screen (about 25 lines)
+- Outcomes and decisions, not mechanics: no task IDs, phases, priorities, status tables, executor notes or skill names
+- Keep new things and changes to existing things in separate sections
+- Confidence is proven (evidence in hand), likely (strong reason), possible (suspected), or uncertain (hypothesis). Never numbers; never proven without evidence
 - The second line names the full artifact's path, or says `in-session only; not persisted`
 - Omit empty sections unless this skill marks one as always present
 - A new artifact goes under `Features to add`; a change to an existing artifact, feature, or document goes under `Updates to existing`
@@ -602,7 +614,7 @@ The audit is complete only when every answer is yes:
 - The deliverable is saved at the stated path, or honestly labeled in-session only
 - The briefing follows the briefing rules
 - The Reader's Briefing was printed in chat before any next-action question
-- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
+- Completion offered one recommended next action with stop and free-text options, or followed an explicit instruction or the parent skill's prompt; an unanswered suggestion does not block the finished deliverable
 
 Any "no" means the audit is not finished. Fix it and review again.
 
@@ -615,7 +627,7 @@ Source: skills/360-blueprint/SKILL.md
 ---
 name: 360-blueprint
 description: Create an executable plan from a new objective, asking questions until every requirement and default is confirmed, with explicit tasks, constraints, and verification. Use when a goal exists but the path is unclear, or the request is "plan this".
-version: 2.7.0
+version: 2.8.0
 ---
 
 # 360 Blueprint
@@ -639,17 +651,17 @@ The smallest plan that meets every objective, planned only once every decision i
 
 ### Entry: Optional Token Efficiency
 
-Reuse explicit approval or refusal for `360-token-efficiency` from this session. If unknown and not already offered, ask once whether to enable it for this session; continue the main task with the overlay inactive while unanswered. Explicit user invocation counts as approval; merely appearing in a generated plan does not. On approval, discover and load it through the host's supported skill mechanism, reusing already-loaded instructions. If unavailable, explain briefly and continue; do not install automatically. Refusal disables the overlay, not ordinary efficient habits. Revocation takes effect immediately. Keep consent in-session only; it does not authorize cross-session memory writes. The overlay never invokes itself or restarts the parent skill.
+Reuse this session's approval or refusal of `360-token-efficiency`. If unknown and not yet offered, ask once, in the same question round as any other entry question, and keep the overlay off until answered. Explicit user invocation is approval; a plan that lists the skill is not. On approval, load it through the host's skill mechanism, reusing instructions already loaded; if unavailable, say so briefly and continue without installing it. Refusal turns the overlay off, not ordinary efficient work. Revocation takes effect immediately. Consent lasts this session only and never authorizes cross-session memory writes.
 
 ### Shared Plan Contract
 
 Preserve stable task IDs and existing user decisions. Every task carries: ID, What, How, Where, Depends on, Skills (list or `None`), Parallel, Effort, Priority, Done when (observable). Use `Priority: must | should | could`, `Effort: S | M | L`, and `Parallel: yes | no`. Only `should` and `could` sit below the cut line. Preserve phase checkpoints, change policy, replanning triggers, and objective-to-task traceability.
 
-Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep it `Draft`; a complete unreviewed plan is `Ready for review`; a passed review sets `Reviewed and ready to execute`. Material edits after review return it to `Ready for review` (or `Draft` if blocked). Execution progress belongs in the ledger, not the readiness status. An explicit user instruction to execute a supplied plan authorizes execution without a mandatory sibling review; record that basis without claiming a review occurred.
+Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep a plan `Draft`; a complete unreviewed plan is `Ready for review`; only a passed review sets `Reviewed and ready to execute`, and material edits after it return the plan to `Ready for review` (or `Draft` if blocked). Execution progress lives in the ledger, not in this status. An explicit user instruction to execute a supplied plan authorizes execution without a sibling review; record that basis and never claim a review occurred.
 
 ### Delivery
 
-Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat carries the Reader's Briefing and the path. These delivery rules also apply to the templates and quality gate below.
+Write the deliverable to a recoverable file when the host supports it, at the existing path or the default below. Honor explicit user output requests. Without files, deliver the same complete structure in chat labeled `in-session only; not persisted`, and never claim a file was saved. With a saved file, chat carries the Reader's Briefing and the path.
 
 Judge completion by observable acceptance checks. A structural or format check does not prove behavior or accuracy; state what was not verified.
 
@@ -658,7 +670,7 @@ Judge completion by observable acceptance checks. A structural or format check d
 - Inspect available instructions, plans, decisions, developer preference records (such as `faculty/` dossiers), relevant artifacts, recent changes, verification and any execution ledger. Establish the current stage and done/pending/blocked work; cite sources and distinguish observed facts from claims. Record unavailable evidence
 - Reuse current evidence and user answers. Resolve discoverable facts by inspection; do not ask the user to rediscover them
 - Track a clarity checklist: outcome and observable success; users and stakeholders; scope in and out; constraints (time, stack, budget, compatibility); acceptance and done-when; dependencies and integrations; must-not-happen and risk tolerance; preferences. Each dimension ends as answered by the user, proven by inspection (cite it), or a proposed default awaiting confirmation. Never present a default or inference as a fact
-- Ask until nothing is open. Use the available interactive question tool in rounds of one to four questions, each with the best supported recommendation first, its trade-off, and a free-text/custom option. For missing facts, request the needed evidence without inventing it. If tools are unavailable, offer equivalent numbered choices and notes in chat
+- Ask only about material decisions and facts that inspection cannot settle; routine reversible choices become proposed defaults for Step 2. Use the available interactive question tool in rounds of one to four questions, each with the best supported recommendation first, its trade-off, and a free-text/custom option. For missing facts, request the needed evidence without inventing it. If tools are unavailable, offer equivalent numbered choices and notes in chat
 - After each round, update the checklist, inspect newly relevant evidence, and ask the next round. An answer that opens new ambiguity starts another round. Stop only when every dimension is answered, proven, or a proposed default
 - Unanswered questions block dependent planning and readiness, not independent inspection. Silence, a recommendation, a preselected option or elapsed time is not an answer. Honor explicit delegation or deferral within its limits
 
@@ -731,16 +743,14 @@ Turn quality goals into task-specific acceptance checks.
 - Reuse the existing path if known; otherwise `plans/<short-slug>.md`; create the folder if needed; ask once if the location is ambiguous
 - If the file cannot be written, use the in-session delivery fallback
 - Ensure required answers were resolved before ready delivery. Keep unanswered blockers in `Draft`. Never end by dumping passive questions
-- Print the Reader's Briefing in chat before asking anything. A next-action question with no briefing above it is a failed delivery. If the host sends one message, the briefing comes first in that message
+- Print the Reader's Briefing in chat before any next-action question; when the host sends one message, the briefing comes first
 
 ### Completion: Choose the Next Action
 
-- Finish and verify the current deliverable first; make the result and its location available before asking about follow-on work. Keep artifact readiness separate from the next-action choice: an unanswered suggestion does not reopen completed work, and a blocked job is not complete
-- Check the result, current project stage, remaining risks, and prior user instructions. Recommend the next useful action from the local routing guidance below; skip irrelevant stages and prefer stopping when no useful work remains
-- Use an available interactive question tool to offer one concise next-action choice. Put the best recommendation first, explain why it fits this result, and include a stop/pause choice. Always allow a free-text note or custom direction, including work outside the 360 flow; never force the user into a sibling skill
-- If interactive tools are unavailable, offer equivalent numbered choices with the recommendation, rationale, and explicit custom-note option in chat. This completion prompt is separate from the deliverable briefing; skill names are allowed here, and it is not a passive list of unresolved task questions
-- Reuse an already explicit next-step instruction instead of asking again; continue work it authorizes. Otherwise wait for the user's choice before starting follow-on work. Silence, a preselected recommendation, and elapsed time are not authorization. An explicit stop or request for no suggestions suppresses the prompt
-- When the user chooses, follow that direction and clarify only missing information needed for it. Discover and load a selected skill through the host's supported mechanism; do not assume it is installed or install it automatically. If unavailable, explain and offer an equivalent action. Carry forward artifact paths, decisions, verification, remaining risks, and session consent without restarting intake
+- Deliver and verify the current result first, with its location. An unanswered suggestion never reopens finished work, and a blocked job is not complete
+- Recommend one next action from the local routing below, based on the result, project stage, open risks and prior instructions. Skip stages that do not apply; recommend stopping when no useful work remains
+- Ask with the host's interactive question tool, or with numbered choices in chat when there is none: the recommendation first with its reason, a stop option, and a free-text option for any direction, inside or outside the 360 skills. This prompt is separate from the briefing and is not a list of open task questions
+- An explicit next-step instruction answers this prompt, and an explicit stop or request for no suggestions suppresses it. Otherwise wait for the user's choice. Silence, a preselected recommendation, and elapsed time are not authorization. On a choice, clarify only what is missing, load a selected skill through the host's mechanism without installing it (offer an equivalent if it is unavailable), and carry forward paths, decisions, verification, risks and session consent
 
 Local routing: Recommend `360-faculty` when tailoring or expertise would materially improve the prepared plan; otherwise recommend `360-expert-review`. Honor an explicit instruction to execute the supplied plan without imposing another review.
 
@@ -862,11 +872,11 @@ Risks
 
 Briefing rules:
 
-- Write for someone who has not read the full artifact. Define or drop any term of art
-- One line per bullet, 20 words or fewer. The whole briefing fits one screen (about 25 lines)
-- Outcomes and decisions, never mechanics: no task IDs, phases, priorities, status tables, executor notes, or skill names
-- Keep new things and changes to existing things in separate sections. Never mix them
-- Confidence uses proven (evidence in hand), likely (strong reason), possible (suspected), or uncertain (hypothesis). Never numbers; never proven without evidence
+- Write for a reader who has not seen the full artifact; define or drop any term of art
+- One line per bullet, 20 words or fewer; the whole briefing fits one screen (about 25 lines)
+- Outcomes and decisions, not mechanics: no task IDs, phases, priorities, status tables, executor notes or skill names
+- Keep new things and changes to existing things in separate sections
+- Confidence is proven (evidence in hand), likely (strong reason), possible (suspected), or uncertain (hypothesis). Never numbers; never proven without evidence
 - The second line names the full artifact's path, or says `in-session only; not persisted`
 - Omit empty sections unless this skill marks one as always present
 - A new artifact goes under `What you'll get`; a change to an existing one goes under `What changes`, showing now and after
@@ -880,7 +890,7 @@ The plan is ready only when every answer is yes:
 - The objective is clear and confirmed, or the output is explicitly marked `Draft`
 - Current project stage and completed work were inspected, or unavailable evidence was explicitly recorded
 - Existing answers were reused; questioning rounds continued until every clarity dimension was answered, proven by inspection, or a confirmed default, without treating silence or recommendations as consent
-- No question or decision was skipped, and no round ended with an open ambiguity left untracked
+- No material decision was skipped, and no open ambiguity was left untracked
 - The restatement and the batch of defaults were shown together and confirmed; each default has a reason and revisit condition
 - No invented technical details were presented as facts; version-specific details cite the project or a current source, or are recorded assumptions
 - Every assumption is explicit and falsifiable
@@ -897,7 +907,7 @@ The plan is ready only when every answer is yes:
 - A reader with no context can say what will change and what they will see afterward
 - The briefing follows the briefing rules
 - The Reader's Briefing was printed in chat before any next-action question
-- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
+- Completion offered one recommended next action with stop and free-text options, or followed an explicit instruction or the parent skill's prompt; an unanswered suggestion does not block the finished deliverable
 
 Any "no" means the plan is not finished. Refine and review again.
 
@@ -909,20 +919,20 @@ Source: skills/360-execute/SKILL.md
 
 ---
 name: 360-execute
-description: Execute a finalized plan task by task with a persisted coverage ledger, verify every item with evidence, and show progress as a quiet phase-and-task board before a final briefing — with optional audited delegation of routine tasks to lighter models. Use when a plan exists and work must begin, or when resuming a partial execution.
-version: 3.2.0
+description: Execute a finalized plan task by task with a persisted coverage ledger, verifying every item against its own acceptance check and keeping chat to short status lines and a final briefing. Optionally delegate routine tasks to lighter models under audit, or run the work in one background executor for a quiet screen. Use when a plan exists and work must begin, or when resuming a partial execution.
+version: 4.0.0
 ---
 
 # 360 Execute
 
 ## Purpose
 
-Execute an authorized plan against its acceptance checks and keep a recoverable coverage ledger of results, deviations and unfinished work. When the user approves, dispatch routine tasks to lighter-tier subagents and reserve heavier models for complex work, then review and audit every delegated result before it counts. By default, keep chat quiet: a progress board and short status lines, not code or raw output.
+Execute an authorized plan against its acceptance checks, keep a recoverable coverage ledger of results, deviations and unfinished work, and spend the fewest tokens that still meet every check.
 
 ## When to Use
 
-- A plan exists and work must begin — any domain, any scale
-- Any request of the form "implement this plan", "build this", "execute this"
+- A plan exists and work must begin, in any domain and at any scale
+- Requests such as "implement this plan", "build this", "execute this"
 - Resuming a partially executed plan by reconciling its ledger with current evidence
 - Not for creating plans (`360-blueprint`) or reviewing drafts (`360-expert-review`)
 
@@ -934,172 +944,136 @@ Current evidence establishes progress; the ledger records it. Delegation speeds 
 
 ### Entry: Optional Token Efficiency
 
-Reuse explicit approval or refusal for `360-token-efficiency` from this session. If unknown and not already offered, ask once whether to enable it for this session; continue the main task with the overlay inactive while unanswered. Explicit user invocation counts as approval; merely appearing in a generated plan does not. On approval, discover and load it through the host's supported skill mechanism, reusing already-loaded instructions. If unavailable, explain briefly and continue; do not install automatically. Refusal disables the overlay, not ordinary efficient habits. Revocation takes effect immediately. Keep consent in-session only; it does not authorize cross-session memory writes. The overlay never invokes itself or restarts the parent skill.
+Reuse this session's approval or refusal of `360-token-efficiency`. If unknown and not yet offered, ask once, in the same question round as any other entry question, and keep the overlay off until answered. Explicit user invocation is approval; a plan that lists the skill is not. On approval, load it through the host's skill mechanism, reusing instructions already loaded; if unavailable, say so briefly and continue without installing it. Refusal turns the overlay off, not ordinary efficient work. Revocation takes effect immediately. Consent lasts this session only and never authorizes cross-session memory writes.
 
-### Entry: Optional Model Delegation
+### Entry: Session Choices
 
-Reuse explicit approval or refusal for model delegation from this session. If unknown and not already offered, ask once using the host's interactive question tool and state the trade-off plainly: routine tasks go to lighter, faster subagent models; complex tasks go to heavier models or stay with the current one; the executing agent reviews and audits everything a subagent returns; refusal means the same work runs with the current model — via same-tier subagents or plain sequential execution. Present refusal as a full equal choice, never as a delay. Continue without delegation while unanswered; silence and elapsed time are not approval. On approval, class models by relative tier (lighter / same / heavier) and prefer the newest model the host offers within each tier; never hardcode or assume a specific vendor or model name. If the host offers no subagent or tier mechanism, explain briefly and execute sequentially. Refusal or unavailability disables delegation only — it changes nothing else in this skill.
+Ask each unknown choice once, in the same round as the token-efficiency offer, then start work; an unanswered choice uses its default. Reuse this session's answers. A later change applies from the next task.
 
-### Entry: Output Mode
-
-Reuse an explicit `quiet` or `lean` choice from this session (treat `verbose` as `lean`). If unknown and not already offered, ask once, in the same interactive round as the delegation question when both are unknown. State the trade-off: `quiet` gives the cleanest screen (todo list and short status lines only) at a higher token cost, because a background executor does the work out of view; `lean` gives the lowest token cost, with work in the main thread, so tool calls and edit diffs stay visible while chat text stays minimal. Recommend `quiet` unless the user has said cost matters more. Quiet applies while unanswered. The user may switch with `quiet` or `lean` at any time; it takes effect immediately. These words set this skill's output only; other skills' modes of the same name are separate.
+- Model delegation, default off. Trade-off: routine tasks go to lighter, faster subagents and complex ones stay with the current or a heavier model; you audit everything returned. Refusal is an equal choice: the same work runs with the current model. On approval, class models by relative tier (lighter, same, heavier) and prefer the newest model the host offers in each tier; do not assume any vendor or model name. Without a subagent or tier mechanism, say so and run sequentially
+- Output mode, default `lean`. `lean` works in the main thread at the lowest token cost, with tool calls visible and chat minimal. `quiet` runs the work in one background executor so the screen shows only the todo list and status lines, at a higher token cost. These mode words belong to this skill; treat `verbose` as `lean`
 
 ### Shared Plan Contract
 
 Preserve stable task IDs and existing user decisions. Every task carries: ID, What, How, Where, Depends on, Skills (list or `None`), Parallel, Effort, Priority, Done when (observable). Use `Priority: must | should | could`, `Effort: S | M | L`, and `Parallel: yes | no`. Only `should` and `could` sit below the cut line. Preserve phase checkpoints, change policy, replanning triggers, and objective-to-task traceability.
 
-Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep it `Draft`; a complete unreviewed plan is `Ready for review`; a passed review sets `Reviewed and ready to execute`. Material edits after review return it to `Ready for review` (or `Draft` if blocked). Execution progress belongs in the ledger, not the readiness status. An explicit user instruction to execute a supplied plan authorizes execution without a mandatory sibling review; record that basis without claiming a review occurred.
+Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep a plan `Draft`; a complete unreviewed plan is `Ready for review`; only a passed review sets `Reviewed and ready to execute`, and material edits after it return the plan to `Ready for review` (or `Draft` if blocked). Execution progress lives in the ledger, not in this status. An explicit user instruction to execute a supplied plan authorizes execution without a sibling review; record that basis and never claim a review occurred.
 
 ### Delivery
 
-Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat carries the Reader's Briefing and the path. These delivery rules also apply to the templates and quality gate below.
+Write the deliverable to a recoverable file when the host supports it, at the existing path or the default below. Honor explicit user output requests. Without files, deliver the same complete structure in chat labeled `in-session only; not persisted`, and never claim a file was saved. With a saved file, chat carries the Reader's Briefing and the path.
 
 Judge completion by observable acceptance checks. A structural or format check does not prove behavior or accuracy; state what was not verified.
 
+### Output Modes
+
+Both modes share one chat rule: chat carries only failures, blockers, deviations and decisions, one or two lines each, and no code, diffs, file contents or raw command output. Put intent in each tool call's description instead of in chat.
+
+**Lean (default)**
+
+- Run builds, tests and checks with full output redirected to `<slug>-log.txt` beside the ledger. Keep only exit status and counts in context; read the log by search or line range when a decision needs it
+- Read only the files and ranges a task needs, batch independent reads and checks in one turn, and do not re-read a file you just edited
+- Change existing files with targeted edits; write whole files only when creating them
+- Update the ledger, and in the main thread the todo list, in the same turn as the next action, never in a turn of their own
+- Do not repeat a check that passed with unchanged inputs
+
+**Quiet (on request)**
+
+Hosts display every main-thread tool call, so a quiet screen needs the work out of view. Where the host can run a background subagent and notify the main thread:
+
+1. The main thread (the shell) reads the plan once, creates one todo item per task (`<ID> <task name>`), and launches one background executor with the Executor Brief. One executor serves the whole plan, because each subagent pays its own start-up cost
+2. The executor runs Steps 1 to 7 under the Lean rules and appends events to `<slug>-events.txt`: `@ <phase> done <IDs>` at each phase checkpoint, and `@ <ID> <status> <note>` immediately for `failed`, `blocked` or `needs decision`
+3. The shell waits on the host's notifications without polling or sleeping; each wake re-reads its context, so completions arrive batched by phase. Per event, it updates the todo list and posts one line: `<symbol> <task names>: <8 words or fewer>`
+4. On `needs decision`, the shell asks the user with the interactive question tool and sends the answer to the same executor, which continues independent work meanwhile
+5. When the executor finishes, the shell runs the plan's overall verification once as an independent check. A mismatch reopens the affected task
+6. The executor's final reply holds only the final Progress Board and the Reader's Briefing; the shell prints both
+
+Without background subagents or notifications, say in one line that quiet is unavailable on this host and continue in `lean`.
+
 ### 1. Load the Plan Completely
 
-Never execute a plan you have not fully read.
-
-- Read the entire plan before touching anything: objective, scope, assumptions, every phase, every task, every checkpoint
+- Read the entire plan before touching anything: objective, scope, assumptions, every phase, task and checkpoint
 - Record the plan's readiness status and the authorization basis. Open blockers in a `Draft` plan block the tasks they affect
-- Build the full task inventory: every task ID, its priority, its dependencies, its "done when" check
+- Build the full task inventory: every task ID, its priority, its dependencies and its done-when check
 - If an acceptance check is missing, derive it from the approved objective; ask only when alternatives would change the intended outcome
 - Resolve material ambiguity before dependent work; continue independent authorized work
 
-Never automatically clear history. Use context management only when the host supports it. Before compaction or handoff, preserve and verify the six handover fields against the plan and ledger, including constraints, authorization, unresolved uncertainty, evidence locations, and exact values. Reopen original evidence if the summary cannot support the next decision. Without recoverable artifacts or context controls, keep state in-session and explain any continuity limit.
+Never clear history automatically. Before host compaction or a handoff, write the six handover fields into the ledger and check them against the plan, including constraints, authorization, open uncertainty, evidence locations and exact values. Reopen the original evidence when the summary cannot support the next decision.
 
 ### 2. Persist the Coverage Ledger
 
-Reconcile the plan, ledger, actual artifacts or external state, and relevant verification before resuming. A ledger verdict is a recorded claim until current evidence supports it.
-
-- Write it to a file and keep it current after each task and significant partial effect
-- Reopen stale or unsupported verified rows; record what changed and invalidate affected verification, including dependent results. Recheck only the affected acceptance conditions
-- Reuse the existing path if known; otherwise `plans/<short-slug>-execution.md`; create the folder if needed; reuse repository conventions for routine location choices
-- If the file cannot be written, use the in-session delivery fallback
-- One row per task: ID, name, priority, acceptance check, status
-- Statuses, with optional board symbols (the text label is required):
-  - `pending` ○ — not started
-  - `in progress` ◐ — work underway
-  - `verifying` ◑ — work finished; acceptance check running
-  - `done (verified)` ✓ — check passed with recorded evidence
-  - `failed` ✗ — check failed; being fixed or retried
-  - `blocked` ⊘ — waiting on a dependency, missing evidence, or missing capability
-  - `needs decision` ? — waiting on a user decision
-  - `dropped (approved)` – — removed with explicit approval or by the cut line
-- Mark verified only when current acceptance evidence supports it; include source revision or state identifiers when relevant
-- For delegated tasks, record the assigned tier alongside the verdict and the audit evidence that backed it
+- Write the ledger to a file and keep it current after each task and each significant partial effect. Reuse the existing path if known; otherwise use `plans/<short-slug>-execution.md`, creating the folder if needed. If the file cannot be written, use the Delivery fallback
+- One row per task: ID, name, priority, acceptance check, status, evidence. Delegated tasks also record the tier and the audit result
+- Statuses (the text label is required; the symbol is optional):
+  - `pending` ○: not started
+  - `in progress` ◐: work underway
+  - `verifying` ◑: work finished, acceptance check running
+  - `done (verified)` ✓: check passed with recorded evidence
+  - `failed` ✗: check failed; being fixed or retried
+  - `blocked` ⊘: waiting on a dependency, missing evidence or a missing capability
+  - `needs decision` ?: waiting on the user
+  - `dropped (approved)` –: removed with explicit approval or by the cut line
+- On resume, reconcile the plan, the ledger, the actual artifacts or external state, and the relevant verification. A ledger verdict is a recorded claim until current evidence supports it: reopen stale or unsupported rows, invalidate dependent verification, and recheck only the affected acceptance conditions
+- Mark `done (verified)` only with current acceptance evidence, including the source revision or state identifier when relevant
 - Record remaining uncertainty and the next check so a fresh agent can resume safely
+- The ledger is the durable record. The log and events files are disposable: at completion, delete them or keep them out of version control, and say which
 
 ### 3. Assign Execution Tiers
 
-When delegation was approved, decide the executor for each task before dispatching. Without approval, every task runs with the current model.
+Only when delegation was approved; otherwise every task runs with the current model.
 
-- Delegate down to a lighter tier: tasks that are self-contained, mechanical, reversible and have an observable done-when — typically effort S with fixed instructions. Send the task contract only; do not hand over full session context
-- Delegate across at the same tier: independent tasks a subagent can finish without the context you have accumulated
-- Route up to a heavier tier when available: tasks whose reasoning or verification demands exceed the current model's demonstrated capability on this plan
-- Keep with the current model: irreversible or external actions, security- and auth-sensitive work, anything depending on accumulated context, and every call the plan assigns to the user. These never leave the accountable executor
-- Classify by relative capability, not by vendor. Model lineups change; the tier rules do not
-- The quiet-mode executor (see Quiet Output) is the accountable executor running out of view, not delegation: at the current tier it needs no delegation consent. Lighter tiers belong inside the executor through approved delegation, not in the shell: in benchmarks, lighter session models ignored the detached design and worked inline
+- Lighter tier: self-contained, mechanical, reversible tasks with an observable done-when, typically effort S. Send a short, fixed task contract instead of the session context; a short brief is cheaper and easier for any model to follow exactly
+- Same tier: independent tasks a subagent can finish without your accumulated context
+- Heavier tier, when available: tasks whose reasoning or verification demands exceed what the current model has shown on this plan
+- Keep with the accountable executor: irreversible or external actions, security- and auth-sensitive work, work that depends on accumulated context, and every decision the plan assigns to the user
+- In quiet mode the background executor is the accountable executor, at the current tier, and needs no delegation consent. Lighter tiers run as its subagents, never as the executor itself, because the executor must hold the whole plan
 
 ### 4. Execute in Order
 
-- Follow phase order and task dependencies exactly; honor parallel markers
-- Load declared skills through the supported host mechanism when available. The optional `360-token-efficiency` always follows session consent; a plan listing is not approval. If another declared skill is unavailable, use the self-contained contract and available capabilities; block only tasks that actually require the missing capability
-- Dispatch delegated tasks within the same order; a rejected or failed delegated attempt returns the task to the current model, recorded as a deviation. Never retry silently across tiers, never forward broken output downstream
-- Verify each phase checkpoint before advancing dependent work. A failure blocks affected descendants; continue independent authorized work where dependencies and parallel markers permit
-- Keep work within the task and change policy
-- Before a non-repeatable or external action, record intent and a recoverable operation identifier or reconciliation method. After interruption, inspect partial effects and external state before retrying. Reuse confirmed results; retry only if absence or safe repeatability is established. If state cannot be determined, block that action and identify the missing check
-
-### Quiet Output
-
-In `quiet` mode, the user's screen shows the todo list and nothing else until the result. Hosts draw every main-thread tool call, so quiet comes from where the work runs, not from restraint: one detached executor does all the work out of view, and the main thread is a thin shell that mirrors progress. The shell's context stays small, so its turns stay cheap.
-
-Shell (main thread), where the host can run a background subagent:
-
-1. Read the plan once and pick the slug. Create one todo item per task (`<ID> <task name>`) before anything else. The shell writes no ledger or runner and reads no source files
-2. Launch one executor in the background (`run_in_background` in Claude Code; a foreground launch blocks the shell and loses live updates) with the Executor Brief, at the current tier or the tier Step 3 sets. Use one executor for the whole plan: every subagent pays a fixed startup cost, so never spawn one per task
-3. Watch `<slug>-events.txt` with the host's event-stream tool (Monitor in Claude Code), filtered so only lines starting with `@ ` wake the shell, for example `tail -n +1 -F <path> | grep --line-buffered '^@ '`. Every wake re-reads the shell's whole context, so wakes are the shell's main cost:
-   - Mark the first ready tasks `in progress` when launching. On each event batch, in one message: mark the reported tasks, mark the tasks they unblock `in progress`, then end the turn with exactly one status line, `<symbol> <task names> — <8 words or fewer>`. Never post "waiting", "still running" or summary sentences; the todo list already shows them
-   - The watch is the only wait: start no sleeps, polls or second watches. Re-arm it only when it expires while the executor still runs, and stop it when the executor finishes
-4. On `needs decision`, or a blocker only the user can clear, ask with the interactive question tool, send the answer to the same executor (SendMessage in Claude Code), and keep watching
-5. When the executor finishes, run `<runner> verify all` once as an independent check. Then print the final board and the Reader's Briefing from the executor's reply. A mismatch reopens the task; it never passes silently
-6. Shell chat holds only the start line, one status line per event batch, and surfaced failures, blockers, deviations and decisions, one or two lines each. Never print code, diffs, file contents or raw output
-
-At start, print one line offering zero-token live views; never launch windows or panes:
-
-```text
-Quiet mode on. Todo list tracks tasks. Full board: <path> (side pane: while :; do clear; cat <path>; sleep 2; done)
-```
-
-Offer `watch -t -n 2 cat <path>` where `watch` exists, or `while(1){cls; gc <path>; sleep 2}` in PowerShell. Where the host has a command status line, also offer a line that prints the board's progress row while the file exists. It refreshes locally and costs no tokens. Never replace an existing status line without explicit approval; offer to chain it instead. Where the host has a view that collapses tool calls (`/focus` in Claude Code), mention it once.
-
-Executor (the background subagent) runs Steps 1–7 in full, with these rules:
-
-- Runner: write one script beside the ledger (`<slug>-run.sh`, or `.ps1` where only PowerShell exists). Every subcommand appends full output to `<slug>-log.txt`, rewrites `<slug>-board.txt` from the ledger (temp file, then rename), and prints one line:
-  - `check <ID> <name>` — run a named build, test or command: `ok T3 35/35 tests` or `FAIL T3 2/35 — log:120`
-  - `verify <ID>...|all` — run acceptance checks plus a change summary; record `done (verified)` with evidence on pass and `failed` on failure: `ok T3 35/35 tests · 3 files +42 -7`
-  - `mark <ID> <status> [note]` — set a ledger row's status
-  - `verify` and `mark` append `@ <ID> <status> [note]` to `<slug>-events.txt` only when a row's status actually changes to a final or problem status: `done (verified)`, `failed`, `blocked`, `needs decision`, `dropped (approved)`. Re-checks that confirm an unchanged status, such as the final sweep, emit nothing. `in progress` and `verifying` emit nothing; the shell infers starts from dependencies. With more than about 12 tasks, or when tasks are long enough that events would arrive further apart than the host's prompt-cache lifetime (treat an unknown lifetime as a few minutes), emit one `@ <phase> done <IDs>` line at each phase checkpoint instead of per-task completions. A wake after the cache expires reprocesses the shell's whole context, so fewer, fuller wakes cost less. Still emit every problem status at once
-- Keep ledger rows one line each, ID first, so the runner can rewrite them. After the skeleton, change the ledger, log, board and events only through the runner
-- Report status only through the runner. The executor has no todo tools, never detaches again, and never asks the user directly. It marks `needs decision`, continues independent work, and waits for the shell's message only when nothing independent remains
-- Delegate inside the executor per Step 3 where the host allows nested subagents. The audit rules of Step 5 are unchanged
-- Final reply: the final Progress Board and the Reader's Briefing only, no code
-
-Without background subagents, the shell and the executor are one thread. Use the runner and update the todo list on every status change. Write no chat text between tool calls. Batch independent calls. Use no `cd …&&` chains or inline heredoc programs. Keep edits targeted, since diffs will show. Without a todo tool, print the Progress Board at start, at each checkpoint, on any problem, and at the end, always as the last element of its message.
-
-### Lean Output
-
-In `lean` mode, spend the fewest tokens that still meet every acceptance check. Work runs in the main thread, so tool calls and diffs show; chat text and avoidable context do not.
-
-- No subagents for display. Delegate only under Step 3 with approval, and only when it saves cost or time
-- Use the runner from Quiet Output for every build, test and check, so only one summary line enters context. Read the log by line range or search, only for the excerpt a decision needs
-- After the ledger skeleton, update ledger rows and the board through the runner `mark` and `verify`, never by rewriting files
-- Read only the files and ranges a task needs, batch independent reads and checks in one message, and never re-read a file just edited
-- Make existing-file changes with targeted edits; write whole files only when creating them
-- Update the todo list in the same message as the next action, never in a turn of its own. Without a todo tool, print the Progress Board only at phase checkpoints, on problems, and at the end
-- No chat text between tool calls except surfaced failures, blockers, deviations and decisions, one or two lines each. Put intent in the tool call's description. Never print code, diffs, file contents or raw output in chat
-- Do not repeat checks already passed with unchanged inputs. The final sweep runs `verify all` once
-
+- Follow phase order and task dependencies; honor parallel markers
+- Load declared skills through the host's mechanism when available. `360-token-efficiency` always follows session consent; a plan listing is not approval. If another declared skill is unavailable, use its self-contained contract and the available capabilities, and block only tasks that actually require the missing capability
+- Dispatch delegated tasks in the same order. A rejected or failed delegated attempt returns the task to the current model and is recorded as a deviation; do not retry silently across tiers or pass broken output downstream
+- Verify each phase checkpoint before dependent work advances. A failure blocks the affected descendants; independent authorized work continues where dependencies and parallel markers permit
+- Keep work within the task and the change policy
+- Before a non-repeatable or external action, record the intent and a recoverable operation identifier or reconciliation method. After an interruption, inspect partial effects and external state before retrying. Reuse confirmed results, and retry only when absence or safe repeatability is established; if the state cannot be determined, block that action and name the missing check
 
 ### 5. Verify Every Task
 
-- Run the task's "done when" check and record the evidence in the ledger
-- Done means the check passed with evidence — never "looks right", never "should work"
-- Delegated output is a claim, never a result. Re-verify it against the task's own done-when check at the same standard as your own work, and audit the returned diff or artifact yourself before dependent work advances. A subagent never marks its own task verified
-- If an implementation acceptance check cannot run, mark the task `blocked` with the missing evidence. An assessment task may finish with disclosed limits only when its own acceptance criteria permit them; an unknown check never becomes a pass
-- Check affected behavior and the diff after each task; state the inspected boundary and regressions rather than claiming everything else is safe
+- Run the task's done-when check and record the evidence in the ledger
+- Done means the check passed with evidence, not "looks right" or "should work"
+- Delegated output is a claim, not a result. Re-verify it against the task's own check at the same standard as your own work, and audit the returned diff or artifact before dependent work advances. A subagent never marks its own task verified
+- If an implementation check cannot run, mark the task `blocked` with the missing evidence. An assessment task may finish with disclosed limits only when its own acceptance criteria permit them; an unknown check never becomes a pass
+- After each task, check the affected behavior and the diff; state the inspected boundary and any regressions instead of claiming everything else is safe
 
 ### 6. Handle Deviations in the Open
 
-When reality disagrees with the plan — a failed assumption, missing information, a visibly better path:
+When reality disagrees with the plan (a failed assumption, missing information, a clearly better path):
 
 - Classify the departure under the plan's change policy and existing authorization
-- Resolve routine reversible implementation choices within that authority; record the reason and affected checks without asking again
-- Escalate changes to outcome, scope, acceptance criteria, significant cost, irreversible effects or authorization. Stop dependent work and present concrete options; continue independent authorized tasks
-- Never silently absorb new scope, never silently skip a task
-- A `must`-priority task is never dropped without an explicit user decision; `should`/`could` tasks follow the plan's cut line
+- Resolve routine reversible implementation choices within that authority; record the reason and the affected checks without asking again
+- Escalate changes to outcome, scope, acceptance criteria, significant cost, irreversible effects or authorization. Stop dependent work, present concrete options, and continue independent authorized tasks
+- Record every new scope item and every skipped task; absorb or skip nothing silently
+- Drop a `must` task only on an explicit user decision; `should` and `could` tasks follow the plan's cut line
 
 ### 7. Sweep and Write the Report
 
 Before declaring completion, walk the ledger top to bottom:
 
-- Every task has a final status — zero unaccounted items
-- Cross-check the plan's traceability: every objective maps to verified work
-- Re-check every delegated verdict: each one carries the assigned tier and the audit evidence, and failed delegations have a recorded re-execution path
-- Run the plan's overall verification; confirm all checkpoints passed
-- Sweep once more for regressions introduced across phases
-- Write the execution report into the same ledger file
+- Every task has a final status; zero unaccounted items
+- Every objective in the plan's traceability maps to verified work
+- Every delegated verdict carries its tier and audit evidence; failed delegations show how they were re-executed
+- Run the plan's overall verification and confirm all checkpoints passed; in quiet mode, the shell's independent run is this check
+- Sweep once for regressions introduced across phases
+- Write the execution report into the ledger file and handle the disposable files
 - Print the final Progress Board, then the Reader's Briefing as the final result
-- Print the Reader's Briefing in chat before asking anything. A next-action question with no briefing above it is a failed delivery. If the host sends one message, the briefing comes first in that message
+- Print the Reader's Briefing in chat before any next-action question; when the host sends one message, the briefing comes first
 
 ### Completion: Choose the Next Action
 
-- Finish and verify the current deliverable first; make the result and its location available before asking about follow-on work. Keep artifact readiness separate from the next-action choice: an unanswered suggestion does not reopen completed work, and a blocked job is not complete
-- Check the result, current project stage, remaining risks, and prior user instructions. Recommend the next useful action from the local routing guidance below; skip irrelevant stages and prefer stopping when no useful work remains
-- Use an available interactive question tool to offer one concise next-action choice. Put the best recommendation first, explain why it fits this result, and include a stop/pause choice. Always allow a free-text note or custom direction, including work outside the 360 flow; never force the user into a sibling skill
-- If interactive tools are unavailable, offer equivalent numbered choices with the recommendation, rationale, and explicit custom-note option in chat. This completion prompt is separate from the deliverable briefing; skill names are allowed here, and it is not a passive list of unresolved task questions
-- Reuse an already explicit next-step instruction instead of asking again; continue work it authorizes. Otherwise wait for the user's choice before starting follow-on work. Silence, a preselected recommendation, and elapsed time are not authorization. An explicit stop or request for no suggestions suppresses the prompt
-- When the user chooses, follow that direction and clarify only missing information needed for it. Discover and load a selected skill through the host's supported mechanism; do not assume it is installed or install it automatically. If unavailable, explain and offer an equivalent action. Carry forward artifact paths, decisions, verification, remaining risks, and session consent without restarting intake
+- Deliver and verify the current result first, with its location. An unanswered suggestion never reopens finished work, and a blocked job is not complete
+- Recommend one next action from the local routing below, based on the result, project stage, open risks and prior instructions. Skip stages that do not apply; recommend stopping when no useful work remains
+- Ask with the host's interactive question tool, or with numbered choices in chat when there is none: the recommendation first with its reason, a stop option, and a free-text option for any direction, inside or outside the 360 skills. This prompt is separate from the briefing and is not a list of open task questions
+- An explicit next-step instruction answers this prompt, and an explicit stop or request for no suggestions suppresses it. Otherwise wait for the user's choice. Silence, a preselected recommendation, and elapsed time are not authorization. On a choice, clarify only what is missing, load a selected skill through the host's mechanism without installing it (offer an equivalent if it is unavailable), and carry forward paths, decisions, verification, risks and session consent
 
 Local routing: Recommend `360-backend-audit` after significant backend work, or `360-optimize` when working code has a relevant performance or weight concern. For other completed work, recommend a concrete domain-appropriate follow-up or stopping; do not invent backend work to fit the flow.
 
@@ -1109,57 +1083,47 @@ Local routing: Recommend `360-backend-audit` after significant backend work, or 
 
 The ledger file contains:
 
-1. Coverage ledger — every task: ID, name, priority, final status, evidence for each `done (verified)`
-2. Delegation — per task: tier assigned (lighter / same / heavier / none) and audit outcome; or "None"
-3. Deviations — what diverged, how it was resolved, who approved it; or "None"
-4. QC results — checks run, checkpoints verified, regression sweeps, outcomes
-5. Unfinished items — pending, blocked, or dropped, with reason and approval; or "None"
-6. Handover summary — Context · Decisions · State (done / pending / blocked) · Remaining tasks (what, how, where) · Verification · Risks and how to detect them early
+1. Coverage ledger: every task with ID, name, priority, acceptance check, final status, and evidence for each `done (verified)`
+2. Delegation: per task, the tier assigned (lighter / same / heavier / none) and the audit outcome; or "None"
+3. Deviations: what diverged, how it was resolved, who approved it; or "None"
+4. QC results: checks run, checkpoints verified, regression sweeps and outcomes
+5. Unfinished items: pending, blocked or dropped, with reason and approval; or "None"
+6. Handover summary: Context · Decisions · State (done / pending / blocked) · Remaining tasks (what, how, where) · Verification · Risks and how to detect them early
 
 ### Executor Brief
 
-The shell sends this to the detached executor. Keep the wording fixed so hosts can cache it.
+In quiet mode, the shell sends this to the background executor. Keep the wording fixed so hosts can cache it.
 
 ```text
-You are the detached executor for <plan path>. Run 360-execute Steps 1–7 out of the user's view.
-Load the 360-execute skill through the host's mechanism, or read <skill path>, and follow its executor rules:
-never detach again, never ask the user directly, use no todo tools, never print code in replies.
-Session choices: output quiet; delegation <approved|refused>; token efficiency <approved|refused>.
-Paths: ledger <slug>-execution.md, runner <slug>-run.sh, log <slug>-log.txt, board <slug>-board.txt, events <slug>-events.txt, all in <dir>.
-Report every status change only through the runner, which appends "@ <ID> <status> [note]" to the events file.
-If a decision is needed, mark it, continue independent work, then stop and wait for a message.
+You are the background executor for <plan path>. Load the 360-execute skill through the host's mechanism, or read <skill path>, and run Steps 1-7 under its Lean rules.
+Session choices: delegation <approved|refused|unanswered>; token efficiency <approved|refused|unanswered>. Treat unanswered as off until a message says otherwise.
+Files in <dir>: ledger <slug>-execution.md, log <slug>-log.txt, events <slug>-events.txt.
+Append "@ <phase> done <IDs>" at each phase checkpoint, and "@ <ID> <status> <note>" at once for failed, blocked or needs decision.
+Do not ask the user, use todo tools, start another background executor, or print code. On needs decision, finish independent work, then wait for a message.
 Final reply: the final Progress Board and the Reader's Briefing only.
 ```
 
 ### Progress Board
 
-The board shows live progress in the board file, and in chat only when the host has no todo list; otherwise chat gets only the final board. It is a progress display, separate from the Reader's Briefing; the briefing rules do not apply to it. Statuses must match the ledger at every print.
+A progress display, separate from the Reader's Briefing; the briefing rules do not apply to it. Print it at the end. Print it at checkpoints and on problems only when the host has no todo list. Its statuses match the ledger at every print.
 
 ```text
-╭─ <plan title> ─────────────────────────────────── <mode> ─╮
-  ▕██████████░░░░░░░░▏ <n>/<m> verified · <k> active · <b> blocked
-  ! Needs you: <decision or blocker, 10 words or fewer>
-  ────────────────────────────────────────────────────────
-  ✓ Phase 1  <name>                                 4/4
-  ◐ Phase 2  <name>                                 2/5
-      ✓ <task name>
-      ◐ <task name>                                 ← now
-      ⊘ <task name> — <reason, 8 words or fewer>
-      ○ <task name>
-  ○ Phase 3  <name>                                 0/5
-  ────────────────────────────────────────────────────────
-  Now     <current task> — <12 words or fewer>
-  Recent  ✓ <task> · ✗ <task> retrying · ✓ <task>
-  Ledger  <path>   Log <path>
-╰──────────────────────────────────────────────── <hh:mm> ─╯
+<plan title>                                    <n>/<m> verified
+[##########..........]  <k> active · <b> blocked
+! Needs you: <decision or blocker, 10 words or fewer>
+✓ Phase 1  <name>                                         4/4
+◐ Phase 2  <name>                                         2/5
+    ✓ <task name>
+    ◐ <task name>
+    ⊘ <task name>: <reason, 8 words or fewer>
+○ Phase 3  <name>                                         0/5
+Ledger: <path>
 ```
 
-- 72 columns or fewer, so it fits a side pane. Truncate names rather than wrap
-- Expand only the active phase and any phase holding a `failed`, `blocked` or `needs decision` task; collapse the rest to one line with verified/total counts
-- A phase shows `failed`, `blocked` or `needs decision` if any of its tasks does; otherwise its least-advanced task status
-- Show `! Needs you` only when something waits on the user. `Recent` holds the last three status changes. Show `Log` only when a log exists
-- Where box characters or symbols may not render, use `+ - |`, `#` and `.` for the bar, and the text status labels
-- Omit `Now` on the final board
+- 72 columns or fewer; truncate names instead of wrapping
+- Expand the active phase and any phase holding a `failed`, `blocked` or `needs decision` task, which that phase then shows; collapse the rest to one line with counts
+- Show `! Needs you` only when something waits on the user
+- Where symbols may not render, use the text status labels
 
 ### Reader's Briefing
 
@@ -1187,48 +1151,35 @@ Issues found
 
 Briefing rules:
 
-- Write for someone who has not read the full artifact. Define or drop any term of art
-- One line per bullet, 20 words or fewer. The whole briefing fits one screen (about 25 lines)
-- Outcomes and decisions, never mechanics: no task IDs, phases, priorities, status tables, executor notes, or skill names
-- Keep new things and changes to existing things in separate sections. Never mix them
-- Confidence uses proven (evidence in hand), likely (strong reason), possible (suspected), or uncertain (hypothesis). Never numbers; never proven without evidence
+- Write for a reader who has not seen the full artifact; define or drop any term of art
+- One line per bullet, 20 words or fewer; the whole briefing fits one screen (about 25 lines)
+- Outcomes and decisions, not mechanics: no task IDs, phases, priorities, status tables, executor notes or skill names
+- Keep new things and changes to existing things in separate sections
+- Confidence is proven (evidence in hand), likely (strong reason), possible (suspected), or uncertain (hypothesis). Never numbers; never proven without evidence
 - The second line names the full artifact's path, or says `in-session only; not persisted`
 - Omit empty sections unless this skill marks one as always present
 - `Done` lists new work shipped; `Updates to existing` lists changes to something that already existed
 - Describe a missing skill or tool by what it does when it explains a limitation
-- Omit delegation tiers and subagent mechanics from the briefing
+- Omit delegation tiers and subagent mechanics
 
 ## Quality Gate
 
 Execution is complete only when every answer is yes:
 
-- Every task in the plan appears in the ledger file with a final status — zero unaccounted items
-- Every `done (verified)` verdict is backed by evidence from the task's own acceptance check
-- Every phase checkpoint passed before its dependent work advanced; independent work respected authorization and dependency/parallel markers
-- Every deviation was recorded and resolved within existing authorization/change policy or an explicit user decision
-- No `must`-priority task was dropped or skipped without explicit user approval
-- Every objective in the plan's traceability maps to verified work
-- Regressions and collateral damage were swept for, and the results are stated
-- Declared skill availability and consent were respected; required unavailable capabilities are explicit blockers
-- The output mode was asked once (with delegation when both were unknown), quiet applied while unanswered, and later switches were honored
-- In `quiet` mode, chat carried no code, diffs, file contents or raw command output, and every failure, blocker, deviation and required decision still surfaced at once
-- Progress Board statuses matched the ledger at every print, and the final board preceded the Reader's Briefing
-- In `quiet` mode with background subagents, one detached executor did all the work; the shell created the todo list first, updated it only from runner events, ran one independent `verify all`, and printed nothing between tool calls except surfaced problems
-- In `quiet` mode, the ledger (after its skeleton), log, board and events changed only through the runner, and no subagent marked its own task verified
-- Without background subagents, the single thread followed the inline fallback: todo list or board cadence, no chat text between tool calls, batched calls
-- In `lean` mode, checks ran through the runner, ledger updates went through `mark`/`verify`, reads and checks were batched, no passed check was repeated without changed inputs, and chat held no text between tool calls beyond surfaced problems
-- The zero-token board viewer was offered once, and no existing status line was replaced without explicit approval
-- The delegation question was asked once with its trade-off stated, the answer was honored, and refusal fell back to same-tier subagents or sequential execution
-- No irreversible, security-sensitive, or context-dependent task was delegated
-- Every delegated task was re-verified and its output audited by the executing agent against the task's own acceptance check; no subagent marked its own work verified
-- Failed delegations were recorded and re-executed with the current model before any dependent work advanced
-- Unfinished items are stated honestly — pending, blocked, or dropped, with reasons
-- The ledger matches current artifacts and verification; stale verdicts and partial actions were reconciled before resumption
-- The next agent can recover evidence, uncertainty and the next check; affected verification was invalidated after relevant changes
-- Delivery honors the requested format and accurately states persistence
-- The briefing follows the briefing rules
+- Every plan task has a final ledger status, and every `done (verified)` row cites current evidence from its own acceptance check
+- Checkpoints passed before dependent work advanced; independent work respected authorization, dependencies and parallel markers
+- Every deviation was recorded and resolved within the change policy or by the user; no `must` task was dropped without an explicit decision
+- Every objective maps to verified work, and the regression sweep result is stated
+- Declared skills and session consent were respected; missing required capabilities are explicit blockers
+- Session choices were asked once in one round, defaults applied while unanswered, and later changes were honored
+- Chat held only surfaced problems and decisions, never code, diffs or raw output; check output went to the log, and passed checks were not repeated with unchanged inputs
+- In quiet mode, one background executor did the work and the shell waited on notifications and ran the independent overall verification; otherwise the fallback to lean was stated
+- No irreversible, security-sensitive or context-dependent task was delegated; every delegated result was re-verified and audited before dependent work advanced
+- The ledger matches current artifacts after reconciliation; a fresh agent can recover evidence, uncertainty, unfinished items and the next check
+- The Progress Board matched the ledger, and the handling of disposable files is stated
+- Delivery states persistence accurately, and the briefing follows the briefing rules
 - The Reader's Briefing was printed in chat before any next-action question
-- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
+- Completion offered one recommended next action with stop and free-text options, or followed an explicit instruction or the parent skill's prompt; an unanswered suggestion does not block the finished deliverable
 
 Any "no" means execution is not finished. Fix it and re-run the sweep.
 
@@ -1241,7 +1192,7 @@ Source: skills/360-expert-review/SKILL.md
 ---
 name: 360-expert-review
 description: Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage.
-version: 3.6.0
+version: 3.7.0
 ---
 
 # 360 Expert Review
@@ -1265,17 +1216,17 @@ Try to disprove readiness with concrete failure cases, and fix each with the sma
 
 ### Entry: Optional Token Efficiency
 
-Reuse explicit approval or refusal for `360-token-efficiency` from this session. If unknown and not already offered, ask once whether to enable it for this session; continue the main task with the overlay inactive while unanswered. Explicit user invocation counts as approval; merely appearing in a generated plan does not. On approval, discover and load it through the host's supported skill mechanism, reusing already-loaded instructions. If unavailable, explain briefly and continue; do not install automatically. Refusal disables the overlay, not ordinary efficient habits. Revocation takes effect immediately. Keep consent in-session only; it does not authorize cross-session memory writes. The overlay never invokes itself or restarts the parent skill.
+Reuse this session's approval or refusal of `360-token-efficiency`. If unknown and not yet offered, ask once, in the same question round as any other entry question, and keep the overlay off until answered. Explicit user invocation is approval; a plan that lists the skill is not. On approval, load it through the host's skill mechanism, reusing instructions already loaded; if unavailable, say so briefly and continue without installing it. Refusal turns the overlay off, not ordinary efficient work. Revocation takes effect immediately. Consent lasts this session only and never authorizes cross-session memory writes.
 
 ### Shared Plan Contract
 
 Preserve stable task IDs and existing user decisions. Every task carries: ID, What, How, Where, Depends on, Skills (list or `None`), Parallel, Effort, Priority, Done when (observable). Use `Priority: must | should | could`, `Effort: S | M | L`, and `Parallel: yes | no`. Only `should` and `could` sit below the cut line. Preserve phase checkpoints, change policy, replanning triggers, and objective-to-task traceability.
 
-Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep it `Draft`; a complete unreviewed plan is `Ready for review`; a passed review sets `Reviewed and ready to execute`. Material edits after review return it to `Ready for review` (or `Draft` if blocked). Execution progress belongs in the ledger, not the readiness status. An explicit user instruction to execute a supplied plan authorizes execution without a mandatory sibling review; record that basis without claiming a review occurred.
+Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep a plan `Draft`; a complete unreviewed plan is `Ready for review`; only a passed review sets `Reviewed and ready to execute`, and material edits after it return the plan to `Ready for review` (or `Draft` if blocked). Execution progress lives in the ledger, not in this status. An explicit user instruction to execute a supplied plan authorizes execution without a sibling review; record that basis and never claim a review occurred.
 
 ### Delivery
 
-Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat carries the Reader's Briefing and the path. These delivery rules also apply to the templates and quality gate below.
+Write the deliverable to a recoverable file when the host supports it, at the existing path or the default below. Honor explicit user output requests. Without files, deliver the same complete structure in chat labeled `in-session only; not persisted`, and never claim a file was saved. With a saved file, chat carries the Reader's Briefing and the path.
 
 Judge completion by observable acceptance checks. A structural or format check does not prove behavior or accuracy; state what was not verified.
 
@@ -1284,7 +1235,7 @@ Judge completion by observable acceptance checks. A structural or format check d
 - Inspect available instructions, plans, decisions, developer preference records (such as `faculty/` dossiers), relevant artifacts, recent changes, verification and any execution ledger. Establish the current stage and done/pending/blocked work; cite sources and distinguish observed facts from claims. Record unavailable evidence
 - Reuse current evidence and user answers. Resolve discoverable facts by inspection; do not ask the user to rediscover them
 - Separate remaining gaps: material user decisions change the outcome, scope, acceptance criteria, significant cost or irreversible effects; reversible implementation defaults stay within established intent and conventions. Choose supported defaults, record the reason and revisit condition, and proceed. Do not present a default or inference as a fact
-- Ask only for unresolved material decisions, conflicting instructions, or inaccessible facts needed to judge success. Use the available interactive question tool in focused rounds of one to three questions, with the best supported recommendation, its trade-off, and a free-text/custom option. For missing facts, request the needed evidence without inventing it. If tools are unavailable, offer equivalent numbered choices and notes in chat
+- Ask only for unresolved material decisions, conflicting instructions, or inaccessible facts needed to judge success. Use the available interactive question tool in focused rounds of one to four questions, with the best supported recommendation, its trade-off, and a free-text/custom option. For missing facts, request the needed evidence without inventing it. If tools are unavailable, offer equivalent numbered choices and notes in chat
 - Unanswered required questions block dependent planning and readiness, not independent inspection. Silence, a recommendation, a preselected option or elapsed time is not an answer. Honor explicit delegation or deferral within its limits
 - After answers, update the existing context, assumptions or review sections and inspect newly relevant evidence. Stop questioning when material choices are settled; reopen only on new conflicting evidence
 - Compare the supplied plan with current artifacts before judging it. Identify stale assumptions, duplicated completed work and conflicting decisions; preserve valid task IDs and progress records
@@ -1342,8 +1293,6 @@ Switch to hostile critic. Ask:
 - What is the most damaging failure?
 - Which step could be read two different ways?
 - What cannot be detected, reproduced, or reversed?
-- What can be deleted, and what breaks if it is?
-- Where does the plan build for a case no objective names?
 
 Fix actionable findings and recheck affected risks. Stop when applicable checks pass and material blockers are resolved. An unavailable check stays unknown; if it prevents judging readiness, keep the plan non-final and name the missing evidence or decision. Otherwise disclose the limit without manufacturing required work. Use the clarification loop only for material user decisions; record routine defaults. Do not loop indefinitely.
 
@@ -1356,16 +1305,14 @@ Fix actionable findings and recheck affected risks. Stop when applicable checks 
 - Include the executor handover in the chosen delivery format
 - If the file cannot be written, use the in-session delivery fallback
 - Ensure required answers were resolved before final delivery. Keep unanswered blockers in `Draft`. Never end by dumping passive questions
-- Print the Reader's Briefing in chat before asking anything. A next-action question with no briefing above it is a failed delivery. If the host sends one message, the briefing comes first in that message
+- Print the Reader's Briefing in chat before any next-action question; when the host sends one message, the briefing comes first
 
 ### Completion: Choose the Next Action
 
-- Finish and verify the current deliverable first; make the result and its location available before asking about follow-on work. Keep artifact readiness separate from the next-action choice: an unanswered suggestion does not reopen completed work, and a blocked job is not complete
-- Check the result, current project stage, remaining risks, and prior user instructions. Recommend the next useful action from the local routing guidance below; skip irrelevant stages and prefer stopping when no useful work remains
-- Use an available interactive question tool to offer one concise next-action choice. Put the best recommendation first, explain why it fits this result, and include a stop/pause choice. Always allow a free-text note or custom direction, including work outside the 360 flow; never force the user into a sibling skill
-- If interactive tools are unavailable, offer equivalent numbered choices with the recommendation, rationale, and explicit custom-note option in chat. This completion prompt is separate from the deliverable briefing; skill names are allowed here, and it is not a passive list of unresolved task questions
-- Reuse an already explicit next-step instruction instead of asking again; continue work it authorizes. Otherwise wait for the user's choice before starting follow-on work. Silence, a preselected recommendation, and elapsed time are not authorization. An explicit stop or request for no suggestions suppresses the prompt
-- When the user chooses, follow that direction and clarify only missing information needed for it. Discover and load a selected skill through the host's supported mechanism; do not assume it is installed or install it automatically. If unavailable, explain and offer an equivalent action. Carry forward artifact paths, decisions, verification, remaining risks, and session consent without restarting intake
+- Deliver and verify the current result first, with its location. An unanswered suggestion never reopens finished work, and a blocked job is not complete
+- Recommend one next action from the local routing below, based on the result, project stage, open risks and prior instructions. Skip stages that do not apply; recommend stopping when no useful work remains
+- Ask with the host's interactive question tool, or with numbered choices in chat when there is none: the recommendation first with its reason, a stop option, and a free-text option for any direction, inside or outside the 360 skills. This prompt is separate from the briefing and is not a list of open task questions
+- An explicit next-step instruction answers this prompt, and an explicit stop or request for no suggestions suppresses it. Otherwise wait for the user's choice. Silence, a preselected recommendation, and elapsed time are not authorization. On a choice, clarify only what is missing, load a selected skill through the host's mechanism without installing it (offer an equivalent if it is unavailable), and carry forward paths, decisions, verification, risks and session consent
 
 Local routing: Recommend `360-execute` for a finalized executable plan. For a blocked or incomplete review, offer resolution of the concrete blocker or `360-blueprint` for substantial replanning; do not present execution as ready.
 
@@ -1433,11 +1380,11 @@ Remaining risks
 
 Briefing rules:
 
-- Write for someone who has not read the full artifact. Define or drop any term of art
-- One line per bullet, 20 words or fewer. The whole briefing fits one screen (about 25 lines)
-- Outcomes and decisions, never mechanics: no task IDs, phases, priorities, status tables, executor notes, or skill names
-- Keep new things and changes to existing things in separate sections. Never mix them
-- Confidence uses proven (evidence in hand), likely (strong reason), possible (suspected), or uncertain (hypothesis). Never numbers; never proven without evidence
+- Write for a reader who has not seen the full artifact; define or drop any term of art
+- One line per bullet, 20 words or fewer; the whole briefing fits one screen (about 25 lines)
+- Outcomes and decisions, not mechanics: no task IDs, phases, priorities, status tables, executor notes or skill names
+- Keep new things and changes to existing things in separate sections
+- Confidence is proven (evidence in hand), likely (strong reason), possible (suspected), or uncertain (hypothesis). Never numbers; never proven without evidence
 - The second line names the full artifact's path, or says `in-session only; not persisted`
 - Omit empty sections unless this skill marks one as always present
 - A new artifact goes under `What you'll get`; a change to an existing one goes under `What changes`, showing now and after
@@ -1451,16 +1398,15 @@ The plan is final only when every applicable answer is yes (record a reason for 
 
 - Real user need understood and served
 - Current project stage and completed work were inspected, or unavailable evidence was explicitly recorded
-- Existing answers were reused; follow-up rounds resolved the goal, scope, outline, and required details without treating silence or recommendations as consent
+- Existing answers were reused; questions covered only unresolved material decisions, and silence or recommendations were not treated as consent
 - Lenses were chosen from the plan's risks and any faculty lens list; each applied lens has findings or a stated reason for none
 - Version-specific or fast-moving claims cite a current source or remain hypotheses with a named check
 - Relevant requirements, likely failures and severe plausible failures were checked; inspection limits are explicit
 - Every actionable finding has a trigger, consequence, evidence or hypothesis, and smallest correction; severity and confidence are separate
 - Relevant requirements are traceable to tasks and observable verification; monitoring is included only where needed
-- Material failure cases have proportionate detection, diagnosis and recovery checks
+- Material failure cases have proportionate tests and detection, diagnosis and recovery checks
 - The design is clear, consistent, and as simple as possible
 - The lean audit ran, cuts were reported next to additions, and no added work lacks a named failure it prevents
-- Testing matches the risk
 - Release and rollback checks address the plan's relevant failure cases
 - The plan survived hostile review
 - Material decisions were resolved through the clarification loop; defaults and unknown evidence are explicit, never silent passes
@@ -1470,7 +1416,7 @@ The plan is final only when every applicable answer is yes (record a reason for 
 - Each finding in the briefing states problem, fix, and the result the user will notice
 - The briefing follows the briefing rules
 - The Reader's Briefing was printed in chat before any next-action question
-- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
+- Completion offered one recommended next action with stop and free-text options, or followed an explicit instruction or the parent skill's prompt; an unanswered suggestion does not block the finished deliverable
 
 Any unresolved "no" keeps the plan non-final. Fix actionable findings or report the blocker and the evidence or decision needed to resolve it.
 
@@ -1483,7 +1429,7 @@ Source: skills/360-faculty/SKILL.md
 ---
 name: 360-faculty
 description: Commission a short panel of research-backed specialist experts, chosen from a plan's nature, depth, and complexity, each equipped with current methods, standards, and the tools available here to critique and improve the plan from distinct angles. Use when a plan or task needs specialist scrutiny before review, when work must fit this developer's goals and taste, or when a named expert team must be created, called, refreshed, or updated.
-version: 3.0.0
+version: 3.0.1
 ---
 
 # 360 Faculty
@@ -1510,17 +1456,17 @@ A seat earns its place by owning a distinct failure surface in this plan and jud
 
 ### Entry: Optional Token Efficiency
 
-Reuse explicit approval or refusal for `360-token-efficiency` from this session. If unknown and not already offered, ask once whether to enable it for this session; continue the main task with the overlay inactive while unanswered. Explicit user invocation counts as approval; merely appearing in a generated plan does not. On approval, discover and load it through the host's supported skill mechanism, reusing already-loaded instructions. If unavailable, explain briefly and continue; do not install automatically. Refusal disables the overlay, not ordinary efficient habits. Revocation takes effect immediately. Keep consent in-session only; it does not authorize cross-session memory writes. The overlay never invokes itself or restarts the parent skill.
+Reuse this session's approval or refusal of `360-token-efficiency`. If unknown and not yet offered, ask once, in the same question round as any other entry question, and keep the overlay off until answered. Explicit user invocation is approval; a plan that lists the skill is not. On approval, load it through the host's skill mechanism, reusing instructions already loaded; if unavailable, say so briefly and continue without installing it. Refusal turns the overlay off, not ordinary efficient work. Revocation takes effect immediately. Consent lasts this session only and never authorizes cross-session memory writes.
 
 ### Shared Plan Contract
 
 Preserve stable task IDs and existing user decisions. Every task carries: ID, What, How, Where, Depends on, Skills (list or `None`), Parallel, Effort, Priority, Done when (observable). Use `Priority: must | should | could`, `Effort: S | M | L`, and `Parallel: yes | no`. Only `should` and `could` sit below the cut line. Preserve phase checkpoints, change policy, replanning triggers, and objective-to-task traceability.
 
-Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep it `Draft`; a complete unreviewed plan is `Ready for review`; a passed review sets `Reviewed and ready to execute`. Material edits after review return it to `Ready for review` (or `Draft` if blocked). Execution progress belongs in the ledger, not the readiness status. An explicit user instruction to execute a supplied plan authorizes execution without a mandatory sibling review; record that basis without claiming a review occurred.
+Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep a plan `Draft`; a complete unreviewed plan is `Ready for review`; only a passed review sets `Reviewed and ready to execute`, and material edits after it return the plan to `Ready for review` (or `Draft` if blocked). Execution progress lives in the ledger, not in this status. An explicit user instruction to execute a supplied plan authorizes execution without a sibling review; record that basis and never claim a review occurred.
 
 ### Delivery
 
-Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat carries the Reader's Briefing and the path. These delivery rules also apply to the templates and quality gate below.
+Write the deliverable to a recoverable file when the host supports it, at the existing path or the default below. Honor explicit user output requests. Without files, deliver the same complete structure in chat labeled `in-session only; not persisted`, and never claim a file was saved. With a saved file, chat carries the Reader's Briefing and the path.
 
 Judge completion by observable acceptance checks. A structural or format check does not prove behavior or accuracy; state what was not verified.
 
@@ -1538,14 +1484,14 @@ Five entry points into one workflow. Choose the mode from what the developer ask
 
 ### 1. Load What Exists
 
-Read the current task or draft plan in full. Then read dossiers if present:
+In this skill, "the developer" is the user the faculty serves. Read the current task or draft plan in full. Then read dossiers if present:
 
 - `faculty/developer.md`: goals, taste, mindset, strategy, house style
 - `faculty/roster.md`: who has been seated on this project, and when
 - `faculty/teams.md`: named teams this developer created
 - `faculty/<role>.md`: each faculty's claims about this developer and project, plus its `## Expertise` cache. `<role>` is kebab-case
 
-`faculty/` sits beside the plan file, or at the project root when the plan is not on disk. Write dossiers only within the user-authorized faculty scope; token-efficiency consent does not authorize memory writes.
+`faculty/` sits beside the plan file, or at the project root when the plan is not on disk. Write dossiers only within the user-authorized faculty scope.
 
 ### 2. Measure the Developer
 
@@ -1706,7 +1652,7 @@ Raise in their language. Put two cuts side by side, theirs and the seat's, name 
   - Open questions → Context & Constraints (2); decisions → Handover Summary (10)
   - Footprint line → Scope (4), updated when an edit changes it
 - Add or refresh one metadata row so a fresh reader knows a faculty pass happened: `| Tailored by | faculty/roster.md @ <date> |`
-- Never claim a review occurred. Material edits to a reviewed plan return it to `Ready for review`, or `Draft` if blocking questions remain
+- Never claim a review occurred; apply the Shared Plan Contract's readiness rule after material edits
 
 **Resolve disagreements in the open.** Check conflicting advice between seats against evidence and existing decisions. Resolve equivalent reversible details with a recorded reason; present material trade-offs needing user choice with what each option protects.
 
@@ -1765,16 +1711,14 @@ After the last seated faculty:
 - Confirm every cross-flag was addressed, handed to the developer, or recorded as open
 - State whether dossiers, expertise caches and teams were persisted; ask about persistence only when required and not already authorized
 - If the next agent would have to guess the house style, the roster, any accepted risk, or which claims are unverified, the handover is not finished
-- Print the Reader's Briefing in chat before asking anything. A next-action question with no briefing above it is a failed delivery. If the host sends one message, the briefing comes first in that message
+- Print the Reader's Briefing in chat before any next-action question; when the host sends one message, the briefing comes first
 
 ### Completion: Choose the Next Action
 
-- Finish and verify the current deliverable first; make the result and its location available before asking about follow-on work. Keep artifact readiness separate from the next-action choice: an unanswered suggestion does not reopen completed work, and a blocked job is not complete
-- Check the result, current project stage, remaining risks, and prior user instructions. Recommend the next useful action from the local routing guidance below; skip irrelevant stages and prefer stopping when no useful work remains
-- Use an available interactive question tool to offer one concise next-action choice. Put the best recommendation first, explain why it fits this result, and include a stop/pause choice. Always allow a free-text note or custom direction, including work outside the 360 flow; never force the user into a sibling skill
-- If interactive tools are unavailable, offer equivalent numbered choices with the recommendation, rationale, and explicit custom-note option in chat. This completion prompt is separate from the deliverable briefing; skill names are allowed here, and it is not a passive list of unresolved task questions
-- Reuse an already explicit next-step instruction instead of asking again; continue work it authorizes. Otherwise wait for the user's choice before starting follow-on work. Silence, a preselected recommendation, and elapsed time are not authorization. An explicit stop or request for no suggestions suppresses the prompt
-- When the user chooses, follow that direction and clarify only missing information needed for it. Discover and load a selected skill through the host's supported mechanism; do not assume it is installed or install it automatically. If unavailable, explain and offer an equivalent action. Carry forward artifact paths, decisions, verification, remaining risks, and session consent without restarting intake
+- Deliver and verify the current result first, with its location. An unanswered suggestion never reopens finished work, and a blocked job is not complete
+- Recommend one next action from the local routing below, based on the result, project stage, open risks and prior instructions. Skip stages that do not apply; recommend stopping when no useful work remains
+- Ask with the host's interactive question tool, or with numbered choices in chat when there is none: the recommendation first with its reason, a stop option, and a free-text option for any direction, inside or outside the 360 skills. This prompt is separate from the briefing and is not a list of open task questions
+- An explicit next-step instruction answers this prompt, and an explicit stop or request for no suggestions suppresses it. Otherwise wait for the user's choice. Silence, a preselected recommendation, and elapsed time are not authorization. On a choice, clarify only what is missing, load a selected skill through the host's mechanism without installing it (offer an equivalent if it is unavailable), and carry forward paths, decisions, verification, risks and session consent
 
 Local routing: Recommend `360-expert-review` when the polished plan is ready for review, `360-blueprint` when guidance or a suggest-mode short list still needs a plan, recommissioning stale or unverified seats when web access becomes available, or resuming the active task after an expertise-only consultation. Apply this at the end of the selected mode, including `suggest` and `research` modes, not after each seat.
 
@@ -1859,11 +1803,11 @@ Saved for next time
 
 Briefing rules:
 
-- Write for someone who has not read the full artifact. Define or drop any term of art
-- One line per bullet, 20 words or fewer. The whole briefing fits one screen (about 25 lines)
-- Outcomes and decisions, never mechanics: no task IDs, phases, priorities, status tables, executor notes, or skill names
-- Keep new things and changes to existing things in separate sections. Never mix them
-- Confidence uses proven (evidence in hand), likely (strong reason), possible (suspected), or uncertain (hypothesis). Never numbers; never proven without evidence
+- Write for a reader who has not seen the full artifact; define or drop any term of art
+- One line per bullet, 20 words or fewer; the whole briefing fits one screen (about 25 lines)
+- Outcomes and decisions, not mechanics: no task IDs, phases, priorities, status tables, executor notes or skill names
+- Keep new things and changes to existing things in separate sections
+- Confidence is proven (evidence in hand), likely (strong reason), possible (suspected), or uncertain (hypothesis). Never numbers; never proven without evidence
 - The second line names the full artifact's path, or says `in-session only; not persisted`
 - Omit empty sections unless this skill marks one as always present
 - `Who looked at it` is always present and names every seat, including one that changed nothing ("no change needed")
@@ -1899,7 +1843,7 @@ The session is finished when every gate applicable to the selected mode passes. 
 - Delivery follows the user's format and authorization; persistence or its absence is stated
 - The briefing follows the briefing rules and names every seat
 - The Reader's Briefing was printed in chat before any next-action question
-- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
+- Completion offered one recommended next action with stop and free-text options, or followed an explicit instruction or the parent skill's prompt; an unanswered suggestion does not block the finished deliverable
 
 An unresolved applicable gate needs a specific correction or an honest blocker. Do not seat faculties, edit plans, or write dossiers to satisfy gates excluded by the selected mode.
 
@@ -3138,7 +3082,7 @@ Source: skills/360-optimize/SKILL.md
 ---
 name: 360-optimize
 description: Audit working code and its whole toolchain — build, test, lint, CI, and runtime libraries — for zero-cost speed, weight, and reliability gains, verifying every claim against the pinned versions and measuring before ranking. Use when existing code must run faster, lighter, or more robustly without changing what it does, or when a list of proposed tooling or library upgrades needs a verdict.
-version: 3.0.0
+version: 3.1.0
 ---
 
 # 360 Optimize
@@ -3164,17 +3108,17 @@ Recommend gains only as strongly as their evidence permits.
 
 ### Entry: Optional Token Efficiency
 
-Reuse explicit approval or refusal for `360-token-efficiency` from this session. If unknown and not already offered, ask once whether to enable it for this session; continue the main task with the overlay inactive while unanswered. Explicit user invocation counts as approval; merely appearing in a generated plan does not. On approval, discover and load it through the host's supported skill mechanism, reusing already-loaded instructions. If unavailable, explain briefly and continue; do not install automatically. Refusal disables the overlay, not ordinary efficient habits. Revocation takes effect immediately. Keep consent in-session only; it does not authorize cross-session memory writes. The overlay never invokes itself or restarts the parent skill.
+Reuse this session's approval or refusal of `360-token-efficiency`. If unknown and not yet offered, ask once, in the same question round as any other entry question, and keep the overlay off until answered. Explicit user invocation is approval; a plan that lists the skill is not. On approval, load it through the host's skill mechanism, reusing instructions already loaded; if unavailable, say so briefly and continue without installing it. Refusal turns the overlay off, not ordinary efficient work. Revocation takes effect immediately. Consent lasts this session only and never authorizes cross-session memory writes.
 
 ### Shared Plan Contract
 
 Preserve stable task IDs and existing user decisions. Every task carries: ID, What, How, Where, Depends on, Skills (list or `None`), Parallel, Effort, Priority, Done when (observable). Use `Priority: must | should | could`, `Effort: S | M | L`, and `Parallel: yes | no`. Only `should` and `could` sit below the cut line. Preserve phase checkpoints, change policy, replanning triggers, and objective-to-task traceability.
 
-Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep it `Draft`; a complete unreviewed plan is `Ready for review`; a passed review sets `Reviewed and ready to execute`. Material edits after review return it to `Ready for review` (or `Draft` if blocked). Execution progress belongs in the ledger, not the readiness status. An explicit user instruction to execute a supplied plan authorizes execution without a mandatory sibling review; record that basis without claiming a review occurred.
+Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep a plan `Draft`; a complete unreviewed plan is `Ready for review`; only a passed review sets `Reviewed and ready to execute`, and material edits after it return the plan to `Ready for review` (or `Draft` if blocked). Execution progress lives in the ledger, not in this status. An explicit user instruction to execute a supplied plan authorizes execution without a sibling review; record that basis and never claim a review occurred.
 
 ### Delivery
 
-Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat carries the Reader's Briefing and the path. These delivery rules also apply to the templates and quality gate below.
+Write the deliverable to a recoverable file when the host supports it, at the existing path or the default below. Honor explicit user output requests. Without files, deliver the same complete structure in chat labeled `in-session only; not persisted`, and never claim a file was saved. With a saved file, chat carries the Reader's Briefing and the path.
 
 Judge completion by observable acceptance checks. A structural or format check does not prove behavior or accuracy; state what was not verified.
 
@@ -3206,7 +3150,6 @@ Read [suspect patterns](references/suspect-patterns.md) once the inventory exist
 - Name the resource: latency, CPU, memory, I/O, binary size, dependency surface
 - Record baseline and candidate under comparable representative workloads, input sizes, environment and run conditions; note variability and measurement limits
 - Expose resource trade-offs: latency, CPU, memory, I/O, dependency/operational weight and money. A local speedup may move cost elsewhere
-- Cold paths stay untouched
 - If you did not measure, write `unmeasured` and keep the finding as a candidate
 - When nothing measures the path, add a minimal harness: timing tests beside the code, skipped by default, or the ecosystem's bench tool. Same workload before and after; repeat runs and report spread
 - Decompose a path into its parts before choosing a target. Declare each gate threshold before measuring; a change that misses it is dropped
@@ -3316,16 +3259,14 @@ Every admitted gain gets a conservative expected effect. This step is not option
 - If the file cannot be written, use the in-session delivery fallback
 - Rank admitted gains by conservative impact versus effort versus risk
 - Keep new work and updates to existing work in separate lists
-- Print the Reader's Briefing in chat before asking anything. A next-action question with no briefing above it is a failed delivery. If the host sends one message, the briefing comes first in that message
+- Print the Reader's Briefing in chat before any next-action question; when the host sends one message, the briefing comes first
 
 ### Completion: Choose the Next Action
 
-- Finish and verify the current deliverable first; make the result and its location available before asking about follow-on work. Keep artifact readiness separate from the next-action choice: an unanswered suggestion does not reopen completed work, and a blocked job is not complete
-- Check the result, current project stage, remaining risks, and prior user instructions. Recommend the next useful action from the local routing guidance below; skip irrelevant stages and prefer stopping when no useful work remains
-- Use an available interactive question tool to offer one concise next-action choice. Put the best recommendation first, explain why it fits this result, and include a stop/pause choice. Always allow a free-text note or custom direction, including work outside the 360 flow; never force the user into a sibling skill
-- If interactive tools are unavailable, offer equivalent numbered choices with the recommendation, rationale, and explicit custom-note option in chat. This completion prompt is separate from the deliverable briefing; skill names are allowed here, and it is not a passive list of unresolved task questions
-- Reuse an already explicit next-step instruction instead of asking again; continue work it authorizes. Otherwise wait for the user's choice before starting follow-on work. Silence, a preselected recommendation, and elapsed time are not authorization. An explicit stop or request for no suggestions suppresses the prompt
-- When the user chooses, follow that direction and clarify only missing information needed for it. Discover and load a selected skill through the host's supported mechanism; do not assume it is installed or install it automatically. If unavailable, explain and offer an equivalent action. Carry forward artifact paths, decisions, verification, remaining risks, and session consent without restarting intake
+- Deliver and verify the current result first, with its location. An unanswered suggestion never reopens finished work, and a blocked job is not complete
+- Recommend one next action from the local routing below, based on the result, project stage, open risks and prior instructions. Skip stages that do not apply; recommend stopping when no useful work remains
+- Ask with the host's interactive question tool, or with numbered choices in chat when there is none: the recommendation first with its reason, a stop option, and a free-text option for any direction, inside or outside the 360 skills. This prompt is separate from the briefing and is not a list of open task questions
+- An explicit next-step instruction answers this prompt, and an explicit stop or request for no suggestions suppresses it. Otherwise wait for the user's choice. Silence, a preselected recommendation, and elapsed time are not authorization. On a choice, clarify only what is missing, load a selected skill through the host's mechanism without installing it (offer an equivalent if it is unavailable), and carry forward paths, decisions, verification, risks and session consent
 
 Local routing: Recommend `360-blueprint` to turn supported findings into scoped work, or `360-execute` when a suitable authorized plan already exists. Recommend stopping if no worthwhile candidates remain; findings alone do not authorize implementation.
 
@@ -3391,11 +3332,11 @@ Need from you
 
 Briefing rules:
 
-- Write for someone who has not read the full artifact. Define or drop any term of art
-- One line per bullet, 20 words or fewer. The whole briefing fits one screen (about 25 lines)
-- Outcomes and decisions, never mechanics: no task IDs, phases, priorities, status tables, executor notes, or skill names
-- Keep new things and changes to existing things in separate sections. Never mix them
-- Confidence uses proven (evidence in hand), likely (strong reason), possible (suspected), or uncertain (hypothesis). Never numbers; never proven without evidence
+- Write for a reader who has not seen the full artifact; define or drop any term of art
+- One line per bullet, 20 words or fewer; the whole briefing fits one screen (about 25 lines)
+- Outcomes and decisions, not mechanics: no task IDs, phases, priorities, status tables, executor notes or skill names
+- Keep new things and changes to existing things in separate sections
+- Confidence is proven (evidence in hand), likely (strong reason), possible (suspected), or uncertain (hypothesis). Never numbers; never proven without evidence
 - The second line names the full artifact's path, or says `in-session only; not persisted`
 - Omit empty sections unless this skill marks one as always present
 - Gains, upgrades and restructures change existing code; a harness or tool the change needs is named inside the item it serves
@@ -3409,10 +3350,9 @@ The audit is complete only when every answer is yes:
 - The stack inventory covers build, test, lint and format, typecheck, CI, runtime libraries and hot-path I/O, or names the layers left out
 - Effective state (pinned version, defaults, unification, transitive presence) was resolved for every candidate
 - Every recommended flag, feature or API was confirmed to exist in the pinned version
-- Every targeted speedup has a measured share and ceiling, or is marked `unmeasured`
+- Hot paths and every targeted speedup's share and ceiling come from evidence or are marked `unmeasured`; unmeasured candidates carry no magnitude, rank or `proven`
 - Persisted, shared and parity-bound behavior was identified before any change was admitted
 - Every supplied recommendation has exactly one verdict with evidence
-- Hot paths were located from evidence, or marked `unmeasured`
 - Waste was considered before upgrades, and upgrades before restructure
 - Every admitted change has affirmative evidence for every Zero-Cost Gate check; unknowns remain candidates and failures are Rejected
 - Every Rejected item names the check it failed
@@ -3420,7 +3360,6 @@ The audit is complete only when every answer is yes:
 - No new dependency was proposed that fails net-lighter
 - Emergent tools meet the same pass/fail/unknown rules for adapter, rollback and improvement evidence
 - Every admitted gain has baseline, conservative expected effect, scope, Holds when, and Falsified when
-- No magnitude, rank, or `proven` on an unmeasured candidate
 - Comparisons use representative workloads and expose resource trade-offs and variability
 - No vendor, blog, or other-project number is presented as this system's gain
 - Best-case is not reported as typical; overlapping gains are not stacked
@@ -3431,7 +3370,7 @@ The audit is complete only when every answer is yes:
 - The deliverable is saved at the stated path, or honestly labeled in-session only
 - The briefing follows the briefing rules and does not hype
 - The Reader's Briefing was printed in chat before any next-action question
-- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
+- Completion offered one recommended next action with stop and free-text options, or followed an explicit instruction or the parent skill's prompt; an unanswered suggestion does not block the finished deliverable
 
 Any "no" means the audit is not finished. Fix it and review again.
 
@@ -3547,7 +3486,7 @@ Source: skills/360-token-efficiency/SKILL.md
 ---
 name: 360-token-efficiency
 description: Reduce avoidable token cost on any agent host by probing its real capabilities and applying cache-, turn- and output-aware techniques with verified handovers. Use as an optional, session-approved companion when token cost or context growth matters, with strict preservation of task requirements by default.
-version: 2.2.0
+version: 2.2.1
 ---
 
 # 360 Token Efficiency
@@ -3605,7 +3544,7 @@ Read [host adaptation](references/host-adaptation.md) only when a host-specific 
 
 ### 4. Apply Cost Rules in Order of Leverage
 
-Each agent turn re-sends the whole history, cheaply when cached and at full price when not; output tokens cost several times input. Apply these in order and stop where the task's needs begin:
+Each agent turn re-sends the whole history, cheaply when cached and at full price when not, and output tokens usually cost more than input. Apply these in order and stop where the task's needs begin:
 
 1. Keep the prefix stable. Do not switch model, reasoning effort, fast modes, tool sets or connected servers mid-task, and never edit earlier context; append instead. Recommend such switches to the user only at task boundaries
 2. Work within the cache lifetime. Avoid idle gaps longer than the host's cache lifetime, which is often minutes and should be treated as short when unknown. When waits are unavoidable, wake less often with more batched work: one cold resume beats several
@@ -3614,7 +3553,7 @@ Each agent turn re-sends the whole history, cheaply when cached and at full pric
 5. Shape tool output at the source. Use filters, failure-only test output, quiet flags and counts, keeping the full output recoverable in a file or log. A filtered result is not proof of completeness: check counts, truncation and pagination
 6. Retrieve just in time. Search first, read narrow ranges, reuse what is already in context, and reread only after a change or new uncertainty
 7. Default to one agent. A subagent pays its own fixed start-up context and does not share the parent's cache. Delegate only to isolate large, noisy work behind a short summary, to run truly parallel work, or because the parent requires it. Count parent and worker usage, retries and coordination
-8. Use lighter models only for routine delegated work, only where the host honors the model choice, and verify the actual model in telemetry. Lighter models may skip long instructions, so give them short, fixed briefs and verify their output
+8. Use lighter models only for routine delegated work, only where the host honors the model choice, and verify the actual model in telemetry. Give them short, fixed briefs, which any model follows more reliably than a long skill, and verify their output
 9. Compact rarely. Compaction is itself a full-context request and resets the cache. Compact at natural breaks with a focus hint, do not pre-empt the host's automatic threshold, and prefer a fresh session with a verified handover for unrelated work
 
 Fully read mandatory instructions and required task inputs; progressive retrieval must not bypass them. Keep source paths, ranges, IDs, versions or timestamps needed to reopen evidence. Reopen stale, conflicting or insufficient evidence before deciding.
@@ -3641,12 +3580,10 @@ For a comparison, use the same task inputs and acceptance criteria, record host,
 
 ### Completion: Choose the Next Action
 
-- Finish and verify the current deliverable first; make the result and its location available before asking about follow-on work. Keep artifact readiness separate from the next-action choice: an unanswered suggestion does not reopen completed work, and a blocked job is not complete
-- Check the result, current project stage, remaining risks, and prior user instructions. Recommend the next useful action from the local routing guidance below; skip irrelevant stages and prefer stopping when no useful work remains
-- Use an available interactive question tool to offer one concise next-action choice. Put the best recommendation first, explain why it fits this result, and include a stop/pause choice. Always allow a free-text note or custom direction, including work outside the 360 flow; never force the user into a sibling skill
-- If interactive tools are unavailable, offer equivalent numbered choices with the recommendation, rationale, and explicit custom-note option in chat. This completion prompt is separate from the deliverable briefing; skill names are allowed here, and it is not a passive list of unresolved task questions
-- Reuse an already explicit next-step instruction instead of asking again; continue work it authorizes. Otherwise wait for the user's choice before starting follow-on work. Silence, a preselected recommendation, and elapsed time are not authorization. An explicit stop or request for no suggestions suppresses the prompt
-- When the user chooses, follow that direction and clarify only missing information needed for it. Discover and load a selected skill through the host's supported mechanism; do not assume it is installed or install it automatically. If unavailable, explain and offer an equivalent action. Carry forward artifact paths, decisions, verification, remaining risks, and session consent without restarting intake
+- Deliver and verify the current result first, with its location. An unanswered suggestion never reopens finished work, and a blocked job is not complete
+- Recommend one next action from the local routing below, based on the result, project stage, open risks and prior instructions. Skip stages that do not apply; recommend stopping when no useful work remains
+- Ask with the host's interactive question tool, or with numbered choices in chat when there is none: the recommendation first with its reason, a stop option, and a free-text option for any direction, inside or outside the 360 skills. This prompt is separate from the briefing and is not a list of open task questions
+- An explicit next-step instruction answers this prompt, and an explicit stop or request for no suggestions suppresses it. Otherwise wait for the user's choice. Silence, a preselected recommendation, and elapsed time are not authorization. On a choice, clarify only what is missing, load a selected skill through the host's mechanism without installing it (offer an equivalent if it is unavailable), and carry forward paths, decisions, verification, risks and session consent
 
 Local routing: While accompanying another skill, let the parent own the single completion prompt; do not issue a duplicate or interrupt its work. For a standalone efficiency task, recommend resuming the main task or addressing an evidenced remaining issue, and allow stopping. Never recommend invoking this overlay recursively.
 
@@ -3682,7 +3619,7 @@ Check every applicable item; record a concrete limitation if one cannot be check
 - Any potentially lossy method had separate technique, metric, and tolerance approval
 - Delivery matches the user's request and honestly states persistence
 - Measurement claims have real evidence and include available overhead; absent telemetry is `UNMEASURED`
-- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
+- Completion offered one recommended next action with stop and free-text options, or followed an explicit instruction or the parent skill's prompt; an unanswered suggestion does not block the finished deliverable
 
 An unresolved check is a limitation or blocker, never proof of equivalent accuracy to a run that did not happen.
 

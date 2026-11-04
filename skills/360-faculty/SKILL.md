@@ -1,7 +1,7 @@
 ---
 name: 360-faculty
 description: Commission a short panel of research-backed specialist experts, chosen from a plan's nature, depth, and complexity, each equipped with current methods, standards, and the tools available here to critique and improve the plan from distinct angles. Use when a plan or task needs specialist scrutiny before review, when work must fit this developer's goals and taste, or when a named expert team must be created, called, refreshed, or updated.
-version: 3.0.0
+version: 3.0.1
 ---
 
 # 360 Faculty
@@ -28,17 +28,17 @@ A seat earns its place by owning a distinct failure surface in this plan and jud
 
 ### Entry: Optional Token Efficiency
 
-Reuse explicit approval or refusal for `360-token-efficiency` from this session. If unknown and not already offered, ask once whether to enable it for this session; continue the main task with the overlay inactive while unanswered. Explicit user invocation counts as approval; merely appearing in a generated plan does not. On approval, discover and load it through the host's supported skill mechanism, reusing already-loaded instructions. If unavailable, explain briefly and continue; do not install automatically. Refusal disables the overlay, not ordinary efficient habits. Revocation takes effect immediately. Keep consent in-session only; it does not authorize cross-session memory writes. The overlay never invokes itself or restarts the parent skill.
+Reuse this session's approval or refusal of `360-token-efficiency`. If unknown and not yet offered, ask once, in the same question round as any other entry question, and keep the overlay off until answered. Explicit user invocation is approval; a plan that lists the skill is not. On approval, load it through the host's skill mechanism, reusing instructions already loaded; if unavailable, say so briefly and continue without installing it. Refusal turns the overlay off, not ordinary efficient work. Revocation takes effect immediately. Consent lasts this session only and never authorizes cross-session memory writes.
 
 ### Shared Plan Contract
 
 Preserve stable task IDs and existing user decisions. Every task carries: ID, What, How, Where, Depends on, Skills (list or `None`), Parallel, Effort, Priority, Done when (observable). Use `Priority: must | should | could`, `Effort: S | M | L`, and `Parallel: yes | no`. Only `should` and `could` sit below the cut line. Preserve phase checkpoints, change policy, replanning triggers, and objective-to-task traceability.
 
-Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep it `Draft`; a complete unreviewed plan is `Ready for review`; a passed review sets `Reviewed and ready to execute`. Material edits after review return it to `Ready for review` (or `Draft` if blocked). Execution progress belongs in the ledger, not the readiness status. An explicit user instruction to execute a supplied plan authorizes execution without a mandatory sibling review; record that basis without claiming a review occurred.
+Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep a plan `Draft`; a complete unreviewed plan is `Ready for review`; only a passed review sets `Reviewed and ready to execute`, and material edits after it return the plan to `Ready for review` (or `Draft` if blocked). Execution progress lives in the ledger, not in this status. An explicit user instruction to execute a supplied plan authorizes execution without a sibling review; record that basis and never claim a review occurred.
 
 ### Delivery
 
-Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat carries the Reader's Briefing and the path. These delivery rules also apply to the templates and quality gate below.
+Write the deliverable to a recoverable file when the host supports it, at the existing path or the default below. Honor explicit user output requests. Without files, deliver the same complete structure in chat labeled `in-session only; not persisted`, and never claim a file was saved. With a saved file, chat carries the Reader's Briefing and the path.
 
 Judge completion by observable acceptance checks. A structural or format check does not prove behavior or accuracy; state what was not verified.
 
@@ -56,14 +56,14 @@ Five entry points into one workflow. Choose the mode from what the developer ask
 
 ### 1. Load What Exists
 
-Read the current task or draft plan in full. Then read dossiers if present:
+In this skill, "the developer" is the user the faculty serves. Read the current task or draft plan in full. Then read dossiers if present:
 
 - `faculty/developer.md`: goals, taste, mindset, strategy, house style
 - `faculty/roster.md`: who has been seated on this project, and when
 - `faculty/teams.md`: named teams this developer created
 - `faculty/<role>.md`: each faculty's claims about this developer and project, plus its `## Expertise` cache. `<role>` is kebab-case
 
-`faculty/` sits beside the plan file, or at the project root when the plan is not on disk. Write dossiers only within the user-authorized faculty scope; token-efficiency consent does not authorize memory writes.
+`faculty/` sits beside the plan file, or at the project root when the plan is not on disk. Write dossiers only within the user-authorized faculty scope.
 
 ### 2. Measure the Developer
 
@@ -224,7 +224,7 @@ Raise in their language. Put two cuts side by side, theirs and the seat's, name 
   - Open questions → Context & Constraints (2); decisions → Handover Summary (10)
   - Footprint line → Scope (4), updated when an edit changes it
 - Add or refresh one metadata row so a fresh reader knows a faculty pass happened: `| Tailored by | faculty/roster.md @ <date> |`
-- Never claim a review occurred. Material edits to a reviewed plan return it to `Ready for review`, or `Draft` if blocking questions remain
+- Never claim a review occurred; apply the Shared Plan Contract's readiness rule after material edits
 
 **Resolve disagreements in the open.** Check conflicting advice between seats against evidence and existing decisions. Resolve equivalent reversible details with a recorded reason; present material trade-offs needing user choice with what each option protects.
 
@@ -283,16 +283,14 @@ After the last seated faculty:
 - Confirm every cross-flag was addressed, handed to the developer, or recorded as open
 - State whether dossiers, expertise caches and teams were persisted; ask about persistence only when required and not already authorized
 - If the next agent would have to guess the house style, the roster, any accepted risk, or which claims are unverified, the handover is not finished
-- Print the Reader's Briefing in chat before asking anything. A next-action question with no briefing above it is a failed delivery. If the host sends one message, the briefing comes first in that message
+- Print the Reader's Briefing in chat before any next-action question; when the host sends one message, the briefing comes first
 
 ### Completion: Choose the Next Action
 
-- Finish and verify the current deliverable first; make the result and its location available before asking about follow-on work. Keep artifact readiness separate from the next-action choice: an unanswered suggestion does not reopen completed work, and a blocked job is not complete
-- Check the result, current project stage, remaining risks, and prior user instructions. Recommend the next useful action from the local routing guidance below; skip irrelevant stages and prefer stopping when no useful work remains
-- Use an available interactive question tool to offer one concise next-action choice. Put the best recommendation first, explain why it fits this result, and include a stop/pause choice. Always allow a free-text note or custom direction, including work outside the 360 flow; never force the user into a sibling skill
-- If interactive tools are unavailable, offer equivalent numbered choices with the recommendation, rationale, and explicit custom-note option in chat. This completion prompt is separate from the deliverable briefing; skill names are allowed here, and it is not a passive list of unresolved task questions
-- Reuse an already explicit next-step instruction instead of asking again; continue work it authorizes. Otherwise wait for the user's choice before starting follow-on work. Silence, a preselected recommendation, and elapsed time are not authorization. An explicit stop or request for no suggestions suppresses the prompt
-- When the user chooses, follow that direction and clarify only missing information needed for it. Discover and load a selected skill through the host's supported mechanism; do not assume it is installed or install it automatically. If unavailable, explain and offer an equivalent action. Carry forward artifact paths, decisions, verification, remaining risks, and session consent without restarting intake
+- Deliver and verify the current result first, with its location. An unanswered suggestion never reopens finished work, and a blocked job is not complete
+- Recommend one next action from the local routing below, based on the result, project stage, open risks and prior instructions. Skip stages that do not apply; recommend stopping when no useful work remains
+- Ask with the host's interactive question tool, or with numbered choices in chat when there is none: the recommendation first with its reason, a stop option, and a free-text option for any direction, inside or outside the 360 skills. This prompt is separate from the briefing and is not a list of open task questions
+- An explicit next-step instruction answers this prompt, and an explicit stop or request for no suggestions suppresses it. Otherwise wait for the user's choice. Silence, a preselected recommendation, and elapsed time are not authorization. On a choice, clarify only what is missing, load a selected skill through the host's mechanism without installing it (offer an equivalent if it is unavailable), and carry forward paths, decisions, verification, risks and session consent
 
 Local routing: Recommend `360-expert-review` when the polished plan is ready for review, `360-blueprint` when guidance or a suggest-mode short list still needs a plan, recommissioning stale or unverified seats when web access becomes available, or resuming the active task after an expertise-only consultation. Apply this at the end of the selected mode, including `suggest` and `research` modes, not after each seat.
 
@@ -377,11 +375,11 @@ Saved for next time
 
 Briefing rules:
 
-- Write for someone who has not read the full artifact. Define or drop any term of art
-- One line per bullet, 20 words or fewer. The whole briefing fits one screen (about 25 lines)
-- Outcomes and decisions, never mechanics: no task IDs, phases, priorities, status tables, executor notes, or skill names
-- Keep new things and changes to existing things in separate sections. Never mix them
-- Confidence uses proven (evidence in hand), likely (strong reason), possible (suspected), or uncertain (hypothesis). Never numbers; never proven without evidence
+- Write for a reader who has not seen the full artifact; define or drop any term of art
+- One line per bullet, 20 words or fewer; the whole briefing fits one screen (about 25 lines)
+- Outcomes and decisions, not mechanics: no task IDs, phases, priorities, status tables, executor notes or skill names
+- Keep new things and changes to existing things in separate sections
+- Confidence is proven (evidence in hand), likely (strong reason), possible (suspected), or uncertain (hypothesis). Never numbers; never proven without evidence
 - The second line names the full artifact's path, or says `in-session only; not persisted`
 - Omit empty sections unless this skill marks one as always present
 - `Who looked at it` is always present and names every seat, including one that changed nothing ("no change needed")
@@ -417,6 +415,6 @@ The session is finished when every gate applicable to the selected mode passes. 
 - Delivery follows the user's format and authorization; persistence or its absence is stated
 - The briefing follows the briefing rules and names every seat
 - The Reader's Briefing was printed in chat before any next-action question
-- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
+- Completion offered one recommended next action with stop and free-text options, or followed an explicit instruction or the parent skill's prompt; an unanswered suggestion does not block the finished deliverable
 
 An unresolved applicable gate needs a specific correction or an honest blocker. Do not seat faculties, edit plans, or write dossiers to satisfy gates excluded by the selected mode.

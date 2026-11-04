@@ -92,6 +92,9 @@ export function checkConsistency(root = ROOT) {
         if (required.some((field, index) => fields[index] !== field)) report('handover template must retain the six fields in order');
       }
       if (/clear the conversation before|never paste .*fallback|at least as correct and complete as it would be without/i.test(text)) report('obsolete behavioral instruction: history clearing, file-only fallback, or unverifiable accuracy claim');
+      // Portable entrypoints name capabilities; host tool names belong in dated references.
+      const hostName = outsideFences(text).match(/\b(?:run_in_background|SendMessage|TodoWrite)\b|\/focus\b|\bin (?:Claude Code|Codex|Gemini CLI|Copilot|Cursor)\b/);
+      if (hostName) report(`host-specific name "${hostName[0]}" in entrypoint; describe the capability instead`);
       if (published && fm) skills.set(name, { ...fm, negative: negative.slice(2), path });
 
       const refs = [];
