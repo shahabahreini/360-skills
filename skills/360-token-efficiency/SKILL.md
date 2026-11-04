@@ -1,7 +1,7 @@
 ---
 name: 360-token-efficiency
 description: Reduce avoidable token cost on any agent host by probing its real capabilities and applying cache-, turn- and output-aware techniques with verified handovers. Use as an optional, session-approved companion when token cost or context growth matters, with strict preservation of task requirements by default.
-version: 2.2.0
+version: 2.2.1
 ---
 
 # 360 Token Efficiency
@@ -59,7 +59,7 @@ Read [host adaptation](references/host-adaptation.md) only when a host-specific 
 
 ### 4. Apply Cost Rules in Order of Leverage
 
-Each agent turn re-sends the whole history, cheaply when cached and at full price when not; output tokens cost several times input. Apply these in order and stop where the task's needs begin:
+Each agent turn re-sends the whole history, cheaply when cached and at full price when not, and output tokens usually cost more than input. Apply these in order and stop where the task's needs begin:
 
 1. Keep the prefix stable. Do not switch model, reasoning effort, fast modes, tool sets or connected servers mid-task, and never edit earlier context; append instead. Recommend such switches to the user only at task boundaries
 2. Work within the cache lifetime. Avoid idle gaps longer than the host's cache lifetime, which is often minutes and should be treated as short when unknown. When waits are unavoidable, wake less often with more batched work: one cold resume beats several
@@ -68,7 +68,7 @@ Each agent turn re-sends the whole history, cheaply when cached and at full pric
 5. Shape tool output at the source. Use filters, failure-only test output, quiet flags and counts, keeping the full output recoverable in a file or log. A filtered result is not proof of completeness: check counts, truncation and pagination
 6. Retrieve just in time. Search first, read narrow ranges, reuse what is already in context, and reread only after a change or new uncertainty
 7. Default to one agent. A subagent pays its own fixed start-up context and does not share the parent's cache. Delegate only to isolate large, noisy work behind a short summary, to run truly parallel work, or because the parent requires it. Count parent and worker usage, retries and coordination
-8. Use lighter models only for routine delegated work, only where the host honors the model choice, and verify the actual model in telemetry. Lighter models may skip long instructions, so give them short, fixed briefs and verify their output
+8. Use lighter models only for routine delegated work, only where the host honors the model choice, and verify the actual model in telemetry. Give them short, fixed briefs, which any model follows more reliably than a long skill, and verify their output
 9. Compact rarely. Compaction is itself a full-context request and resets the cache. Compact at natural breaks with a focus hint, do not pre-empt the host's automatic threshold, and prefer a fresh session with a verified handover for unrelated work
 
 Fully read mandatory instructions and required task inputs; progressive retrieval must not bypass them. Keep source paths, ranges, IDs, versions or timestamps needed to reopen evidence. Reopen stale, conflicting or insufficient evidence before deciding.
@@ -95,12 +95,10 @@ For a comparison, use the same task inputs and acceptance criteria, record host,
 
 ### Completion: Choose the Next Action
 
-- Finish and verify the current deliverable first; make the result and its location available before asking about follow-on work. Keep artifact readiness separate from the next-action choice: an unanswered suggestion does not reopen completed work, and a blocked job is not complete
-- Check the result, current project stage, remaining risks, and prior user instructions. Recommend the next useful action from the local routing guidance below; skip irrelevant stages and prefer stopping when no useful work remains
-- Use an available interactive question tool to offer one concise next-action choice. Put the best recommendation first, explain why it fits this result, and include a stop/pause choice. Always allow a free-text note or custom direction, including work outside the 360 flow; never force the user into a sibling skill
-- If interactive tools are unavailable, offer equivalent numbered choices with the recommendation, rationale, and explicit custom-note option in chat. This completion prompt is separate from the deliverable briefing; skill names are allowed here, and it is not a passive list of unresolved task questions
-- Reuse an already explicit next-step instruction instead of asking again; continue work it authorizes. Otherwise wait for the user's choice before starting follow-on work. Silence, a preselected recommendation, and elapsed time are not authorization. An explicit stop or request for no suggestions suppresses the prompt
-- When the user chooses, follow that direction and clarify only missing information needed for it. Discover and load a selected skill through the host's supported mechanism; do not assume it is installed or install it automatically. If unavailable, explain and offer an equivalent action. Carry forward artifact paths, decisions, verification, remaining risks, and session consent without restarting intake
+- Deliver and verify the current result first, with its location. An unanswered suggestion never reopens finished work, and a blocked job is not complete
+- Recommend one next action from the local routing below, based on the result, project stage, open risks and prior instructions. Skip stages that do not apply; recommend stopping when no useful work remains
+- Ask with the host's interactive question tool, or with numbered choices in chat when there is none: the recommendation first with its reason, a stop option, and a free-text option for any direction, inside or outside the 360 skills. This prompt is separate from the briefing and is not a list of open task questions
+- An explicit next-step instruction answers this prompt, and an explicit stop or request for no suggestions suppresses it. Otherwise wait for the user's choice; in a non-interactive run, state the recommendation and stop. Silence, a preselected recommendation, and elapsed time are not authorization. On a choice, clarify only what is missing, load a selected skill through the host's mechanism without installing it (offer an equivalent if it is unavailable), and carry forward paths, decisions, verification, risks and session consent
 
 Local routing: While accompanying another skill, let the parent own the single completion prompt; do not issue a duplicate or interrupt its work. For a standalone efficiency task, recommend resuming the main task or addressing an evidenced remaining issue, and allow stopping. Never recommend invoking this overlay recursively.
 
@@ -136,6 +134,6 @@ Check every applicable item; record a concrete limitation if one cannot be check
 - Any potentially lossy method had separate technique, metric, and tolerance approval
 - Delivery matches the user's request and honestly states persistence
 - Measurement claims have real evidence and include available overhead; absent telemetry is `UNMEASURED`
-- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
+- Completion offered one recommended next action with stop and free-text options, or followed an explicit instruction or the parent skill's prompt; an unanswered suggestion does not block the finished deliverable
 
 An unresolved check is a limitation or blocker, never proof of equivalent accuracy to a run that did not happen.

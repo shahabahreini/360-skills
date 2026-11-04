@@ -38,3 +38,92 @@ Structural fixtures reached 91 passing tests, including public/experimental comp
 - Compatible minor versions: blueprint 2.4.0; expert review 3.4.0; faculty 1.3.0; backend audit, execute and optimize 2.2.0. Unchanged token efficiency remains 2.1.0.
 - README metadata and compiled documentation were synchronized. Descriptions did not change, so `llms.txt` required no edit and passed exact-description consistency.
 - Final diff review found only intended source, validation and generated-document changes; the pre-existing staged `.gitignore` edit was preserved. No installed copies were modified.
+
+## 2026-11-04 audit: duplication, host coupling and execution cost
+
+Baseline: `5af2af2`, 99/99 tests and consistency passing, entrypoints 23,157 whitespace-delimited words. Scope: logic gaps, contradictions, over-structure, wording tied to current hosts or models, and the language used toward agents and users. User decisions: simplify execute's quiet mode, make `lean` the default, keep faculty to wording fixes, delete the stale execution ledger.
+
+| ID | Finding | Disposition |
+|---|---|---|
+| F1 | About 750 words of shared blocks repeated per skill | Compressed consent, delivery, completion and briefing blocks in `scripts/lib/contracts.mjs` and every copy; semantics kept |
+| F2 | Execute could ask three entry questions in separate rounds | Consent now joins any other entry question in one round; execute asks delegation and mode in that round and starts on defaults |
+| F3 | Default `quiet` cost more tokens than `lean` | `lean` is the default; `quiet` on request |
+| F4 | Quiet mode required a per-plan runner script, board file and viewer offers | Removed; the ledger is the only state file, plus a disposable log and an append-only events file |
+| F5 | Host tool names and a benchmark anecdote in a portable entrypoint | Replaced by capability wording; validator rejects known host tool names in `SKILL.md` |
+| F6 | Output-mode sections interrupted Steps 1 to 7 | Moved before Step 1 |
+| F7 | Executor brief had no state for unanswered choices | Added `unanswered`, treated as off until a message says otherwise |
+| F8 | Ledger row fields differed between workflow and output | One field list: ID, name, priority, acceptance check, status, evidence |
+| F9 | No cleanup rule for runtime files | Log and events files are disposable; their handling is stated at completion |
+| F10 | 24 execute gate items with duplicates | 12 local items plus the two shared items |
+| F11 | Blueprint "ask until nothing is open" contradicted the routine-default rule | Asks only about material decisions and facts inspection cannot settle |
+| F12 | Review gate demanded rounds its workflow does not require; round sizes differed | Gate aligned to material decisions; rounds of one to four in both skills |
+| F13 | Review repeated lean-audit questions and a testing gate item | Duplicates removed |
+| F14 | Backend audit routing omitted `360-optimize`; grammar error | Negative trigger and README routing updated; sentence fixed |
+| F15 | Optimize repeated the cold-path rule and three "unmeasured" gate items | One rule and one gate item |
+| F16 | Faculty repeated consent and readiness rules; "developer" and "user" were undefined synonyms | Duplicates now point to the shared rule; term defined in Step 1 |
+| F17 | Token efficiency stated price ratios and model behavior as fact | Reworded as general rules with reasons |
+| F18 | Stale execution ledger in `plans/` | Deleted |
+| F19 | The Agent Skills specification may expect `version` under `metadata` | Open: agentskills.io was unreachable from this session; frontmatter unchanged |
+
+Language rules for agents and users were added to AGENTS.md: rules carry their reason, `never` is kept for unsafe or irreversible actions, one term per concept, gates check results instead of restating steps, and user-facing text states concrete results and calibrated confidence.
+
+Execute walkthroughs against the revised text, applied manually by the implementing agent (not independent trials):
+
+| Case | Expected | Observed in text |
+|---|---|---|
+| Entry questions unanswered | One question round; work starts in `lean`, delegation off | Session Choices and the consent block both require one round and defaults while unanswered |
+| Quiet with a background executor, then a decision | Executor marks `needs decision`, continues independent work; shell relays the answer; shell runs final verification | Quiet steps 2, 4 and 5 and the Executor Brief cover each point |
+| Quiet on a host without background subagents | One-line notice, continue in `lean` | Stated after the quiet steps |
+| Resume with a stale verified row | Row reopened, dependent verification invalidated | Step 2 reconciliation bullet |
+
+One conflict was found and fixed during the walkthrough: the Lean rules told the executor to update the todo list, which the Executor Brief forbids. The todo list now belongs to the main thread only.
+
+Result: entrypoints total 21,014 words (from 23,157). Execute fell from 4,787 to 3,366 words; the 3,000-word target was not met because the shared blocks it must carry account for about 600 words. Structural checks and these walkthroughs do not establish model compliance or token savings; those remain UNMEASURED.
+
+## 2026-11-04 second pass: handoffs, conflicts, validator, fallbacks, routing and a trial
+
+Baseline: `db5533a`, 100/100 tests. Token figures below are chars/4 estimates, not the Claude tokenizer (its encoding file was blocked by the network policy).
+
+### Static analyses
+
+| ID | Analysis | Finding | Disposition |
+|---|---|---|---|
+| S1 | Handoff map | Review read a "faculty lens list" and "seat Cards" that faculty never produces | Review now reads faculty review angles and faculty blocks |
+| S2 | Handoff map | Audit and optimize implementation plans carry no readiness status; execute required one | A plan without a status counts as unreviewed |
+| S3 | Rule conflicts | Token efficiency requires confirming the model that ran; execute delegation never recorded it | Ledger records the model that actually ran when the host reports it |
+| S4 | Rule conflicts | Faculty writes dossiers after every seat but named no single authorization point | Authorization is asked once, in the seating confirmation |
+| S5 | Validator coverage | Purpose length, duplicate gate items and the briefing path line were not enforced; faculty's Purpose had three sentences | Three checks with fixtures; faculty Purpose fixed |
+| S6 | Fallbacks | With no one to answer, Completion and question rounds waited indefinitely | Shared Delivery and Completion: record open questions, apply only reversible defaults, deliver, stop |
+| S7 | Fallbacks | Quiet mode needs file writes for its events file | Quiet falls back to lean without file writes |
+
+### Faculty 4.0.0
+
+Seats extend the shipped profile with 10 plan-specific fields instead of rewriting 17; the per-seat block is 7 lines instead of 13; one source serves several seats; the cross-cutting profile (about 5,000 tokens) loads only when a cross-cutting seat is needed; the gate checks results instead of restating steps. Entrypoint: 5,142 to 4,767 words. The 4,000-word target was not met without cutting working rules.
+
+### Routing test
+
+Thirty prompts (26 with an expected skill, 4 with none), descriptions only. Sonnet: 30/30. Haiku: 30/30. No description changed. The most frequent runner-up confusions were faculty against expert review and backend audit against optimize. Limit: the prompts were written by the agent that edited the descriptions, so they may be easier than real requests.
+
+### Behavioral trial
+
+One agent per chain ran blueprint, expert review and execute on a fixture Node project (add `maxLength` to `slugify`, fix repeated dashes), with scripted user answers. This deviates from the planned one agent per skill because a single session is the realistic case.
+
+| Check | Chain B (lighter model) |
+|---|---|
+| Plan tasks carry every contract field and valid vocabulary | pass (5 tasks) |
+| Review set `Reviewed and ready to execute` and wrote the appendix | pass |
+| Every task has a final ledger status with evidence | pass |
+| Project tests and objective probe | pass (11/11; dashes, `maxLength`, existing caller) |
+| Briefing before every next-action question; path on line two | pass (3 skills) |
+| Token-efficiency offer asked once; execute choices in one round | pass |
+| Ledger handover section | fail: missing |
+| Review briefing bullet length | fail: 3 finding bullets over 20 words |
+| Review briefing size matches plan footprint | fail: briefing said 1 new file, plan said 0 |
+
+Fixes: execute Step 7 now names every Work file section including the handover; review finding bullets may use up to 30 words, since the template carries problem, fix and result; blueprint and review briefings must match the plan's footprint line. These were rechecked against the text, not by a full re-run.
+
+Chain A (current model) stopped during blueprint when a safety check halted the agent while it wrote the plan. Its partial transcript shows one question round with the token-efficiency offer asked once, then the defaults batch. The run was not repeated. Quiet mode was not trialed (it needs nested background agents). Token usage per chain was not reported by the host and is UNMEASURED.
+
+### Result
+
+103/103 tests and consistency pass. Estimated load: all entrypoints 33,856 to 33,577 tokens; faculty 8,190 to 7,575; blueprint, review and execute chain 13,870 to 14,114, because the headless-run rule adds about 40 tokens per skill. The main remaining weight is in the blueprint, review and optimize Quality Gates (about 550 to 610 tokens each).

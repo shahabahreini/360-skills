@@ -1,7 +1,7 @@
 ---
 name: 360-expert-review
 description: Stress-test a draft plan, write the finalized executable plan back to the same file, and brief the user in chat. Use before executing any plan where a missed case could cause real damage.
-version: 3.6.0
+version: 3.7.1
 ---
 
 # 360 Expert Review
@@ -25,17 +25,17 @@ Try to disprove readiness with concrete failure cases, and fix each with the sma
 
 ### Entry: Optional Token Efficiency
 
-Reuse explicit approval or refusal for `360-token-efficiency` from this session. If unknown and not already offered, ask once whether to enable it for this session; continue the main task with the overlay inactive while unanswered. Explicit user invocation counts as approval; merely appearing in a generated plan does not. On approval, discover and load it through the host's supported skill mechanism, reusing already-loaded instructions. If unavailable, explain briefly and continue; do not install automatically. Refusal disables the overlay, not ordinary efficient habits. Revocation takes effect immediately. Keep consent in-session only; it does not authorize cross-session memory writes. The overlay never invokes itself or restarts the parent skill.
+Reuse this session's approval or refusal of `360-token-efficiency`. If unknown and not yet offered, ask once, in the same question round as any other entry question, and keep the overlay off until answered. Explicit user invocation is approval; a plan that lists the skill is not. On approval, load it through the host's skill mechanism, reusing instructions already loaded; if unavailable, say so briefly and continue without installing it. Refusal turns the overlay off, not ordinary efficient work. Revocation takes effect immediately. Consent lasts this session only and never authorizes cross-session memory writes.
 
 ### Shared Plan Contract
 
 Preserve stable task IDs and existing user decisions. Every task carries: ID, What, How, Where, Depends on, Skills (list or `None`), Parallel, Effort, Priority, Done when (observable). Use `Priority: must | should | could`, `Effort: S | M | L`, and `Parallel: yes | no`. Only `should` and `could` sit below the cut line. Preserve phase checkpoints, change policy, replanning triggers, and objective-to-task traceability.
 
-Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep it `Draft`; a complete unreviewed plan is `Ready for review`; a passed review sets `Reviewed and ready to execute`. Material edits after review return it to `Ready for review` (or `Draft` if blocked). Execution progress belongs in the ledger, not the readiness status. An explicit user instruction to execute a supplied plan authorizes execution without a mandatory sibling review; record that basis without claiming a review occurred.
+Plan status: `Draft` → `Ready for review` → `Reviewed and ready to execute`. Open blocking questions keep a plan `Draft`; a complete unreviewed plan is `Ready for review`; only a passed review sets `Reviewed and ready to execute`, and material edits after it return the plan to `Ready for review` (or `Draft` if blocked). Execution progress lives in the ledger, not in this status. An explicit user instruction to execute a supplied plan authorizes execution without a sibling review; record that basis and never claim a review occurred.
 
 ### Delivery
 
-Prefer a recoverable file when supported, using the existing path or the default below. Honor explicit user output requests. If files are unavailable, deliver the same complete structure in-session and label it `in-session only; not persisted`; never claim a file was saved. With a saved file, chat carries the Reader's Briefing and the path. These delivery rules also apply to the templates and quality gate below.
+Write the deliverable to a recoverable file when the host supports it, at the existing path or the default below. Honor explicit user output requests. Without files, deliver the same complete structure in chat labeled `in-session only; not persisted`, and never claim a file was saved. With a saved file, chat carries the Reader's Briefing and the path. In a non-interactive run where no one can answer, do not wait: record each open question, apply only reversible defaults, mark readiness honestly, and deliver.
 
 Judge completion by observable acceptance checks. A structural or format check does not prove behavior or accuracy; state what was not verified.
 
@@ -44,14 +44,14 @@ Judge completion by observable acceptance checks. A structural or format check d
 - Inspect available instructions, plans, decisions, developer preference records (such as `faculty/` dossiers), relevant artifacts, recent changes, verification and any execution ledger. Establish the current stage and done/pending/blocked work; cite sources and distinguish observed facts from claims. Record unavailable evidence
 - Reuse current evidence and user answers. Resolve discoverable facts by inspection; do not ask the user to rediscover them
 - Separate remaining gaps: material user decisions change the outcome, scope, acceptance criteria, significant cost or irreversible effects; reversible implementation defaults stay within established intent and conventions. Choose supported defaults, record the reason and revisit condition, and proceed. Do not present a default or inference as a fact
-- Ask only for unresolved material decisions, conflicting instructions, or inaccessible facts needed to judge success. Use the available interactive question tool in focused rounds of one to three questions, with the best supported recommendation, its trade-off, and a free-text/custom option. For missing facts, request the needed evidence without inventing it. If tools are unavailable, offer equivalent numbered choices and notes in chat
+- Ask only for unresolved material decisions, conflicting instructions, or inaccessible facts needed to judge success. Use the available interactive question tool in focused rounds of one to four questions, with the best supported recommendation, its trade-off, and a free-text/custom option. For missing facts, request the needed evidence without inventing it. If tools are unavailable, offer equivalent numbered choices and notes in chat
 - Unanswered required questions block dependent planning and readiness, not independent inspection. Silence, a recommendation, a preselected option or elapsed time is not an answer. Honor explicit delegation or deferral within its limits
 - After answers, update the existing context, assumptions or review sections and inspect newly relevant evidence. Stop questioning when material choices are settled; reopen only on new conflicting evidence
 - Compare the supplied plan with current artifacts before judging it. Identify stale assumptions, duplicated completed work and conflicting decisions; preserve valid task IDs and progress records
 
 ### 2. Review Through Expert Lenses
 
-Choose lenses from the plan's nature, reversibility and risks. If the plan or session carries a faculty lens list, seat Cards, or a `Tailored by` row, start from those and add any lens the risks still need. Typical lenses:
+Choose lenses from the plan's nature, reversibility and risks. If the plan or session carries faculty review angles, faculty blocks, or a `Tailored by` row, start from those and add any lens the risks still need. Typical lenses:
 
 - Architecture: boundaries, simplicity, trade-offs
 - Engineering: correctness, edge cases, integration, performance
@@ -102,8 +102,6 @@ Switch to hostile critic. Ask:
 - What is the most damaging failure?
 - Which step could be read two different ways?
 - What cannot be detected, reproduced, or reversed?
-- What can be deleted, and what breaks if it is?
-- Where does the plan build for a case no objective names?
 
 Fix actionable findings and recheck affected risks. Stop when applicable checks pass and material blockers are resolved. An unavailable check stays unknown; if it prevents judging readiness, keep the plan non-final and name the missing evidence or decision. Otherwise disclose the limit without manufacturing required work. Use the clarification loop only for material user decisions; record routine defaults. Do not loop indefinitely.
 
@@ -116,16 +114,14 @@ Fix actionable findings and recheck affected risks. Stop when applicable checks 
 - Include the executor handover in the chosen delivery format
 - If the file cannot be written, use the in-session delivery fallback
 - Ensure required answers were resolved before final delivery. Keep unanswered blockers in `Draft`. Never end by dumping passive questions
-- Print the Reader's Briefing in chat before asking anything. A next-action question with no briefing above it is a failed delivery. If the host sends one message, the briefing comes first in that message
+- Print the Reader's Briefing in chat before any next-action question; when the host sends one message, the briefing comes first
 
 ### Completion: Choose the Next Action
 
-- Finish and verify the current deliverable first; make the result and its location available before asking about follow-on work. Keep artifact readiness separate from the next-action choice: an unanswered suggestion does not reopen completed work, and a blocked job is not complete
-- Check the result, current project stage, remaining risks, and prior user instructions. Recommend the next useful action from the local routing guidance below; skip irrelevant stages and prefer stopping when no useful work remains
-- Use an available interactive question tool to offer one concise next-action choice. Put the best recommendation first, explain why it fits this result, and include a stop/pause choice. Always allow a free-text note or custom direction, including work outside the 360 flow; never force the user into a sibling skill
-- If interactive tools are unavailable, offer equivalent numbered choices with the recommendation, rationale, and explicit custom-note option in chat. This completion prompt is separate from the deliverable briefing; skill names are allowed here, and it is not a passive list of unresolved task questions
-- Reuse an already explicit next-step instruction instead of asking again; continue work it authorizes. Otherwise wait for the user's choice before starting follow-on work. Silence, a preselected recommendation, and elapsed time are not authorization. An explicit stop or request for no suggestions suppresses the prompt
-- When the user chooses, follow that direction and clarify only missing information needed for it. Discover and load a selected skill through the host's supported mechanism; do not assume it is installed or install it automatically. If unavailable, explain and offer an equivalent action. Carry forward artifact paths, decisions, verification, remaining risks, and session consent without restarting intake
+- Deliver and verify the current result first, with its location. An unanswered suggestion never reopens finished work, and a blocked job is not complete
+- Recommend one next action from the local routing below, based on the result, project stage, open risks and prior instructions. Skip stages that do not apply; recommend stopping when no useful work remains
+- Ask with the host's interactive question tool, or with numbered choices in chat when there is none: the recommendation first with its reason, a stop option, and a free-text option for any direction, inside or outside the 360 skills. This prompt is separate from the briefing and is not a list of open task questions
+- An explicit next-step instruction answers this prompt, and an explicit stop or request for no suggestions suppresses it. Otherwise wait for the user's choice; in a non-interactive run, state the recommendation and stop. Silence, a preselected recommendation, and elapsed time are not authorization. On a choice, clarify only what is missing, load a selected skill through the host's mechanism without installing it (offer an equivalent if it is unavailable), and carry forward paths, decisions, verification, risks and session consent
 
 Local routing: Recommend `360-execute` for a finalized executable plan. For a blocked or incomplete review, offer resolution of the concrete blocker or `360-blueprint` for substantial replanning; do not present execution as ready.
 
@@ -193,17 +189,18 @@ Remaining risks
 
 Briefing rules:
 
-- Write for someone who has not read the full artifact. Define or drop any term of art
-- One line per bullet, 20 words or fewer. The whole briefing fits one screen (about 25 lines)
-- Outcomes and decisions, never mechanics: no task IDs, phases, priorities, status tables, executor notes, or skill names
-- Keep new things and changes to existing things in separate sections. Never mix them
-- Confidence uses proven (evidence in hand), likely (strong reason), possible (suspected), or uncertain (hypothesis). Never numbers; never proven without evidence
+- Write for a reader who has not seen the full artifact; define or drop any term of art
+- One line per bullet, 20 words or fewer; the whole briefing fits one screen (about 25 lines)
+- Outcomes and decisions, not mechanics: no task IDs, phases, priorities, status tables, executor notes or skill names
+- Keep new things and changes to existing things in separate sections
+- Confidence is proven (evidence in hand), likely (strong reason), possible (suspected), or uncertain (hypothesis). Never numbers; never proven without evidence
 - The second line names the full artifact's path, or says `in-session only; not persisted`
 - Omit empty sections unless this skill marks one as always present
 - A new artifact goes under `What you'll get`; a change to an existing one goes under `What changes`, showing now and after
 - `What to expect` is always present and observable: a command that runs, a screen that shows, a number that moves. "Works correctly" is not allowed
 - No trailing question list. Required questions use the clarification loop before delivery
-- Every finding pairs the problem, the fix, and the result the user will notice. A finding with no visible result says `no visible change; protects <what>`
+- Every finding pairs the problem, the fix, and the result the user will notice, and may use up to 30 words to fit them. A finding with no visible result says `no visible change; protects <what>`
+- `Size` matches the plan's footprint line
 
 ## Quality Gate
 
@@ -211,16 +208,15 @@ The plan is final only when every applicable answer is yes (record a reason for 
 
 - Real user need understood and served
 - Current project stage and completed work were inspected, or unavailable evidence was explicitly recorded
-- Existing answers were reused; follow-up rounds resolved the goal, scope, outline, and required details without treating silence or recommendations as consent
-- Lenses were chosen from the plan's risks and any faculty lens list; each applied lens has findings or a stated reason for none
+- Existing answers were reused; questions covered only unresolved material decisions, and silence or recommendations were not treated as consent
+- Lenses were chosen from the plan's risks and any faculty review angles; each applied lens has findings or a stated reason for none
 - Version-specific or fast-moving claims cite a current source or remain hypotheses with a named check
 - Relevant requirements, likely failures and severe plausible failures were checked; inspection limits are explicit
 - Every actionable finding has a trigger, consequence, evidence or hypothesis, and smallest correction; severity and confidence are separate
 - Relevant requirements are traceable to tasks and observable verification; monitoring is included only where needed
-- Material failure cases have proportionate detection, diagnosis and recovery checks
+- Material failure cases have proportionate tests and detection, diagnosis and recovery checks
 - The design is clear, consistent, and as simple as possible
 - The lean audit ran, cuts were reported next to additions, and no added work lacks a named failure it prevents
-- Testing matches the risk
 - Release and rollback checks address the plan's relevant failure cases
 - The plan survived hostile review
 - Material decisions were resolved through the clarification loop; defaults and unknown evidence are explicit, never silent passes
@@ -230,6 +226,6 @@ The plan is final only when every applicable answer is yes (record a reason for 
 - Each finding in the briefing states problem, fix, and the result the user will notice
 - The briefing follows the briefing rules
 - The Reader's Briefing was printed in chat before any next-action question
-- Completion includes the interactive next-action offer with a recommendation, stop choice, and custom-note option, or the explicit-instruction/parent-owned exception; unanswered suggestions do not block the completed deliverable
+- Completion offered one recommended next action with stop and free-text options, or followed an explicit instruction or the parent skill's prompt; an unanswered suggestion does not block the finished deliverable
 
 Any unresolved "no" keeps the plan non-final. Fix actionable findings or report the blocker and the evidence or decision needed to resolve it.
